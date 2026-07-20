@@ -42,7 +42,7 @@ export default function HeroSection() {
         </div>
         <div className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[0.72rem] tracking-wide">
           <span className="h-2 w-2 animate-pulse rounded-full bg-[#51e08a] shadow-[0_0_12px_#51e08a]" />
-          2026 届应届 · 现居长沙 · 意向北上广深
+          2026 届毕业生 · 现居长沙 · 意向北上广深
         </div>
       </FadeIn>
 

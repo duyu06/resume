@@ -44,7 +44,7 @@ export default function DockNav() {
             href={l.href}
             className={`whitespace-nowrap rounded-full px-2.5 py-2 font-display text-[0.62rem] font-semibold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-[0.72rem] ${
               on
-                ? 'pill-grad text-white shadow-[0_6px_18px_rgba(182,0,168,0.4)]'
+                ? 'pill-grad text-white shadow-[0_6px_18px_rgba(255,255,255,0.15)]'
                 : 'text-ink-dim hover:text-white'
             }`}
           >

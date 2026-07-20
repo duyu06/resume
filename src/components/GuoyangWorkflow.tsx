@@ -1,4 +1,4 @@
-import { ArrowDown, Clapperboard, FileText, Film, Image, LayoutGrid, UserRound, Video } from 'lucide-react';
+import { ArrowRight, Clapperboard, FileText, Film, Image, LayoutGrid, UserRound, Video } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
@@ -238,7 +238,7 @@ export default function GuoyangWorkflow() {
               </FadeIn>
               {i < steps.length - 1 && (
                 <div className="flex shrink-0 items-center pt-12">
-                  <ArrowDown className="h-5 w-5 text-ink/30" strokeWidth={2} />
+                  <ArrowRight className="h-5 w-5 text-ink/30" strokeWidth={2} />
                 </div>
               )}
             </div>
@@ -251,7 +251,7 @@ export default function GuoyangWorkflow() {
               <MobileCard step={step} index={i} />
               {i < steps.length - 1 && (
                 <div className="py-1">
-                  <ArrowDown className="h-5 w-5 text-ink/25" strokeWidth={2} />
+                  <ArrowRight className="h-5 w-5 text-ink/25" strokeWidth={2} />
                 </div>
               )}
             </div>

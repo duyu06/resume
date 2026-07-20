@@ -18,7 +18,7 @@ export default function Footer() {
       <div className="mx-auto max-w-[1200px]">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-4 text-sm text-white/50">
-            <span className="font-['Noto_Sans_SC'] text-white/60">张滨文 · AI 产品经理</span>
+            <span className="font-['Noto_Sans_SC'] text-white/60">© 2026 张滨文 · AI 产品经理</span>
             {links.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
@@ -32,7 +32,7 @@ export default function Footer() {
               </a>
             ))}
           </div>
-          <span className="text-xs text-white/40">© 2026 · 长沙 · 意向北上广深 / 苏州 / 佛山</span>
+          <span className="text-xs text-white/40">Designed & Built by Zhang Binwen</span>
         </div>
       </div>
     </motion.footer>

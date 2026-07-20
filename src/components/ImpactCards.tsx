@@ -32,9 +32,9 @@ const cards: Card[] = [
   },
   {
     icon: FileCheck,
-    stat: '26+25',
-    label: '标准测试 Prompt 与评分体系',
-    desc: '形成模型横向评测方法',
+    stat: '26 条',
+    label: '标准测试 Prompt',
+    desc: '25 分制 · 五维模型评分体系',
   },
 ];
 

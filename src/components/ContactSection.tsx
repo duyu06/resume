@@ -18,8 +18,10 @@ const item = {
   },
 };
 
+const pdfUrl = `${import.meta.env.BASE_URL}resume.pdf`;
+
 const actions = [
-  { icon: FileDown, label: '下载 PDF 简历', type: 'link' as const, href: '/resume.pdf', download: true },
+  { icon: FileDown, label: '下载 PDF 简历', type: 'link' as const, href: pdfUrl, download: true },
   { icon: Copy, label: '复制邮箱', type: 'copy' as const },
   { icon: Code, label: '查看 GitHub', type: 'link' as const, href: 'https://github.com/duyu06' },
   { icon: ExternalLink, label: '访问 果漾 AI', type: 'link' as const, href: 'https://guoyang.xin' },
@@ -48,7 +50,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section className="bg-bg px-5 pb-24 pt-16 sm:px-8 md:px-10 md:pb-32 md:pt-28">
+    <section id="contact" className="bg-bg px-5 pb-24 pt-16 sm:px-8 md:px-10 md:pb-32 md:pt-28">
       <motion.div
         className="mx-auto max-w-5xl"
         variants={container}
@@ -73,7 +75,7 @@ export default function ContactSection() {
                 正在寻找：AI 产品经理 / 技术产品经理 / AI 解决方案产品经理
               </p>
               <p className="mt-3 font-body text-sm leading-relaxed text-ink/50">
-                2026 届毕业生 · 现居长沙 · 意向北上广深 / 苏州 / 佛山
+                2026 届毕业生 · 现居长沙 · 意向北上广深
               </p>
             </div>
 
@@ -128,7 +130,7 @@ export default function ContactSection() {
               <div className="space-y-4 font-body text-sm text-ink-dim">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-ink/50">最快到岗</span>
-                  <span>毕业后</span>
+                  <span>1 周内到岗</span>
                 </div>
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-ink/50">出差</span>
@@ -147,10 +149,6 @@ export default function ContactSection() {
           </motion.div>
         </div>
       </motion.div>
-
-      <footer className="mt-16 text-center text-xs tracking-wide text-ink-dim md:mt-20">
-        &copy; 2026 张滨文 &middot; AI 产品经理 &middot; Viktor Oddy &times; Layered Depth &times; 3D Jack
-      </footer>
     </section>
   );
 }

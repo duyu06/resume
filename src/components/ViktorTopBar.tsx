@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import ContactButton from './ContactButton';
 
 const links = [
-  { href: '#about', label: 'About' },
-  { href: '#projects', label: 'Work' },
-  { href: '#career', label: 'Resume' },
-  { href: '#contact', label: 'Say hi ↗' },
+  { href: '#hero', label: '首页' },
+  { href: '#about', label: '关于' },
+  { href: '#projects', label: '项目' },
+  { href: '#guoyang', label: '果漾' },
+  { href: '#contact', label: '联系' },
 ];
 
 export default function ViktorTopBar() {
