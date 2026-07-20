@@ -28,7 +28,7 @@ export default function ViktorTopBar() {
       >
         <a
           href="#hero"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent-3 font-display text-[11px] font-bold italic text-white sm:h-10 sm:w-10 sm:text-xs"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black font-display text-[11px] font-bold italic text-white ring-1 ring-white/20 sm:h-10 sm:w-10 sm:text-xs"
           title="回到顶部"
         >
           ZB
