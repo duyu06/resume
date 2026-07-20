@@ -1,4 +1,4 @@
-import { ArrowRight, Clapperboard, FileText, Film, Image, LayoutGrid, UserRound, Video } from 'lucide-react';
+import { ArrowDown, ArrowRight, Clapperboard, FileText, Film, Image, LayoutGrid, UserRound, Video } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
@@ -255,7 +255,7 @@ export default function GuoyangWorkflow() {
               <MobileCard step={step} index={i} />
               {i < steps.length - 1 && (
                 <div className="py-1">
-                  <ArrowRight className="h-5 w-5 text-ink/25" strokeWidth={2} />
+                  <ArrowDown className="h-5 w-5 text-ink/25" strokeWidth={2} />
                 </div>
               )}
             </div>

@@ -33,7 +33,7 @@ export default function DockNav() {
 
   return (
     <nav
-      className="fixed bottom-4 left-1/2 z-[900] flex -translate-x-1/2 gap-1 rounded-full border border-ink/15 bg-bg/55 px-2 py-1.5 shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:bottom-6 sm:gap-1.5 sm:px-2.5 sm:py-2"
+      className="fixed bottom-4 left-1/2 z-[900] flex -translate-x-1/2 gap-1 rounded-full border border-ink/15 bg-bg/55 px-2 py-1.5 shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:bottom-6 sm:gap-1.5 sm:px-2.5 sm:py-2 md:hidden"
       aria-label="页面导航"
     >
       {links.map((l) => {

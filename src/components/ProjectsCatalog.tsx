@@ -201,14 +201,14 @@ function ProjectDetailModal({
               <button
                 ref={prevRef}
                 onClick={() => setImgIdx((i) => (i > 0 ? i - 1 : project.imgs.length - 1))}
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white/80 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity hover:bg-black/70"
                 aria-label="上一张"
               >
                 <ArrowLeft size={18} />
               </button>
               <button
                 onClick={() => setImgIdx((i) => (i < project.imgs.length - 1 ? i + 1 : 0))}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white/80 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity hover:bg-black/70"
                 aria-label="下一张"
               >
                 <ArrowRight size={18} />
