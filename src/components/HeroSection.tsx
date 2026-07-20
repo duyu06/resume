@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
 
-const tags = ['产品设计', 'AI 落地', '技术协同', '部署交付', 'AI 电商', '独立站', 'RPA 自动化'];
+const tags = ['AI 产品设计', '多模态应用', '技术方案', '原型与交付'];
 
 export default function HeroSection() {
   const root = useRef<HTMLElement>(null);
@@ -57,7 +57,12 @@ export default function HeroSection() {
         </FadeIn>
         <FadeIn delay={0.28} y={24}>
           <p className="font-display text-[clamp(0.95rem,2.8vw,1.75rem)] font-medium tracking-wide text-ink">
-            AI 产品经理 · 技术产品经理 · AI 解决方案产品经理
+            AI 产品经理 · 懂技术、能落地的 2026 届毕业生
+          </p>
+        </FadeIn>
+        <FadeIn delay={0.34} y={20}>
+          <p className="mt-1 font-body text-sm leading-relaxed text-ink-dim md:text-base">
+            从需求拆解、模型选型，到原型开发与部署验证
           </p>
         </FadeIn>
         <FadeIn delay={0.4} y={20}>
@@ -75,12 +80,12 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-30 flex flex-wrap items-end justify-between gap-5">
-        <FadeIn delay={0.35} y={20}>
+        <FadeIn delay={0.5} y={20}>
           <p className="max-w-[300px] font-display text-[clamp(0.75rem,1.4vw,1.05rem)] font-light uppercase leading-snug tracking-wide text-ink">
-            产品设计 + AI 落地 + 技术协同 + 部署交付 · 内容生产 · 电商 · RPA 自动化
+            产品设计 + AI 落地 + 原型开发 + 部署交付
           </p>
         </FadeIn>
-        <FadeIn delay={0.5} y={20}>
+        <FadeIn delay={0.6} y={20}>
           <ContactButton href="#projects" label="查看作品集" />
         </FadeIn>
       </div>

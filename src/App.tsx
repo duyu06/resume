@@ -10,6 +10,7 @@ import AboutSection from './components/AboutSection';
 import GuoyangFeature from './components/GuoyangFeature';
 import GuoyangWorkflow from './components/GuoyangWorkflow';
 import CareerTimeline from './components/CareerTimeline';
+import EducationSection from './components/EducationSection';
 import ProjectsCatalog from './components/ProjectsCatalog';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
@@ -30,6 +31,7 @@ export default function App() {
         <GuoyangFeature />
         <GuoyangWorkflow />
         <CareerTimeline />
+        <EducationSection />
         <ProjectsCatalog />
         <ContactSection />
       </main>

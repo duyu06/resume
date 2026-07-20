@@ -78,7 +78,7 @@ const steps: Step[] = [
     subtitle: 'Keyframe',
     fields: [
       { key: 'input', value: '分镜脚本' },
-      { key: 'model', value: 'Kling / Seedance' },
+      { key: 'model', value: 'Nano Banana Pro / Doubao-Seedream-5.0 / FLUX' },
       { key: 'output', value: '关键帧图片' },
       { key: 'evaluation', value: '动作幅度、角色一致性' },
       { key: 'exception', value: '超时切换备用模型' },
@@ -90,7 +90,7 @@ const steps: Step[] = [
     subtitle: 'Generation',
     fields: [
       { key: 'input', value: '分镜 + 首尾帧 + 动作描述' },
-      { key: 'model', value: 'Kling / Seedance / Veo' },
+      { key: 'model', value: 'Kling Video / Doubao-Seedance-2.0 / Veo' },
       { key: 'output', value: '逐镜头视频' },
       { key: 'evaluation', value: '动作自然度、生成时长、成本' },
       { key: 'exception', value: '超时重试、模型切换、结果留存' },
@@ -108,23 +108,25 @@ const steps: Step[] = [
   },
 ];
 
-function NodeCard({ step, index }: { step: Step; index: number }) {
-  const [hovered, setHovered] = useState(false);
+function NodeCard({ step, index, active, onToggle }: { step: Step; index: number; active: boolean; onToggle: () => void }) {
   const Icon = step.icon;
 
   return (
-    <div
-      className="group relative flex flex-col items-center"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <motion.div
-        className="glass flex w-[130px] cursor-default flex-col items-center gap-2 rounded-2xl px-3 py-4 transition-colors duration-300 hover:border-accent/35"
-        whileHover={{ y: -4 }}
+    <div className="group relative flex flex-col items-center">
+      <button
+        className="glass flex w-[130px] cursor-pointer flex-col items-center gap-2 rounded-2xl px-3 py-4 transition-colors duration-300 hover:border-accent/35"
+        onClick={onToggle}
+        onFocus={onToggle}
+        aria-expanded={active}
+        aria-label={`${step.title}: ${step.subtitle}`}
       >
-        <div className="rounded-xl bg-gradient-to-br from-accent/25 to-accent-3/10 p-2.5">
-          <Icon className="h-5 w-5 text-ink" strokeWidth={1.75} />
-        </div>
+        <motion.div
+          whileHover={{ y: -4 }}
+        >
+          <div className="rounded-xl bg-gradient-to-br from-accent/25 to-accent-3/10 p-2.5">
+            <Icon className="h-5 w-5 text-ink" strokeWidth={1.75} />
+          </div>
+        </motion.div>
         <span className="font-mono text-[0.6rem] uppercase tracking-widest text-ink-dim">
           {String(index + 1).padStart(2, '0')}
         </span>
@@ -134,10 +136,10 @@ function NodeCard({ step, index }: { step: Step; index: number }) {
         <span className="-mt-1 text-[0.6rem] uppercase tracking-widest text-ink-dim">
           {step.subtitle}
         </span>
-      </motion.div>
+      </button>
 
       <AnimatePresence>
-        {hovered && (
+        {active && (
           <motion.div
             initial={{ opacity: 0, y: -6, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -209,6 +211,8 @@ function MobileCard({ step, index }: { step: Step; index: number }) {
 }
 
 export default function GuoyangWorkflow() {
+  const [activeStep, setActiveStep] = useState<number | null>(null);
+
   return (
     <section id="guoyang-workflow" className="relative bg-bg px-5 py-20 sm:px-8 md:px-10 md:py-28">
       <div className="mx-auto max-w-6xl">
@@ -230,11 +234,11 @@ export default function GuoyangWorkflow() {
           </div>
         </FadeIn>
 
-        <div className="hidden md:flex md:items-start md:justify-center md:gap-1.5 lg:gap-2">
+        <div className="hidden xl:flex xl:items-start xl:justify-center xl:gap-1.5">
           {steps.map((step, i) => (
             <div key={step.title} className="flex items-start">
               <FadeIn delay={i * 0.07} y={24}>
-                <NodeCard step={step} index={i} />
+                <NodeCard step={step} index={i} active={activeStep === i} onToggle={() => setActiveStep(activeStep === i ? null : i)} />
               </FadeIn>
               {i < steps.length - 1 && (
                 <div className="flex shrink-0 items-center pt-12">
@@ -245,7 +249,7 @@ export default function GuoyangWorkflow() {
           ))}
         </div>
 
-        <div className="flex flex-col items-center gap-3 md:hidden">
+        <div className="flex flex-col items-center gap-3 xl:hidden">
           {steps.map((step, i) => (
             <div key={step.title} className="flex w-full flex-col items-center">
               <MobileCard step={step} index={i} />

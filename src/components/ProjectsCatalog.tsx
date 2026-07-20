@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ExternalLink, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink, X } from 'lucide-react';
 
 type Project = {
   n: string;
@@ -133,16 +133,23 @@ function ProjectDetailModal({
   project: Project;
   onClose: () => void;
 }) {
+  const [imgIdx, setImgIdx] = useState(0);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const prevRef = useRef<HTMLButtonElement>(null);
+
   const onKey = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft') setImgIdx((i) => (i > 0 ? i - 1 : project.imgs.length - 1));
+      if (e.key === 'ArrowRight') setImgIdx((i) => (i < project.imgs.length - 1 ? i + 1 : 0));
     },
-    [onClose],
+    [onClose, project.imgs.length],
   );
 
   useEffect(() => {
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
+    prevRef.current?.focus();
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
@@ -156,6 +163,9 @@ function ProjectDetailModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
     >
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
@@ -163,6 +173,7 @@ function ProjectDetailModal({
       />
 
       <motion.div
+        ref={dialogRef}
         className="relative glass w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl p-6 md:p-8"
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -172,18 +183,51 @@ function ProjectDetailModal({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-colors z-10"
-          aria-label="Close"
+          aria-label="关闭项目详情"
         >
           <X size={20} />
         </button>
 
-        <div className="aspect-video rounded-xl overflow-hidden mb-6 bg-white/5">
+        {/* Image gallery */}
+        <div className="relative aspect-video rounded-xl overflow-hidden mb-6 bg-white/5 group">
           <img
-            src={`${IMG_BASE}${project.imgs[0]}`}
-            alt={project.name}
+            src={`${IMG_BASE}${project.imgs[imgIdx]}`}
+            alt={`${project.name} 截图 ${imgIdx + 1}`}
             className="w-full h-full object-cover"
-            loading="lazy"
           />
+
+          {project.imgs.length > 1 && (
+            <>
+              <button
+                ref={prevRef}
+                onClick={() => setImgIdx((i) => (i > 0 ? i - 1 : project.imgs.length - 1))}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                aria-label="上一张"
+              >
+                <ArrowLeft size={18} />
+              </button>
+              <button
+                onClick={() => setImgIdx((i) => (i < project.imgs.length - 1 ? i + 1 : 0))}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                aria-label="下一张"
+              >
+                <ArrowRight size={18} />
+              </button>
+
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {project.imgs.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setImgIdx(i)}
+                    className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                      i === imgIdx ? 'bg-white' : 'bg-white/40'
+                    }`}
+                    aria-label={`第 ${i + 1} 张`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         <span className="pill-grad inline-block rounded-full px-3 py-1 text-xs text-ink-dim mb-3">
@@ -191,6 +235,7 @@ function ProjectDetailModal({
         </span>
 
         <h3
+          id="modal-title"
           className="hero-heading text-2xl md:text-3xl mb-2"
           style={{ fontFamily: 'var(--font-display)' }}
         >

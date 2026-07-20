@@ -10,7 +10,7 @@
   --color-accent-3: rgba(255, 255, 255, 0.3);
   --font-display: "Orbitron", "Noto Sans SC", system-ui, sans-serif;
   --font-body: "Space Grotesk", "Noto Sans SC", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Noto Sans SC", monospace;
+  --font-mono: "Noto Sans SC", ui-monospace, "Cascadia Code", "Consolas", monospace;
 }
 
 @layer base {

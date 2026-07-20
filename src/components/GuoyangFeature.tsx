@@ -9,7 +9,7 @@ const features = [
   { icon: MessageSquare, title: '对话式创作', desc: '多轮对话迭代修改，持续打磨效果' },
 ];
 
-const models = ['Nanobanana Pro', 'Seedream-5.0', 'Seedance-2.0', 'Gemini 3 Pro'];
+const models = ['Nano Banana Pro', 'Doubao-Seedream-5.0', 'Doubao-Seedance-2.0', 'Gemini 3.1 Pro'];
 
 const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`;
 
