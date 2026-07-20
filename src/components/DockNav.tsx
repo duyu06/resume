@@ -4,9 +4,8 @@ const links = [
   { href: '#hero', label: '首页' },
   { href: '#about', label: '关于' },
   { href: '#guoyang', label: '果漾' },
-  { href: '#work', label: '作品' },
+  { href: '#career', label: '经历' },
   { href: '#projects', label: '项目' },
-  { href: '#certs', label: '认证' },
   { href: '#contact', label: '联系' },
 ];
 

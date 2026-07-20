@@ -5,15 +5,14 @@ import CursorGlow from './components/CursorGlow';
 import ViktorTopBar from './components/ViktorTopBar';
 import DockNav from './components/DockNav';
 import HeroSection from './components/HeroSection';
-import MarqueeSection from './components/MarqueeSection';
+import ImpactCards from './components/ImpactCards';
 import AboutSection from './components/AboutSection';
 import GuoyangFeature from './components/GuoyangFeature';
-import ViktorWorkStrip from './components/ViktorWorkStrip';
-import CareerSection from './components/CareerSection';
-import ProjectsSection from './components/ProjectsSection';
-import ExperienceSection from './components/ExperienceSection';
-import CertGallery from './components/CertGallery';
+import GuoyangWorkflow from './components/GuoyangWorkflow';
+import CareerTimeline from './components/CareerTimeline';
+import ProjectsCatalog from './components/ProjectsCatalog';
 import ContactSection from './components/ContactSection';
+import Footer from './components/Footer';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -26,16 +25,15 @@ export default function App() {
       <ViktorTopBar />
       <main className="overflow-x-clip bg-bg">
         <HeroSection />
-        <MarqueeSection />
+        <ImpactCards />
         <AboutSection />
         <GuoyangFeature />
-        <ViktorWorkStrip />
-        <CareerSection />
-        <ProjectsSection />
-        <ExperienceSection />
-        <CertGallery />
+        <GuoyangWorkflow />
+        <CareerTimeline />
+        <ProjectsCatalog />
         <ContactSection />
       </main>
+      <Footer />
       <DockNav />
     </>
   );

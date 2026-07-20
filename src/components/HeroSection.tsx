@@ -31,10 +31,9 @@ export default function HeroSection() {
       ref={root}
       className="relative flex min-h-dvh flex-col justify-between overflow-hidden px-5 pb-28 pt-20 sm:px-8 md:px-10 md:pb-32 md:pt-24"
     >
-      <div className="depth-layer pointer-events-none absolute inset-0" data-depth="0.06" aria-hidden>
-        <div className="absolute -left-[8%] -top-[10%] h-[46vw] w-[46vw] rounded-full bg-[radial-gradient(circle,#B600A8,transparent_70%)] opacity-55 blur-[60px]" />
-        <div className="absolute -bottom-[12%] -right-[6%] h-[40vw] w-[40vw] rounded-full bg-[radial-gradient(circle,#7621B0,transparent_70%)] opacity-55 blur-[60px]" />
-        <div className="absolute left-[55%] top-[40%] h-[30vw] w-[30vw] rounded-full bg-[radial-gradient(circle,#BE4C00,transparent_70%)] opacity-40 blur-[60px]" />
+      <div className="depth-layer pointer-events-none absolute inset-0" data-depth="0.05" aria-hidden>
+        <div className="absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.03]" />
+        <div className="absolute left-1/2 top-1/2 h-[90vmin] w-[90vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.015]" />
       </div>
 
       <FadeIn delay={0} y={-20} className="relative z-30 flex items-start justify-between gap-4">
@@ -47,36 +46,11 @@ export default function HeroSection() {
         </div>
       </FadeIn>
 
-      <div
-        className="glass absolute left-[4%] top-[16%] z-20 hidden max-w-[180px] rounded-[20px] px-4 py-3.5 md:block"
-        data-depth="0.18"
-      >
-        <div className="text-[0.62rem] uppercase tracking-[0.18em] text-ink-dim">数据处理</div>
-        <div className="hero-heading mt-1 font-display text-3xl font-black leading-none">7,328</div>
-        <div className="mt-1 text-[0.66rem] text-ink-dim">条对话数据清洗与标注</div>
-      </div>
-      <div
-        className="glass absolute right-[4%] top-[28%] z-20 hidden max-w-[180px] rounded-[20px] px-4 py-3.5 text-right md:block"
-        data-depth="0.12"
-      >
-        <div className="text-[0.62rem] uppercase tracking-[0.18em] text-ink-dim">推理吞吐</div>
-        <div className="hero-heading mt-1 font-display text-3xl font-black leading-none">18+</div>
-        <div className="mt-1 text-[0.66rem] text-ink-dim">token/s 本地稳定运行</div>
-      </div>
-      <div
-        className="glass absolute bottom-[32%] left-[8%] z-20 hidden max-w-[190px] rounded-[20px] px-4 py-3.5 lg:block"
-        data-depth="0.08"
-      >
-        <div className="text-[0.62rem] uppercase tracking-[0.18em] text-ink-dim">部署提效</div>
-        <div className="hero-heading mt-1 font-display text-3xl font-black leading-none">4h→20min</div>
-        <div className="mt-1 text-[0.66rem] text-ink-dim">单次部署时间缩短</div>
-      </div>
-
       <div className="relative z-20 flex flex-1 flex-col items-center justify-center gap-3 py-10 text-center">
         <FadeIn delay={0.15} y={40} className="w-full overflow-hidden">
           <h1
             className="hero-heading font-display text-[14vw] font-black uppercase leading-none tracking-tight sm:text-[15vw] md:text-[16vw] lg:text-[12vw]"
-            data-depth="0.14"
+            data-depth="0.12"
           >
             张滨文
           </h1>
@@ -91,7 +65,7 @@ export default function HeroSection() {
             {tags.map((t) => (
               <span
                 key={t}
-                className="rounded-full border border-ink/15 bg-white/5 px-3 py-1.5 text-[0.72rem] tracking-wide backdrop-blur-md"
+                className="rounded-full border border-ink/15 bg-white/5 px-3 py-1.5 text-[0.72rem] tracking-wide backdrop-blur-md transition-colors duration-300 hover:border-white/30 hover:bg-white/10"
               >
                 {t}
               </span>
@@ -107,7 +81,7 @@ export default function HeroSection() {
           </p>
         </FadeIn>
         <FadeIn delay={0.5} y={20}>
-          <ContactButton href="#contact" />
+          <ContactButton href="#projects" label="查看作品集" />
         </FadeIn>
       </div>
     </section>
