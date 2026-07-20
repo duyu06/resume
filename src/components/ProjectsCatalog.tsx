@@ -47,6 +47,7 @@ const projects: Project[] = [
       '按商品理解/抠图/背景生成/图像编辑/高清放大拆分模型能力，规划异步任务与套餐商业化',
     ],
     result: '完成产品需求、核心流程、Prompt 模板体系、模型能力拆分和质量验收标准，形成可联动独立站商品后台的 AI 电商素材生产闭环。',
+    link: `${import.meta.env.BASE_URL}demos/ai-ecommerce/`,
     imgs: ['proj-02-a.png', 'proj-02-b.png'],
   },
   {
@@ -62,6 +63,7 @@ const projects: Project[] = [
       'view_item / add_to_cart / begin_checkout / purchase 埋点及转化漏斗；联动 AI 主图生成器',
     ],
     result: '完成独立站核心业务架构、用户流程、商品与订单模型、后台清单、交易规则、埋点指标和 MVP 迭代规划。',
+    link: `${import.meta.env.BASE_URL}demos/cross-border/`,
     imgs: ['proj-03-a.png', 'proj-03-b.png'],
   },
   {
@@ -77,6 +79,7 @@ const projects: Project[] = [
       '加载超时/元素变化/登录失效/频率控制/人工确认等异常处理与风险管控节点',
     ],
     result: '完成多账号任务导入、独立环境启动、自定义执行和结果回写的完整工作流原型，沉淀流程模板与异常处理机制。',
+    link: `${import.meta.env.BASE_URL}demos/rpa/`,
     imgs: ['proj-07-a.png', 'proj-07-b.png'],
   },
   {
@@ -92,6 +95,7 @@ const projects: Project[] = [
       '构建 26 条标准测试 Prompt + 25 分制评分卡，五维评测模型版本',
     ],
     result: '不足两周完成需求、数据、训练、评测、部署和 API 调用全流程，Loss 正常收敛；沉淀数据模板、标准测试集与评分卡。',
+    link: `${import.meta.env.BASE_URL}demos/digitalhuman/`,
     imgs: ['proj-04-a.png', 'proj-04-b.png'],
   },
   {
@@ -107,6 +111,7 @@ const projects: Project[] = [
       'temperature、top-p、repeat_penalty 等场景化调参，输出质量与资源占用平衡',
     ],
     result: '推理吞吐稳定 18+ token/s，显存 < 85%，7×24 小时运行；形成可复用的部署、监控、调优和故障排查方案。',
+    link: `${import.meta.env.BASE_URL}demos/webui/`,
     imgs: ['proj-05-a.png', 'proj-05-b.png'],
   },
   {
@@ -122,6 +127,7 @@ const projects: Project[] = [
       '模拟/API 双模式 Tkinter GUI，先验证流程再接入真实模型',
     ],
     result: '完成可交互 0—1 多 Agent 产品原型，验证多角色协作与分支叙事技术可行性，沉淀可复用 Prompt 与状态管理范式。',
+    link: `${import.meta.env.BASE_URL}demos/soulcaller/`,
     imgs: ['proj-06-a.png', 'proj-06-b.png'],
   },
 ];
@@ -285,7 +291,7 @@ function ProjectDetailModal({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 pill-grad rounded-full px-5 py-2.5 text-sm hover:bg-white/[0.12] transition-colors group"
           >
-            访问产品
+            {project.n === '01' ? '访问产品' : '查看 Demo'}
             <ExternalLink
               size={14}
               className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
