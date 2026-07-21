@@ -1,23 +1,30 @@
-name: Capture cross-border screenshots v4
+name: Capture all demo screenshots
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
+      - .github/workflows/capture-cross-border-v2.yml
+      - public/demos/shared/**
+      - public/demos/ai-ecommerce/**
+      - public/demos/digitalhuman/**
+      - public/demos/rpa/**
       - public/demos/cross-border/**
+      - public/demos/webui/**
+      - public/demos/soulcaller/**
 
 permissions:
   contents: write
 
 concurrency:
-  group: capture-cross-border
+  group: capture-all-demo-screenshots
   cancel-in-progress: true
 
 jobs:
   capture:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -30,17 +37,27 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          url="https://duyu06.github.io/resume/demos/cross-border/?capture=${GITHUB_SHA}"
-          for attempt in $(seq 1 36); do
-            html="$(curl -fsSL --retry 2 --connect-timeout 10 "$url" || true)"
-            if grep -q "Blue Nile" <<<"$html" && grep -q "hero-section" <<<"$html"; then
-              echo "Blue Nile storefront is live."
+          base="https://duyu06.github.io/resume/demos"
+          for attempt in $(seq 1 60); do
+            ai="$(curl -fsSL --retry 2 --connect-timeout 10 "$base/ai-ecommerce/?capture=${GITHUB_SHA}" || true)"
+            digital="$(curl -fsSL --retry 2 --connect-timeout 10 "$base/digitalhuman/?capture=${GITHUB_SHA}" || true)"
+            rpa="$(curl -fsSL --retry 2 --connect-timeout 10 "$base/rpa/?capture=${GITHUB_SHA}" || true)"
+            cross="$(curl -fsSL --retry 2 --connect-timeout 10 "$base/cross-border/?capture=${GITHUB_SHA}" || true)"
+            webui="$(curl -fsSL --retry 2 --connect-timeout 10 "$base/webui/?capture=${GITHUB_SHA}" || true)"
+            soul="$(curl -fsSL --retry 2 --connect-timeout 10 "$base/soulcaller/?capture=${GITHUB_SHA}" || true)"
+            if grep -q "PixelForge" <<<"$ai" \
+              && grep -q "SoulAI" <<<"$digital" \
+              && grep -q "FlowPilot" <<<"$rpa" \
+              && grep -q "NOVA Goods" <<<"$cross" \
+              && grep -q "LocalStack AI" <<<"$webui" \
+              && grep -q "叫魂者" <<<"$soul"; then
+              echo "All redesigned demos are live."
               exit 0
             fi
-            echo "Waiting for Pages deployment (${attempt}/36)..."
+            echo "Waiting for Pages deployment (${attempt}/60)..."
             sleep 10
           done
-          echo "Latest cross-border page was not deployed in time." >&2
+          echo "Latest demo pages were not deployed in time." >&2
           exit 1
 
       - name: Set up Node.js
@@ -54,68 +71,107 @@ jobs:
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
-      - name: Capture live responsive screenshots
+      - name: Capture live project screenshots
         shell: bash
         run: |
           node <<'NODE'
           const { chromium } = require('playwright');
           const fs = require('node:fs');
 
-          async function waitForAssets(page) {
-            await page.waitForSelector('.hero-section', { timeout: 45000 });
-            await page.waitForSelector('.hero-image-wrapper img', { timeout: 45000 });
-            await page.evaluate(async () => {
-              if (document.fonts?.ready) await document.fonts.ready;
-              const images = [...document.images];
-              await Promise.all(images.map((img) => {
-                if (img.complete) return Promise.resolve();
-                return new Promise((resolve) => {
-                  const done = () => resolve();
-                  img.addEventListener('load', done, { once: true });
-                  img.addEventListener('error', done, { once: true });
-                  setTimeout(done, 20000);
-                });
-              }));
-            });
-            await page.waitForTimeout(1800);
-          }
+          const demos = [
+            {
+              slug: 'ai-ecommerce', a: 'proj-02-a.png', b: 'proj-02-b.png',
+              interact: async (page) => {
+                await page.locator('.variant-card').nth(1).click();
+                await page.waitForTimeout(500);
+              },
+            },
+            {
+              slug: 'digitalhuman', a: 'proj-04-a.png', b: 'proj-04-b.png',
+              interact: async (page) => {
+                await page.locator('#chatInput').fill('我今天终于完成了模型评测。');
+                await page.locator('#chatForm').evaluate((form) => form.requestSubmit());
+                await page.waitForTimeout(500);
+              },
+            },
+            {
+              slug: 'rpa', a: 'proj-07-a.png', b: 'proj-07-b.png',
+              interact: async (page) => {
+                await page.locator('#runTask').click();
+                await page.waitForTimeout(1500);
+              },
+            },
+            {
+              slug: 'cross-border', a: 'proj-03-a.png', b: 'proj-03-b.png',
+              interact: async (page) => {
+                await page.locator('.product').nth(0).click();
+                await page.locator('.product').nth(1).click();
+                await page.waitForTimeout(500);
+              },
+            },
+            {
+              slug: 'webui', a: 'proj-05-a.png', b: 'proj-05-b.png',
+              interact: async (page) => {
+                await page.locator('.model-card').nth(1).click();
+                await page.locator('#deployBtn').click();
+                await page.waitForTimeout(1500);
+              },
+            },
+            {
+              slug: 'soulcaller', a: 'proj-06-a.png', b: 'proj-06-b.png',
+              interact: async (page) => {
+                const card = page.locator('.agent-card.front');
+                const box = await card.boundingBox();
+                if (box) {
+                  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+                  await page.mouse.down();
+                  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 145, { steps: 8 });
+                  await page.mouse.up();
+                  await page.waitForTimeout(750);
+                }
+              },
+            },
+          ];
 
           (async () => {
-            const browser = await chromium.launch({ headless: true });
             fs.mkdirSync('public/assets/projects', { recursive: true });
-            const url = `https://duyu06.github.io/resume/demos/cross-border/?capture=${Date.now()}`;
+            const browser = await chromium.launch({ headless: true });
 
-            const desktop = await browser.newContext({
-              viewport: { width: 1440, height: 900 },
-              deviceScaleFactor: 1,
-              locale: 'en-US',
-              colorScheme: 'light',
-            });
-            const desktopPage = await desktop.newPage();
-            await desktopPage.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
-            await waitForAssets(desktopPage);
-            await desktopPage.screenshot({
-              path: 'public/assets/projects/proj-03-a.png',
-              type: 'png',
-              animations: 'disabled',
-            });
-            await desktop.close();
-
-            const responsive = await browser.newContext({
-              viewport: { width: 1000, height: 750 },
-              deviceScaleFactor: 1,
-              locale: 'en-US',
-              colorScheme: 'light',
-            });
-            const responsivePage = await responsive.newPage();
-            await responsivePage.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
-            await waitForAssets(responsivePage);
-            await responsivePage.screenshot({
-              path: 'public/assets/projects/proj-03-b.png',
-              type: 'png',
-              animations: 'disabled',
-            });
-            await responsive.close();
+            for (const demo of demos) {
+              const context = await browser.newContext({
+                viewport: { width: 1440, height: 900 },
+                deviceScaleFactor: 1,
+                locale: 'zh-CN',
+                colorScheme: 'light',
+                reducedMotion: 'no-preference',
+              });
+              const page = await context.newPage();
+              const url = `https://duyu06.github.io/resume/demos/${demo.slug}/?capture=${Date.now()}`;
+              await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
+              await page.waitForSelector('.phone', { timeout: 45000 });
+              await page.evaluate(async () => {
+                if (document.fonts?.ready) await document.fonts.ready;
+                await Promise.all([...document.images].map((image) => image.complete
+                  ? Promise.resolve()
+                  : new Promise((resolve) => {
+                      image.addEventListener('load', resolve, { once: true });
+                      image.addEventListener('error', resolve, { once: true });
+                    })));
+              });
+              await page.waitForTimeout(2200);
+              await page.screenshot({
+                path: `public/assets/projects/${demo.a}`,
+                type: 'png',
+                animations: 'disabled',
+              });
+              await demo.interact(page);
+              await page.screenshot({
+                path: `public/assets/projects/${demo.b}`,
+                type: 'png',
+                animations: 'disabled',
+              });
+              await context.close();
+            }
 
             await browser.close();
           })().catch((error) => {
@@ -128,12 +184,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- public/assets/projects/proj-03-a.png public/assets/projects/proj-03-b.png; then
+          files=(
+            public/assets/projects/proj-02-a.png public/assets/projects/proj-02-b.png
+            public/assets/projects/proj-03-a.png public/assets/projects/proj-03-b.png
+            public/assets/projects/proj-04-a.png public/assets/projects/proj-04-b.png
+            public/assets/projects/proj-05-a.png public/assets/projects/proj-05-b.png
+            public/assets/projects/proj-06-a.png public/assets/projects/proj-06-b.png
+            public/assets/projects/proj-07-a.png public/assets/projects/proj-07-b.png
+          )
+          if git diff --quiet -- "${files[@]}"; then
             echo "Screenshots are unchanged."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/assets/projects/proj-03-a.png public/assets/projects/proj-03-b.png
-          git commit -m "chore: refresh Blue Nile project screenshots"
+          git add "${files[@]}"
+          git commit -m "chore: refresh redesigned demo screenshots"
           git push origin HEAD:main
