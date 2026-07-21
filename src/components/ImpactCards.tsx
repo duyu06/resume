@@ -14,21 +14,21 @@ type Card = {
 const cards: Card[] = [
   {
     icon: Database,
-    stat: '7,328',
-    label: '条多模态对话数据',
-    desc: '完成清洗、标注与训练集构建',
+    stat: '1W+ / 7,328',
+    label: '原始数据 / 有效训练数据',
+    desc: '完成清洗、去重、标注与 JSONL 训练集构建',
   },
   {
     icon: Timer,
     stat: '4h→20min',
     label: '模型平台单次部署时间',
-    desc: '通过 Docker Compose 标准化部署',
+    desc: '通过 Docker Compose 标准化服务依赖与部署流程',
   },
   {
     icon: Gauge,
-    stat: '18+',
-    label: 'token/s 本地模型推理吞吐',
-    desc: '建立 GPU 与服务监控',
+    stat: '50+',
+    label: 'token/s 典型本地推理吞吐',
+    desc: '结合 GPU、显存、服务状态与 Token 吞吐监控',
   },
   {
     icon: FileCheck,
@@ -86,7 +86,7 @@ function TiltCard({ icon: Icon, stat, label, desc, index }: Card & { index: numb
         </div>
 
         <motion.div
-          className="hero-heading font-display text-[2.4rem] font-black leading-none tracking-tight sm:text-[3rem]"
+          className="hero-heading font-display text-[2.2rem] font-black leading-none tracking-tight sm:text-[2.75rem]"
           initial={{ opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '60px' }}
@@ -118,7 +118,7 @@ export default function ImpactCards() {
           <div className="mb-14 flex items-center gap-5">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-ink/20 to-transparent" />
             <h2 className="hero-heading shrink-0 text-center font-display text-[clamp(2rem,7vw,4.8rem)] font-black uppercase leading-none tracking-tight">
-              CORE IMPACT
+              核心成果
             </h2>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-ink/20 to-transparent" />
           </div>
