@@ -1,4 +1,4 @@
-name: Capture cross-border screenshots v2
+name: Capture cross-border screenshots v3
 
 on:
   workflow_dispatch:
@@ -33,11 +33,14 @@ jobs:
           url="https://duyu06.github.io/resume/demos/cross-border/?capture=${GITHUB_SHA}"
           for attempt in $(seq 1 36); do
             html="$(curl -fsSL --retry 2 --connect-timeout 10 "$url" || true)"
-            if grep -q "cross-border.css" <<<"$html" && grep -q "MEASURED" <<<"$html"; then
+            if grep -q "remote-management-hero" <<<"$html" && grep -q "cross-border.js" <<<"$html"; then
+              echo "Remote management hero is live."
               exit 0
             fi
+            echo "Waiting for Pages deployment (${attempt}/36)..."
             sleep 10
           done
+          echo "Latest cross-border page was not deployed in time." >&2
           exit 1
 
       - name: Set up Node.js
@@ -62,7 +65,7 @@ jobs:
             const context = await browser.newContext({
               viewport: { width: 1440, height: 900 },
               deviceScaleFactor: 1,
-              locale: 'zh-CN',
+              locale: 'en-US',
               colorScheme: 'light',
             });
             const page = await context.newPage();
@@ -70,14 +73,14 @@ jobs:
               waitUntil: 'domcontentloaded',
               timeout: 120000,
             });
-            await page.waitForSelector('.hero-title', { timeout: 30000 });
+            await page.waitForSelector('.hero-title', { timeout: 45000 });
             await page.evaluate(async () => { if (document.fonts?.ready) await document.fonts.ready; });
             try { await page.waitForSelector('.hero-video.is-ready', { timeout: 20000 }); } catch {}
-            await page.waitForTimeout(1800);
+            await page.waitForTimeout(2200);
             fs.mkdirSync('public/assets/projects', { recursive: true });
             await page.screenshot({ path: 'public/assets/projects/proj-03-a.png', type: 'png', animations: 'disabled' });
             await page.locator('#about').scrollIntoViewIfNeeded();
-            await page.waitForTimeout(1500);
+            await page.waitForTimeout(1600);
             await page.screenshot({ path: 'public/assets/projects/proj-03-b.png', type: 'png', animations: 'disabled' });
             await browser.close();
           })().catch((error) => { console.error(error); process.exit(1); });
@@ -88,10 +91,11 @@ jobs:
         run: |
           set -euo pipefail
           if git diff --quiet -- public/assets/projects/proj-03-a.png public/assets/projects/proj-03-b.png; then
+            echo "Screenshots are unchanged."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/assets/projects/proj-03-a.png public/assets/projects/proj-03-b.png
-          git commit -m "chore: refresh cross-border project screenshots"
+          git commit -m "chore: refresh remote management project screenshots"
           git push origin HEAD:main
