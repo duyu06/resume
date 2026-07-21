@@ -1,226 +1,314 @@
-import React, { useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { motion } from 'motion/react';
+(() => {
+  'use strict';
 
-const h = React.createElement;
-const MotionDiv = motion.div;
-const MotionHeader = motion.header;
-const MotionH1 = motion.h1;
-const MotionP = motion.p;
+  const gsap = window.gsap;
+  const ScrollTrigger = window.ScrollTrigger;
+  if (!gsap || !ScrollTrigger) return;
+  gsap.registerPlugin(ScrollTrigger);
 
-const VIDEO_URL = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260302_085640_276ea93b-d7da-4418-a09b-2aa5b490e838.mp4';
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const activeScrubbers = [];
+  let rebuildTimer = 0;
+  let lastWidth = window.innerWidth;
 
-const containerVariants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.14,
-      delayChildren: 0.12,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 28, filter: 'blur(10px)' },
-  show: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-    transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
-function LogoMark() {
-  return h(
-    'span',
-    { className: 'flex items-center gap-2.5 font-geist text-[14px] font-semibold tracking-[-0.03em] text-[#1d2029]' },
-    h('span', { className: 'grid size-8 place-items-center rounded-full bg-[#17191e] text-[11px] font-semibold text-white shadow-[0_8px_22px_rgba(10,12,18,0.18)]' }, 'S'),
-    h('span', null, 'Simple')
-  );
-}
-
-function StarRow() {
-  return h(
-    'div',
-    { className: 'flex items-center gap-[3px] text-[14px] leading-none text-[#16181e]', 'aria-label': 'Five star rating' },
-    ...Array.from({ length: 5 }, (_, index) => h('span', { key: index, 'aria-hidden': true }, '★'))
-  );
-}
-
-function SocialProof() {
-  return h(
-    MotionDiv,
-    {
-      variants: itemVariants,
-      className: 'social-proof mx-auto flex w-fit items-center gap-3 rounded-full border border-black/[0.06] bg-white/75 px-4 py-2.5 shadow-[0_12px_38px_rgba(74,82,96,0.08)] backdrop-blur-xl',
-    },
-    h('div', { className: 'flex -space-x-1.5', 'aria-hidden': true },
-      h('span', { className: 'proof-logo' }, 'N'),
-      h('span', { className: 'proof-logo' }, 'A'),
-      h('span', { className: 'proof-logo' }, 'R')
-    ),
-    h('div', { className: 'h-5 w-px bg-black/10', 'aria-hidden': true }),
-    h(StarRow),
-    h('span', { className: 'font-geist text-[12px] font-medium text-[#373a46]' }, '1,020+ Reviews')
-  );
-}
-
-function EmailCTA() {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  function submit(event) {
-    event.preventDefault();
-    if (!email.trim()) return;
-    setSubmitted(true);
+  function splitCharacters(element, className) {
+    if (!element || element.dataset.split === 'true') return;
+    const text = element.textContent || '';
+    element.textContent = '';
+    [...text].forEach((character) => {
+      const span = document.createElement('span');
+      span.className = className;
+      span.textContent = character === ' ' ? '\u00a0' : character;
+      element.appendChild(span);
+    });
+    element.dataset.split = 'true';
   }
 
-  return h(
-    MotionDiv,
-    { variants: itemVariants, className: 'email-shell mx-auto w-full max-w-[650px] rounded-[40px] border border-black/[0.07] bg-[#fcfcfc] p-2' },
-    h(
-      'form',
-      { onSubmit: submit, className: 'flex items-center gap-2', id: 'cta' },
-      h('label', { className: 'sr-only', htmlFor: 'email' }, 'Work email'),
-      h('input', {
-        id: 'email',
-        type: 'email',
-        required: true,
-        value: email,
-        onChange: (event) => {
-          setEmail(event.target.value);
-          setSubmitted(false);
-        },
-        placeholder: 'Enter your work email',
-        className: 'min-w-0 flex-1 rounded-full bg-transparent px-5 py-4 font-geist text-[15px] text-[#252832] outline-none placeholder:text-[#7d818d] focus:ring-0',
-      }),
-      h(
-        motion.button,
-        {
-          type: 'submit',
-          whileHover: { scale: 1.015 },
-          whileTap: { scale: 0.985 },
-          className: 'cta-gloss min-h-[54px] rounded-full px-7 font-geist text-[14px] font-medium tracking-[-0.02em] text-white transition duration-200 shadow-[inset_-4px_-6px_25px_0px_rgba(201,201,201,0.08),inset_4px_4px_10px_0px_rgba(29,29,29,0.24)]',
-        },
-        submitted ? 'Account Reserved' : 'Create Free Account'
-      )
-    ),
-    submitted
-      ? h('p', { className: 'px-5 pb-2 pt-1 font-geist text-[12px] text-[#5d6270]', role: 'status' }, `Invitation reserved for ${email}.`)
-      : null
-  );
-}
+  function splitWords(element) {
+    if (!element || element.dataset.split === 'true') return;
+    const words = (element.textContent || '').trim().split(/\s+/);
+    element.textContent = '';
+    words.forEach((word, index) => {
+      const span = document.createElement('span');
+      span.className = 'detail-word';
+      span.textContent = word;
+      element.appendChild(span);
+      if (index < words.length - 1) element.appendChild(document.createTextNode(' '));
+    });
+    element.dataset.split = 'true';
+  }
 
-function Hero() {
-  const [videoReady, setVideoReady] = useState(false);
+  function createScrubber(video, options = {}) {
+    const state = {
+      duration: 0,
+      targetProgress: 0,
+      targetTime: 0,
+      currentTime: 0,
+      lastSeekAt: 0,
+      raf: 0,
+      destroyed: false,
+    };
 
-  return h(
-    'section',
-    { className: 'relative min-h-screen overflow-hidden bg-white', 'data-template': 'remote-management-hero' },
-    h('div', { className: 'video-fallback', 'aria-hidden': true }),
-    h(
-      'div',
-      { className: 'absolute inset-0 overflow-hidden', 'aria-hidden': true },
-      h('video', {
-        autoPlay: true,
-        loop: true,
-        muted: true,
-        playsInline: true,
-        preload: 'auto',
-        src: VIDEO_URL,
-        onLoadedData: () => setVideoReady(true),
-        onCanPlay: () => setVideoReady(true),
-        className: `hero-video w-full h-full object-cover [transform:scaleY(-1)]${videoReady ? ' is-ready' : ''}`,
-      }),
-      h('div', { className: 'absolute inset-0 bg-gradient-to-b from-[26.416%] from-[rgba(255,255,255,0)] to-[66.943%] to-white' }),
-      h('div', { className: 'absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,0)_0%,rgba(255,255,255,0.06)_28%,rgba(255,255,255,0.38)_56%,rgba(255,255,255,0.9)_82%)]' })
-    ),
-    h(
-      MotionHeader,
-      {
-        initial: { opacity: 0, y: -14 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-        className: 'glass-nav fixed left-8 right-8 top-7 z-30 mx-auto flex max-w-[1200px] items-center justify-between rounded-full px-4 py-3',
+    const lerp = options.lerp ?? (isMobile ? 0.12 : 0.08);
+    const minimumDelta = options.minimumDelta ?? (isMobile ? 0.035 : 0.012);
+    const minimumInterval = options.minimumInterval ?? (isMobile ? 50 : 28);
+
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.preload = isMobile ? 'metadata' : 'auto';
+    video.pause();
+
+    const syncTarget = () => {
+      if (state.duration > 0) state.targetTime = state.targetProgress * Math.max(0, state.duration - 0.03);
+    };
+    const markReady = () => {
+      state.duration = Number.isFinite(video.duration) ? video.duration : 0;
+      state.currentTime = video.currentTime || 0;
+      syncTarget();
+      video.pause();
+      video.classList.add('is-ready');
+    };
+    const markBuffering = () => video.classList.remove('is-ready');
+    const markError = () => {
+      video.classList.remove('is-ready');
+      video.classList.add('is-error');
+    };
+
+    video.addEventListener('loadedmetadata', markReady, { passive: true });
+    video.addEventListener('loadeddata', markReady, { passive: true });
+    video.addEventListener('canplay', markReady, { passive: true });
+    video.addEventListener('seeked', markReady, { passive: true });
+    video.addEventListener('waiting', markBuffering, { passive: true });
+    video.addEventListener('stalled', markBuffering, { passive: true });
+    video.addEventListener('error', markError, { passive: true });
+
+    function tick(now) {
+      if (state.destroyed) return;
+      if (!document.hidden && state.duration > 0 && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        state.currentTime += (state.targetTime - state.currentTime) * (reducedMotion ? 1 : lerp);
+        const delta = state.currentTime - video.currentTime;
+        if (!video.seeking && Math.abs(delta) > minimumDelta && now - state.lastSeekAt >= minimumInterval) {
+          state.lastSeekAt = now;
+          try {
+            video.currentTime = Math.max(0, Math.min(state.duration, state.currentTime));
+          } catch {
+            // Keep the last decoded frame when the browser rejects a seek.
+          }
+        }
+      }
+      state.raf = requestAnimationFrame(tick);
+    }
+
+    state.raf = requestAnimationFrame(tick);
+
+    const controller = {
+      setProgress(progress) {
+        state.targetProgress = Math.max(0, Math.min(1, progress));
+        syncTarget();
       },
-      h(LogoMark),
-      h('nav', { className: 'flex items-center gap-2 font-geist text-[13px] font-medium text-[#4d515d]' },
-        h('a', { href: '#about', className: 'hidden rounded-full px-4 py-2 transition hover:bg-black/[0.04] sm:block' }, 'How it works'),
-        h('a', { href: '/resume/#projects', className: 'rounded-full bg-white px-4 py-2 text-[#1e2027] shadow-[0_4px_18px_rgba(44,49,60,0.08)] transition hover:-translate-y-0.5' }, 'Return to portfolio')
-      )
-    ),
-    h(
-      MotionDiv,
-      {
-        variants: containerVariants,
-        initial: 'hidden',
-        animate: 'show',
-        className: 'relative z-10 mx-auto flex min-h-screen max-w-[1200px] flex-col items-center gap-y-8 px-6 pb-24 pt-[290px] text-center sm:px-8',
+      destroy() {
+        state.destroyed = true;
+        cancelAnimationFrame(state.raf);
+        video.removeEventListener('loadedmetadata', markReady);
+        video.removeEventListener('loadeddata', markReady);
+        video.removeEventListener('canplay', markReady);
+        video.removeEventListener('seeked', markReady);
+        video.removeEventListener('waiting', markBuffering);
+        video.removeEventListener('stalled', markBuffering);
+        video.removeEventListener('error', markError);
       },
-      h(
-        MotionH1,
-        {
-          variants: itemVariants,
-          className: 'hero-title hero-heading max-w-[1120px] font-geist text-[80px] font-medium leading-[0.93] tracking-[-0.04em] text-[#17191f]',
-        },
-        'Simple ',
-        h('span', { className: 'management-word font-instrument text-[100px] font-normal italic tracking-[-0.035em]' }, 'management'),
-        ' for your remote team'
-      ),
-      h(
-        MotionP,
-        {
-          variants: itemVariants,
-          className: 'hero-copy max-w-[554px] font-geist text-[18px] leading-[1.55] tracking-[-0.015em] text-[#373a46]/80',
-        },
-        'Plan work, align priorities and keep every timezone moving from one calm, transparent workspace built for distributed teams.'
-      ),
-      h(EmailCTA),
-      h(SocialProof)
-    )
-  );
-}
+    };
+    activeScrubbers.push(controller);
+    return controller;
+  }
 
-const signals = [
-  ['01', 'Async by default', 'Decisions, approvals and progress stay visible without adding another meeting.'],
-  ['02', 'One operating rhythm', 'Goals, projects and weekly updates share a single source of truth.'],
-  ['03', 'Built across time zones', 'Clear ownership and handoffs keep work moving while your team sleeps.'],
-];
+  function setupMenu() {
+    const button = document.querySelector('.menu-button');
+    const panel = document.querySelector('.menu-panel');
+    if (!button || !panel) return;
+    const close = () => {
+      panel.classList.remove('is-open');
+      button.setAttribute('aria-expanded', 'false');
+    };
+    button.addEventListener('click', () => {
+      const open = !panel.classList.contains('is-open');
+      panel.classList.toggle('is-open', open);
+      button.setAttribute('aria-expanded', String(open));
+    });
+    panel.querySelectorAll('a,button').forEach((item) => item.addEventListener('click', close));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') close();
+    });
+  }
 
-function About() {
-  return h(
-    'section',
-    { id: 'about', className: 'relative bg-white px-6 py-28 sm:px-8 lg:py-36' },
-    h('div', { className: 'hairline mx-auto mb-20 max-w-[1200px]' }),
-    h(
-      MotionDiv,
-      {
-        initial: 'hidden',
-        whileInView: 'show',
-        viewport: { once: true, amount: 0.25 },
-        variants: containerVariants,
-        className: 'mx-auto max-w-[1200px]',
+  function setupHero() {
+    const hero = document.querySelector('.hero-scroll');
+    const video = document.querySelector('.hero-video');
+    const button = document.querySelector('.hero-content .capsule-button');
+    const chars = [...document.querySelectorAll('.hero-char')];
+    if (!hero || !video) return;
+
+    const scrubber = createScrubber(video);
+    ScrollTrigger.create({
+      trigger: hero,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate(self) {
+        const progress = self.progress;
+        scrubber.setProgress(progress);
+        const exitProgress = Math.max(0, Math.min(1, (progress - 0.8) / 0.2));
+        const eased = 1 - Math.pow(1 - exitProgress, 3);
+        chars.forEach((character, index) => {
+          const stagger = index / Math.max(1, chars.length) * 0.28;
+          const local = Math.max(0, Math.min(1, (eased - stagger) / 0.72));
+          character.style.opacity = String(1 - local);
+          character.style.filter = `blur(${local * 12}px)`;
+          character.style.transform = `translateY(${-local * 30}px)`;
+        });
+        if (button) {
+          const buttonExit = Math.pow(exitProgress, 4);
+          button.style.opacity = String(1 - buttonExit);
+          button.style.transform = `translateY(${-buttonExit * 24}px)`;
+        }
       },
-      h(MotionP, { variants: itemVariants, className: 'mb-7 font-geist text-[12px] font-semibold uppercase tracking-[0.16em] text-[#777c88]' }, 'Remote operations, simplified'),
-      h(MotionH1, { variants: itemVariants, className: 'max-w-[850px] font-geist text-[clamp(42px,5vw,72px)] font-medium leading-[0.98] tracking-[-0.045em] text-[#17191f]' },
-        'Less coordination overhead. ',
-        h('span', { className: 'font-instrument font-normal italic' }, 'More momentum.')
-      ),
-      h('div', { className: 'mt-16 grid gap-5 md:grid-cols-3' },
-        ...signals.map(([index, title, copy]) => h(
-          MotionDiv,
-          { key: index, variants: itemVariants, className: 'signal-card min-h-[270px] rounded-[30px] p-7 sm:p-8' },
-          h('p', { className: 'font-geist text-[12px] font-semibold text-[#888d98]' }, index),
-          h('h2', { className: 'mt-20 font-geist text-[24px] font-medium tracking-[-0.035em] text-[#20232b]' }, title),
-          h('p', { className: 'mt-4 max-w-[320px] font-geist text-[15px] leading-[1.55] text-[#5b606d]' }, copy)
-        ))
-      )
-    )
-  );
-}
+    });
+  }
 
-function App() {
-  return h(React.Fragment, null, h(Hero), h(About));
-}
+  function setupAwards() {
+    const section = document.querySelector('.awards-section');
+    const grid = document.querySelector('.awards-grid');
+    const reveal = document.querySelector('.video-scaling-wrapper');
+    const revealVideo = document.querySelector('.reveal-video');
+    if (!section || !grid || !reveal || !revealVideo) return;
 
-createRoot(document.getElementById('root')).render(h(App));
+    const scrubber = createScrubber(revealVideo, { minimumInterval: isMobile ? 58 : 30 });
+    const getDistance = () => Math.max(0, grid.scrollWidth - window.innerWidth);
+    const getEnd = () => `+=${Math.max(window.innerHeight * 2.2, getDistance() + window.innerHeight * 1.25)}`;
+
+    const timeline = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: getEnd,
+        pin: true,
+        scrub: reducedMotion ? false : 0.35,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate(self) {
+          const videoProgress = Math.max(0, Math.min(1, (self.progress - 0.7) / 0.3));
+          scrubber.setProgress(videoProgress);
+          reveal.style.pointerEvents = videoProgress > 0.02 ? 'auto' : 'none';
+        },
+      },
+    });
+
+    timeline.to(grid, { x: () => -getDistance(), duration: 0.7 });
+    timeline.to(reveal, { width: '100%', duration: 0.3 });
+  }
+
+  function setupStats() {
+    const targets = [...document.querySelectorAll('[data-fade-slide-in]')];
+    if (targets.length) {
+      gsap.to(targets, {
+        autoAlpha: 1,
+        y: 0,
+        duration: reducedMotion ? 0 : 0.8,
+        stagger: reducedMotion ? 0 : 0.15,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: '.stats-left', start: 'top 72%', once: true },
+      });
+    }
+
+    document.querySelectorAll('.stat-card').forEach((card) => {
+      const chars = card.querySelectorAll('.stat-char');
+      const words = card.querySelectorAll('.detail-word');
+      const subtext = card.querySelector('.card-subtext');
+      const timeline = gsap.timeline({ scrollTrigger: { trigger: card, start: 'top 72%', once: true } });
+      timeline.from(chars, {
+        yPercent: 105,
+        opacity: 0,
+        duration: reducedMotion ? 0 : 0.55,
+        stagger: reducedMotion ? 0 : 0.025,
+        ease: 'power3.out',
+      });
+      timeline.from(words, {
+        y: 12,
+        opacity: 0,
+        duration: reducedMotion ? 0 : 0.45,
+        stagger: reducedMotion ? 0 : 0.018,
+        ease: 'power2.out',
+      }, '-=0.2');
+      if (subtext) timeline.from(subtext, { opacity: 0, y: 10, duration: 0.4 }, '-=0.2');
+    });
+  }
+
+  function setupFooter() {
+    const footer = document.querySelector('.site-footer');
+    const spacer = document.querySelector('.footer-spacer');
+    if (!footer || !spacer) return;
+    const sync = () => {
+      spacer.style.height = `${footer.offsetHeight}px`;
+    };
+    sync();
+    if ('ResizeObserver' in window) new ResizeObserver(sync).observe(footer);
+    window.addEventListener('resize', sync, { passive: true });
+  }
+
+  function setupButtons() {
+    document.querySelectorAll('[data-scroll-target]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelector(button.dataset.scrollTarget)?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
+      });
+    });
+    document.querySelector('.newsletter-form')?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const input = event.currentTarget.querySelector('input');
+      if (!input?.value.trim()) return;
+      alert("You're on the list. Welcome.");
+      event.currentTarget.reset();
+    });
+  }
+
+  function prepareText() {
+    document.querySelectorAll('.hero-title-line-inner').forEach((element) => splitCharacters(element, 'hero-char'));
+    document.querySelectorAll('.heading-style-h1:last-child').forEach((element) => splitCharacters(element, 'stat-char'));
+    document.querySelectorAll('.detail-paragraph').forEach(splitWords);
+  }
+
+  function initialize() {
+    prepareText();
+    setupMenu();
+    setupHero();
+    setupAwards();
+    setupStats();
+    setupFooter();
+    setupButtons();
+    ScrollTrigger.refresh();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) document.querySelectorAll('video').forEach((video) => video.pause());
+  });
+
+  window.addEventListener('resize', () => {
+    clearTimeout(rebuildTimer);
+    rebuildTimer = window.setTimeout(() => {
+      if (window.innerWidth !== lastWidth) {
+        lastWidth = window.innerWidth;
+        ScrollTrigger.refresh();
+      }
+    }, 200);
+  }, { passive: true });
+
+  window.addEventListener('pagehide', () => activeScrubbers.forEach((controller) => controller.destroy()), { once: true });
+
+  const start = () => initialize();
+  if (document.fonts?.ready) document.fonts.ready.then(start);
+  else if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
+})();
