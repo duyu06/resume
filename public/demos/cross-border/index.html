@@ -1,114 +1,38 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#ffffff" />
-  <meta name="description" content="OYLA 跨境精品独立站交互原型：滚动视频、横向商品展示、品牌数据与固定页脚揭示。" />
-  <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=3" />
+  <meta name="description" content="A minimalist remote-team management hero built with React, Tailwind CSS v4 and Motion." />
+  <meta name="cross-border-template" content="remote-management-hero" />
+  <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=4" />
+  <link rel="preconnect" href="https://d8j0ntlcm91z4.cloudfront.net" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet" />
-  <link rel="preload" as="image" href="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.2.6/index.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./cross-border.css" />
-  <title>OYLA — 跨境精品独立站</title>
-  <style>
-    .menu-panel{position:fixed;top:88px;right:32px;z-index:130;width:min(320px,calc(100vw - 32px));padding:22px;border:1px solid rgba(0,0,0,.14);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);opacity:0;visibility:hidden;transform:translateY(-10px);transition:.25s}
-    .menu-panel.is-open{opacity:1;visibility:visible;transform:none}.menu-panel nav{display:grid}.menu-panel a{padding:14px 0;border-bottom:1px solid rgba(0,0,0,.14);font-size:14px;text-transform:uppercase}.menu-panel a:last-child{border-bottom:0}
-    @media(max-width:768px){.menu-panel{top:68px;right:16px}}
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
-  <script src="./cross-border.js" defer></script>
+  <title>Simple Management — Remote Team Platform</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@19.1.0",
+        "react/jsx-runtime": "https://esm.sh/react@19.1.0/jsx-runtime",
+        "react-dom": "https://esm.sh/react-dom@19.1.0",
+        "react-dom/client": "https://esm.sh/react-dom@19.1.0/client",
+        "motion/react": "https://esm.sh/motion@12.23.12/react?external=react,react-dom"
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" defer></script>
+  <script type="module" src="./cross-border.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand-logo" href="#hero" aria-label="OYLA 首页">
-      <svg viewBox="0 0 112 60" role="img" aria-label="OYLA">
-        <ellipse cx="16" cy="30" rx="13" ry="21" fill="none" stroke="currentColor" stroke-width="2.5" />
-        <ellipse cx="16" cy="30" rx="6" ry="13" fill="none" stroke="currentColor" stroke-width="1.6" />
-        <text x="34" y="40" fill="currentColor" font-family="Georgia,serif" font-size="31" letter-spacing="-2">YLA</text>
-      </svg>
-    </a>
-    <nav class="header-nav" aria-label="主要导航">
-      <a href="#about">ABOUT</a>
-      <div class="header-actions">
-        <button class="menu-button" type="button" aria-label="打开菜单" aria-expanded="false">
-          <span class="menu-lines" aria-hidden="true"><span></span><span></span></span>
-        </button>
-        <button class="header-action" type="button" data-scroll-target="#collection">[ BAG ]</button>
-      </div>
-    </nav>
-  </header>
-
-  <aside class="menu-panel" aria-label="快捷导航">
-    <nav>
-      <a href="#hero">Measured Purity</a>
-      <a href="#collection">Collection</a>
-      <a href="#about">Our Method</a>
-      <a href="#footer">Newsletter</a>
-      <a href="/resume/#projects">Return to Portfolio</a>
-    </nav>
-  </aside>
-
-  <a class="demo-back" href="/resume/#projects">← 返回作品集</a>
-
-  <div class="page-shell">
-    <section class="hero-scroll" id="hero" aria-label="OYLA 品牌主视觉">
-      <div class="hero-sticky">
-        <video class="hero-video" muted playsinline preload="auto" poster="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_212146_743b92b3-40a3-46cb-988d-7bf716564ec3.mp4"></video>
-        <div class="hero-overlay" aria-hidden="true"></div>
-        <div class="hero-content">
-          <h1 class="hero-title">
-            <span class="hero-title-line"><span class="hero-title-line-inner">MEASURED</span></span>
-            <span class="hero-title-line"><span class="hero-title-line-inner">PURITY</span></span>
-          </h1>
-          <button class="capsule-button" type="button" data-scroll-target="#collection"><span>Discover</span><span class="capsule-icon" aria-hidden="true"></span></button>
-        </div>
-      </div>
-    </section>
-
-    <section class="awards-section" id="collection" aria-label="OYLA 产品系列">
-      <div class="awards-pin">
-        <div class="awards-grid">
-          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" alt="Obsidian Coil 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Obsidian Coil</h2><p class="product-price">$480</p></div></article>
-          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min.webp" alt="Void Arc 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Void Arc</h2><p class="product-price">$560</p></div></article>
-          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144747_f21bc119-e460-45be-a071-851291bd71c5_min.webp" alt="Onyx Hex 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Onyx Hex</h2><p class="product-price">$620</p></div></article>
-          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_215521_100b78bd-d24a-4225-b2e8-5bb30d44af73_min.webp" alt="Shadow Sigil 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Shadow Sigil</h2><p class="product-price">$740</p></div></article>
-          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" alt="Eclipse Band 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Eclipse Band</h2><p class="product-price">$820</p></div></article>
-          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min.webp" alt="Matte Skull 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Matte Skull</h2><p class="product-price">$950</p></div></article>
-        </div>
-        <div class="video-scaling-wrapper" aria-hidden="true">
-          <video class="reveal-video" muted playsinline preload="auto" poster="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min.webp" src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_122130_8b16d300-75cb-49f5-82ce-afd6b79c2d79.mp4"></video>
-        </div>
-      </div>
-    </section>
-
-    <section class="stats-copy-section" id="about">
-      <div class="stats-left">
-        <h2 class="fade-target" data-fade-slide-in>Made Without Compromise</h2>
-        <div class="stats-copy">
-          <p class="fade-target" data-fade-slide-in>Each ring is forged by a single pair of hands — no factory floor, no assembly line. The material is chosen first; the form follows its nature.</p>
-          <p class="fade-target" data-fade-slide-in>We work in oxidized silver, blackened bronze, and raw brass. Weights are deliberate. Edges are left where they fall. Nothing is smoothed for comfort.</p>
-          <p class="fade-target" data-fade-slide-in>OYLA exists for those who wear jewelry that means something. Not decoration — declaration. One piece at a time, made to last a lifetime.</p>
-        </div>
-        <button class="capsule-button fade-target" type="button" data-fade-slide-in data-scroll-target="#collection"><span>View Collection</span><span class="capsule-icon" aria-hidden="true"></span></button>
-      </div>
-      <div class="stats-right">
-        <article class="stat-card"><div class="stomp-wrapper"><div class="stomp-stack"><h3>100%</h3><h3 class="heading-style-h1">100%</h3></div><div class="stomp-stack"><h3>Handmade</h3><h3 class="heading-style-h1">Handmade</h3></div></div><p class="detail-paragraph">Every ring crafted by a single artisan, start to finish</p></article>
-        <article class="stat-card"><div class="stomp-wrapper"><div class="stomp-stack"><h3>14-92g</h3><h3 class="heading-style-h1">14-92g</h3></div><div class="stomp-stack"><h3>Per piece</h3><h3 class="heading-style-h1">Per piece</h3></div></div><p class="detail-paragraph">Deliberate weight — each ring is a physical presence you feel</p></article>
-        <article class="stat-card"><div class="stomp-wrapper"><div class="stomp-stack"><h3>Sterling</h3><h3 class="heading-style-h1">Sterling</h3></div><div class="stomp-stack"><h3>&amp; Silver</h3><h3 class="heading-style-h1">&amp; Silver</h3></div></div><p class="detail-paragraph">Oxidized metals only — no plating, no compromise</p></article>
-        <article class="stat-card"><div class="stomp-wrapper"><div class="stomp-stack"><h3>Lifetime</h3><h3 class="heading-style-h1">Lifetime</h3></div><div class="stomp-stack"><h3>Guarantee</h3><h3 class="heading-style-h1">Guarantee</h3></div></div><div><p class="detail-paragraph">We stand behind every piece we make, forever</p><p class="card-subtext">Est. OYLA Studio, 2019.</p></div></article>
-      </div>
-    </section>
-
-    <div class="footer-spacer" aria-hidden="true"></div>
+  <div id="root">
+    <main class="fallback-shell" data-template="remote-management-hero">
+      <p>Simple management for your remote team</p>
+    </main>
   </div>
-
-  <footer class="site-footer" id="footer">
-    <section class="footer-column"><a href="/resume/#projects">Return to portfolio</a><p class="credits">Handcrafted in small batches<br />OYLA Studio<br /><br />Based in Berlin<br />(c) OYLA 2026<br />All pieces are original designs.</p></section>
-    <section class="footer-column"><a href="#collection">Instagram</a><nav class="footer-links"><a href="#footer">Refund Policy</a><a href="#footer">Privacy Policy</a><a href="#footer">Terms of Service</a></nav></section>
-    <section class="footer-column"><h3>Newsletter</h3><p class="newsletter-copy">Join our list. Be first to know new drops. 10% off your first order.</p><form class="newsletter-form"><input type="email" placeholder="Email" aria-label="Email" required /><button class="capsule-button" type="submit"><span>Subscribe</span><span class="capsule-icon" aria-hidden="true"></span></button></form></section>
-  </footer>
 </body>
 </html>
