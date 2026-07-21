@@ -1,0 +1,97 @@
+name: Capture cross-border screenshots v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - public/demos/cross-border/**
+
+permissions:
+  contents: write
+
+concurrency:
+  group: capture-cross-border
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Wait for GitHub Pages deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://duyu06.github.io/resume/demos/cross-border/?capture=${GITHUB_SHA}"
+          for attempt in $(seq 1 36); do
+            html="$(curl -fsSL --retry 2 --connect-timeout 10 "$url" || true)"
+            if grep -q "cross-border.css" <<<"$html" && grep -q "MEASURED" <<<"$html"; then
+              exit 0
+            fi
+            sleep 10
+          done
+          exit 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Chromium renderer
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Capture live desktop screenshots
+        shell: bash
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('node:fs');
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const context = await browser.newContext({
+              viewport: { width: 1440, height: 900 },
+              deviceScaleFactor: 1,
+              locale: 'zh-CN',
+              colorScheme: 'light',
+            });
+            const page = await context.newPage();
+            await page.goto(`https://duyu06.github.io/resume/demos/cross-border/?capture=${Date.now()}`, {
+              waitUntil: 'domcontentloaded',
+              timeout: 120000,
+            });
+            await page.waitForSelector('.hero-title', { timeout: 30000 });
+            await page.evaluate(async () => { if (document.fonts?.ready) await document.fonts.ready; });
+            try { await page.waitForSelector('.hero-video.is-ready', { timeout: 20000 }); } catch {}
+            await page.waitForTimeout(1800);
+            fs.mkdirSync('public/assets/projects', { recursive: true });
+            await page.screenshot({ path: 'public/assets/projects/proj-03-a.png', type: 'png', animations: 'disabled' });
+            await page.locator('#about').scrollIntoViewIfNeeded();
+            await page.waitForTimeout(1500);
+            await page.screenshot({ path: 'public/assets/projects/proj-03-b.png', type: 'png', animations: 'disabled' });
+            await browser.close();
+          })().catch((error) => { console.error(error); process.exit(1); });
+          NODE
+
+      - name: Commit refreshed project screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- public/assets/projects/proj-03-a.png public/assets/projects/proj-03-b.png; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/projects/proj-03-a.png public/assets/projects/proj-03-b.png
+          git commit -m "chore: refresh cross-border project screenshots"
+          git push origin HEAD:main
