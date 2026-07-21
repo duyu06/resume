@@ -80,16 +80,19 @@ jobs:
           const fs = require('node:fs');
 
           const demos = [
-            { slug: 'ai-ecommerce', a: 'proj-02-a.png', b: 'proj-02-b.png', marker: '#root' },
+            { slug: 'ai-ecommerce', a: 'proj-02-a.png', b: 'proj-02-b.png', marker: '#root > *', enriched: true },
             { slug: 'cross-border', a: 'proj-03-a.png', b: 'proj-03-b.png', marker: '.hero-sticky', target: '#collection' },
-            { slug: 'digitalhuman', a: 'proj-04-a.png', b: 'proj-04-b.png', marker: '#main-content', target: '#stats-section' },
-            { slug: 'webui', a: 'proj-05-a.png', b: 'proj-05-b.png', marker: '#root' },
-            { slug: 'soulcaller', a: 'proj-06-a.png', b: 'proj-06-b.png', marker: '#root' },
-            { slug: 'rpa', a: 'proj-07-a.png', b: 'proj-07-b.png', marker: '#root' },
+            { slug: 'digitalhuman', a: 'proj-04-a.png', b: 'proj-04-b.png', marker: '#main-content.visible', target: '#stats-section', enriched: true },
+            { slug: 'webui', a: 'proj-05-a.png', b: 'proj-05-b.png', marker: '#root > *', enriched: true },
+            { slug: 'soulcaller', a: 'proj-06-a.png', b: 'proj-06-b.png', marker: '#root > *', enriched: true },
+            { slug: 'rpa', a: 'proj-07-a.png', b: 'proj-07-b.png', marker: '#root > *', enriched: true },
           ];
 
-          async function settle(page, marker) {
-            await page.waitForSelector(marker, { timeout: 45000 });
+          async function settle(page, demo) {
+            await page.waitForSelector(demo.marker, { timeout: 45000 });
+            if (demo.enriched) {
+              await page.waitForSelector('.motion-enrich-status', { timeout: 15000 });
+            }
             await page.evaluate(async () => {
               if (document.fonts?.ready) await document.fonts.ready;
               const images = [...document.images];
@@ -153,7 +156,7 @@ jobs:
                 waitUntil: 'domcontentloaded',
                 timeout: 120000,
               });
-              await settle(page, demo.marker);
+              await settle(page, demo);
               await page.screenshot({
                 path: `public/assets/projects/${demo.a}`,
                 type: 'png',
