@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
 
-const tags = ['AI 产品设计', '多模态应用', '技术方案', '原型与交付'];
+const tags = ['AI 产品规划', '模型评测与选型', '多模态应用', '原型与交付'];
 
 export default function HeroSection() {
   const root = useRef<HTMLElement>(null);
@@ -29,20 +29,24 @@ export default function HeroSection() {
     <section
       id="hero"
       ref={root}
-      className="relative flex min-h-dvh flex-col justify-between overflow-hidden px-5 pb-28 pt-20 sm:px-8 md:px-10 md:pb-32 md:pt-24"
+      className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pb-28 pt-20 sm:px-8 md:min-h-dvh md:px-10 md:pb-32 md:pt-24"
     >
       <div className="depth-layer pointer-events-none absolute inset-0" data-depth="0.05" aria-hidden>
         <div className="absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.03]" />
         <div className="absolute left-1/2 top-1/2 h-[90vmin] w-[90vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.015]" />
       </div>
 
-      <FadeIn delay={0} y={-20} className="relative z-30 flex items-start justify-between gap-4">
-        <div className="font-display text-base font-extrabold tracking-wide md:text-lg">
+      <FadeIn
+        delay={0}
+        y={-20}
+        className="relative z-30 flex flex-col items-start gap-3 sm:flex-row sm:items-start sm:justify-between"
+      >
+        <div className="font-display text-sm font-extrabold tracking-wide sm:text-base md:text-lg">
           ZHANG<span className="text-accent">.</span>BINWEN
         </div>
-        <div className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[0.72rem] tracking-wide">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-[#51e08a] shadow-[0_0_12px_#51e08a]" />
-          2026 届毕业生 · 现居长沙 · 意向北上广深
+        <div className="glass inline-flex max-w-full items-center gap-2 rounded-full px-3 py-2 text-[0.65rem] leading-relaxed tracking-wide sm:whitespace-nowrap sm:text-[0.72rem]">
+          <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#51e08a] shadow-[0_0_12px_#51e08a]" />
+          <span>2026 届毕业生 · 现居长沙 · 意向北上广深、苏州、佛山</span>
         </div>
       </FadeIn>
 
@@ -57,16 +61,16 @@ export default function HeroSection() {
         </FadeIn>
         <FadeIn delay={0.28} y={24}>
           <p className="font-display text-[clamp(0.95rem,2.8vw,1.75rem)] font-medium tracking-wide text-ink">
-            AI 产品经理 · 懂技术、能落地的 2026 届毕业生
+            AI 产品经理 · 技术产品经理 · AI 解决方案产品经理
           </p>
         </FadeIn>
         <FadeIn delay={0.34} y={20}>
-          <p className="mt-1 font-body text-sm leading-relaxed text-ink-dim md:text-base">
-            从需求拆解、模型选型，到原型开发与部署验证
+          <p className="mt-1 max-w-2xl font-body text-sm leading-relaxed text-ink-dim md:text-base">
+            聚焦 AI 内容生产、电商与自动化场景，将模型能力转化为可使用、可评测、可追踪、可交付的产品流程。
           </p>
         </FadeIn>
         <FadeIn delay={0.4} y={20}>
-          <div className="mt-2 flex max-w-xl flex-wrap justify-center gap-2">
+          <div className="mt-2 flex max-w-2xl flex-wrap justify-center gap-2">
             {tags.map((t) => (
               <span
                 key={t}
@@ -81,8 +85,8 @@ export default function HeroSection() {
 
       <div className="relative z-30 flex flex-wrap items-end justify-between gap-5">
         <FadeIn delay={0.5} y={20}>
-          <p className="max-w-[300px] font-display text-[clamp(0.75rem,1.4vw,1.05rem)] font-light uppercase leading-snug tracking-wide text-ink">
-            产品设计 + AI 落地 + 原型开发 + 部署交付
+          <p className="max-w-[360px] font-display text-[clamp(0.75rem,1.4vw,1.05rem)] font-light uppercase leading-snug tracking-wide text-ink">
+            产品设计 + AI 应用落地 + 技术协同 + 原型开发与部署验证
           </p>
         </FadeIn>
         <FadeIn delay={0.6} y={20}>
