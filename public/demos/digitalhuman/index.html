@@ -3,16 +3,931 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>数字人风格对话模型微调 — SoulAI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="/resume/demos/digitalhuman/assets/index-D6wha3Fq.js"></script>
-    <link rel="stylesheet" crossorigin href="/resume/demos/digitalhuman/assets/index-BCGOEf-L.css">
-    <link rel="stylesheet" href="/resume/demos/mobile-overrides.css">
+    <meta name="theme-color" content="#08090d" />
+    <meta
+      name="description"
+      content="张滨文数字人风格对话模型微调项目案例：数据治理、Prompt 设计、模型训练、评测与 API 调用闭环。"
+    />
+    <title>数字人风格对话模型微调｜张滨文作品集</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #08090d;
+        --surface: rgba(255, 255, 255, 0.055);
+        --surface-strong: rgba(255, 255, 255, 0.09);
+        --border: rgba(255, 255, 255, 0.12);
+        --border-strong: rgba(118, 222, 255, 0.4);
+        --text: #f7f8fb;
+        --muted: rgba(247, 248, 251, 0.62);
+        --soft: rgba(247, 248, 251, 0.42);
+        --cyan: #76deff;
+        --violet: #b69cff;
+        --green: #84efb1;
+        --warning: #ffd38b;
+        --shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
+        --radius-lg: 28px;
+        --radius-md: 20px;
+        --max-width: 1180px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        background: var(--bg);
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100svh;
+        overflow-x: hidden;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 12% 8%, rgba(118, 222, 255, 0.13), transparent 28rem),
+          radial-gradient(circle at 88% 18%, rgba(182, 156, 255, 0.13), transparent 30rem),
+          linear-gradient(180deg, #08090d 0%, #0c0d13 48%, #08090d 100%);
+        font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .shell {
+        width: min(calc(100% - 32px), var(--max-width));
+        margin-inline: auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        padding-top: env(safe-area-inset-top);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(8, 9, 13, 0.78);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+      }
+
+      .topbar-inner {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .back-link,
+      .topbar-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.045);
+      }
+
+      .back-link {
+        min-height: 42px;
+        padding: 0 16px;
+        color: rgba(255, 255, 255, 0.86);
+        transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+      }
+
+      .back-link:hover {
+        border-color: rgba(118, 222, 255, 0.45);
+        background: rgba(118, 222, 255, 0.08);
+        transform: translateY(-1px);
+      }
+
+      .topbar-badge {
+        padding: 8px 12px;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 14px rgba(132, 239, 177, 0.8);
+      }
+
+      main {
+        padding-bottom: max(72px, calc(48px + env(safe-area-inset-bottom)));
+      }
+
+      .hero {
+        min-height: calc(100svh - 65px);
+        display: grid;
+        align-items: center;
+        grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.82fr);
+        gap: clamp(36px, 7vw, 92px);
+        padding-block: clamp(68px, 10vw, 130px);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid rgba(118, 222, 255, 0.28);
+        border-radius: 999px;
+        color: var(--cyan);
+        background: rgba(118, 222, 255, 0.075);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 850px;
+        margin-bottom: 22px;
+        font-size: clamp(44px, 8vw, 96px);
+        line-height: 0.98;
+        letter-spacing: -0.055em;
+      }
+
+      h1 span {
+        display: block;
+        color: transparent;
+        background: linear-gradient(110deg, #ffffff 0%, var(--cyan) 47%, var(--violet) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+
+      .hero-summary {
+        max-width: 720px;
+        margin-bottom: 28px;
+        color: var(--muted);
+        font-size: clamp(16px, 2vw, 20px);
+        line-height: 1.85;
+      }
+
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .chip {
+        display: inline-flex;
+        min-height: 34px;
+        align-items: center;
+        padding: 6px 12px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.035);
+        font-size: 13px;
+      }
+
+      .hero-panel,
+      .card,
+      .panel {
+        border: 1px solid var(--border);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .hero-panel {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(24px, 4vw, 38px);
+        border-radius: var(--radius-lg);
+      }
+
+      .hero-panel::before {
+        content: "";
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        right: -70px;
+        top: -70px;
+        border-radius: 50%;
+        background: rgba(118, 222, 255, 0.15);
+        filter: blur(10px);
+      }
+
+      .panel-label {
+        position: relative;
+        margin-bottom: 20px;
+        color: var(--soft);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .metric-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .metric {
+        min-width: 0;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 18px;
+        background: rgba(0, 0, 0, 0.24);
+      }
+
+      .metric strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: clamp(26px, 4vw, 40px);
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .panel-note {
+        position: relative;
+        margin: 18px 0 0;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
+        color: var(--soft);
+        font-size: 12px;
+        line-height: 1.75;
+      }
+
+      .section {
+        padding-block: clamp(68px, 9vw, 112px);
+      }
+
+      .section-head {
+        display: grid;
+        grid-template-columns: minmax(0, 0.65fr) minmax(300px, 1.35fr);
+        gap: 32px;
+        align-items: end;
+        margin-bottom: 34px;
+      }
+
+      .section-index {
+        color: var(--cyan);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      h2 {
+        margin-bottom: 0;
+        font-size: clamp(32px, 5vw, 60px);
+        line-height: 1.08;
+        letter-spacing: -0.045em;
+      }
+
+      .section-intro {
+        margin-bottom: 0;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .three-grid,
+      .delivery-grid,
+      .evaluation-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        min-width: 0;
+        padding: 24px;
+        border-radius: var(--radius-md);
+      }
+
+      .card-number {
+        display: inline-flex;
+        width: 34px;
+        height: 34px;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        color: var(--cyan);
+        background: rgba(118, 222, 255, 0.09);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .card h3 {
+        margin-bottom: 12px;
+        font-size: 19px;
+      }
+
+      .card p,
+      .card li {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .card ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .step {
+        position: relative;
+        min-width: 0;
+        padding: 22px 18px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .step:not(:last-child)::after {
+        content: "→";
+        position: absolute;
+        right: -12px;
+        top: 50%;
+        z-index: 2;
+        width: 24px;
+        text-align: center;
+        color: rgba(118, 222, 255, 0.65);
+        transform: translateY(-50%);
+      }
+
+      .step small {
+        display: block;
+        margin-bottom: 16px;
+        color: var(--cyan);
+        font-weight: 800;
+        letter-spacing: 0.12em;
+      }
+
+      .step h3 {
+        margin-bottom: 10px;
+        font-size: 17px;
+      }
+
+      .step p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .case-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+        gap: 18px;
+      }
+
+      .panel {
+        min-width: 0;
+        padding: clamp(24px, 4vw, 38px);
+        border-radius: var(--radius-lg);
+      }
+
+      .panel h3 {
+        margin-bottom: 18px;
+        font-size: clamp(22px, 3vw, 30px);
+      }
+
+      .prompt-stack {
+        display: grid;
+        gap: 10px;
+      }
+
+      .prompt-layer {
+        display: grid;
+        grid-template-columns: 132px minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      .prompt-layer strong {
+        color: var(--cyan);
+        font-size: 13px;
+      }
+
+      .prompt-layer span {
+        min-width: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+      }
+
+      .score-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .score-total strong {
+        font-size: 42px;
+        color: var(--green);
+      }
+
+      .score-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .score-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .score-name {
+        min-width: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .score-value {
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .score-bar {
+        grid-column: 1 / -1;
+        height: 6px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .score-bar::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--cyan), var(--violet));
+      }
+
+      .evaluation-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .evaluation-card {
+        min-width: 0;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .evaluation-card strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--cyan);
+        font-size: 14px;
+      }
+
+      .evaluation-card span {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .boundary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .boundary-card {
+        padding: 24px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+      }
+
+      .boundary-card.good {
+        background: rgba(132, 239, 177, 0.055);
+        border-color: rgba(132, 239, 177, 0.22);
+      }
+
+      .boundary-card.warn {
+        background: rgba(255, 211, 139, 0.055);
+        border-color: rgba(255, 211, 139, 0.22);
+      }
+
+      .boundary-card h3 {
+        margin-bottom: 14px;
+        font-size: 18px;
+      }
+
+      .boundary-card ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .delivery-grid .card {
+        box-shadow: none;
+      }
+
+      .cta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: clamp(26px, 5vw, 48px);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, rgba(118, 222, 255, 0.11), rgba(182, 156, 255, 0.08));
+      }
+
+      .cta h2 {
+        margin-bottom: 10px;
+        font-size: clamp(26px, 4vw, 42px);
+      }
+
+      .cta p {
+        margin-bottom: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .cta-link {
+        flex: 0 0 auto;
+        display: inline-flex;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 20px;
+        border-radius: 999px;
+        color: #05070a;
+        background: linear-gradient(110deg, var(--cyan), #ffffff);
+        font-size: 14px;
+        font-weight: 800;
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .cta-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(118, 222, 255, 0.25);
+      }
+
+      .footnote {
+        margin: 18px 0 0;
+        color: var(--soft);
+        font-size: 12px;
+        line-height: 1.7;
+      }
+
+      @media (max-width: 980px) {
+        .hero,
+        .section-head,
+        .case-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          min-height: auto;
+        }
+
+        .three-grid,
+        .delivery-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .workflow {
+          grid-template-columns: 1fr;
+        }
+
+        .step:not(:last-child)::after {
+          content: "↓";
+          right: auto;
+          left: 50%;
+          top: auto;
+          bottom: -18px;
+          transform: translateX(-50%);
+        }
+
+        .evaluation-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 680px) {
+        .shell {
+          width: min(calc(100% - 24px), var(--max-width));
+        }
+
+        .topbar-inner {
+          min-height: 58px;
+        }
+
+        .topbar-badge {
+          display: none;
+        }
+
+        .back-link {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .hero {
+          gap: 36px;
+          padding-block: 56px 72px;
+        }
+
+        h1 {
+          font-size: clamp(40px, 15vw, 62px);
+        }
+
+        .metric-grid,
+        .three-grid,
+        .delivery-grid,
+        .evaluation-grid,
+        .boundary-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .metric {
+          padding: 16px;
+        }
+
+        .section-head {
+          gap: 18px;
+        }
+
+        .prompt-layer {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+
+        .cta {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .cta-link {
+          width: 100%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="demo-context-bar"><a href="/resume/#projects">← 返回作品集</a><span>交互原型 · 展示数据、训练与评测流程</span></div>
-    <div id="root"></div>
+    <header class="topbar">
+      <div class="shell topbar-inner">
+        <a class="back-link" href="/resume/#projects" aria-label="返回张滨文作品集">← 返回作品集</a>
+        <div class="topbar-badge"><span class="status-dot"></span>交互案例页 · 非生产系统</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="shell hero">
+        <div>
+          <div class="eyebrow">核心案例 · AI 应用与模型评测</div>
+          <h1>数字人风格对话<span>模型微调</span></h1>
+          <p class="hero-summary">
+            针对通用大模型在个性化数字人对话中出现的语气漂移、历史记忆缺失、上下文不连贯与格式不稳定问题，完成从数据治理、Prompt 结构、训练评测到 API 调用的闭环验证。
+          </p>
+          <div class="hero-meta" aria-label="项目标签">
+            <span class="chip">产品负责人 / AI 应用实践</span>
+            <span class="chip">Python</span>
+            <span class="chip">Hugging Face</span>
+            <span class="chip">JSONL</span>
+            <span class="chip">Prompt Engineering</span>
+            <span class="chip">2026.04</span>
+          </div>
+        </div>
+
+        <aside class="hero-panel" aria-label="项目核心数据">
+          <div class="panel-label">Project Evidence</div>
+          <div class="metric-grid">
+            <div class="metric"><strong>1W+</strong><span>原始历史多模态对话</span></div>
+            <div class="metric"><strong>7,328</strong><span>清洗后有效训练数据</span></div>
+            <div class="metric"><strong>26</strong><span>标准测试 Prompt</span></div>
+            <div class="metric"><strong>25 分</strong><span>五维模型评测体系</span></div>
+          </div>
+          <p class="panel-note">
+            本页面用于展示项目方法、产品决策与交付结构，不展示涉及隐私的原始对话、训练权重或敏感业务数据。
+          </p>
+        </aside>
+      </section>
+
+      <section class="shell section" id="problem">
+        <div class="section-head">
+          <div>
+            <div class="section-index">01 · Problem</div>
+            <h2>为什么不是只写一段角色 Prompt</h2>
+          </div>
+          <p class="section-intro">
+            Prompt 可以快速验证角色方向，但当对话轮次增长、历史记忆变长或输出格式变复杂时，单纯依赖提示词容易出现稳定性下降，因此需要把数据、训练与评测放在同一套产品流程中。
+          </p>
+        </div>
+
+        <div class="three-grid">
+          <article class="card">
+            <span class="card-number">01</span>
+            <h3>角色一致性不足</h3>
+            <p>模型在长对话中容易偏离人物语气、价值观和表达习惯，导致数字人“越聊越不像本人”。</p>
+          </article>
+          <article class="card">
+            <span class="card-number">02</span>
+            <h3>上下文与记忆断裂</h3>
+            <p>历史事实、关系状态和当前情绪不能稳定承接，容易重复提问、前后矛盾或忽略关键事件。</p>
+          </article>
+          <article class="card">
+            <span class="card-number">03</span>
+            <h3>输出格式不稳定</h3>
+            <p>业务需要的 <code>[emoji]</code>、<code>[voice]</code> 等结构化标记可能缺失、错位或被自然语言污染。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="shell section" id="workflow">
+        <div class="section-head">
+          <div>
+            <div class="section-index">02 · Workflow</div>
+            <h2>从历史对话到可调用模型</h2>
+          </div>
+          <p class="section-intro">
+            以可复现、可评测和可交付为目标，将模型微调拆成五个相互约束的阶段，而不是把“训练成功”当作项目终点。
+          </p>
+        </div>
+
+        <div class="workflow" aria-label="模型微调流程">
+          <article class="step"><small>STEP 01</small><h3>数据治理</h3><p>清洗、去重、脱敏、角色归属确认和低质量样本剔除。</p></article>
+          <article class="step"><small>STEP 02</small><h3>数据结构化</h3><p>统一为 JSONL，补充角色设定、上下文和输出约束字段。</p></article>
+          <article class="step"><small>STEP 03</small><h3>训练验证</h3><p>划分训练集与验证集，观察 Loss 与异常样本表现。</p></article>
+          <article class="step"><small>STEP 04</small><h3>标准评测</h3><p>用固定测试 Prompt 和评分卡对不同版本进行横向比较。</p></article>
+          <article class="step"><small>STEP 05</small><h3>部署调用</h3><p>通过 API 验证真实上下文、格式标记和业务集成流程。</p></article>
+        </div>
+      </section>
+
+      <section class="shell section" id="design">
+        <div class="section-head">
+          <div>
+            <div class="section-index">03 · Product Design</div>
+            <h2>Prompt 结构与评分卡</h2>
+          </div>
+          <p class="section-intro">
+            将角色信息、当前对话、长期记忆和格式要求拆成稳定字段，让模型训练、在线调用和问题定位使用同一种输入结构。
+          </p>
+        </div>
+
+        <div class="case-layout">
+          <article class="panel">
+            <h3>四层 Prompt 结构</h3>
+            <div class="prompt-stack">
+              <div class="prompt-layer"><strong>角色设定</strong><span>身份、语气、关系、价值观、禁区与行为边界。</span></div>
+              <div class="prompt-layer"><strong>当前上下文</strong><span>本轮用户输入、当前任务和即时情绪线索。</span></div>
+              <div class="prompt-layer"><strong>历史记忆</strong><span>需要持续保持的人物关系、事件和用户偏好。</span></div>
+              <div class="prompt-layer"><strong>输出约束</strong><span>回答长度、表达风格以及 [emoji]、[voice] 等结构化标记。</span></div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="score-total">
+              <div>
+                <div class="panel-label">Evaluation Card</div>
+                <h3 style="margin-bottom: 0">五维评分卡</h3>
+              </div>
+              <strong>25</strong>
+            </div>
+            <div class="score-list">
+              <div class="score-row"><span class="score-name">人物一致性</span><span class="score-value">5 分</span><div class="score-bar"></div></div>
+              <div class="score-row"><span class="score-name">上下文连贯性</span><span class="score-value">5 分</span><div class="score-bar"></div></div>
+              <div class="score-row"><span class="score-name">表达自然度</span><span class="score-value">5 分</span><div class="score-bar"></div></div>
+              <div class="score-row"><span class="score-name">回复稳定性</span><span class="score-value">5 分</span><div class="score-bar"></div></div>
+              <div class="score-row"><span class="score-name">格式合规性</span><span class="score-value">5 分</span><div class="score-bar"></div></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="evaluation-grid" style="margin-top: 16px">
+          <div class="evaluation-card"><strong>人物一致性</strong><span>是否保持固定语气、身份关系和价值判断。</span></div>
+          <div class="evaluation-card"><strong>上下文连贯</strong><span>能否承接上一轮事实并避免前后矛盾。</span></div>
+          <div class="evaluation-card"><strong>自然度</strong><span>表达是否自然，避免模板化和机械重复。</span></div>
+          <div class="evaluation-card"><strong>稳定性</strong><span>同类输入下的质量波动与异常回复概率。</span></div>
+          <div class="evaluation-card"><strong>格式合规</strong><span>结构化标签、字段顺序与输出约束是否正确。</span></div>
+        </div>
+      </section>
+
+      <section class="shell section" id="boundary">
+        <div class="section-head">
+          <div>
+            <div class="section-index">04 · Boundaries</div>
+            <h2>方案边界与风险控制</h2>
+          </div>
+          <p class="section-intro">
+            模型微调不是万能答案。项目同时关注数据授权、隐私脱敏、过拟合、幻觉和在线调用成本，避免只展示理想输出。
+          </p>
+        </div>
+
+        <div class="boundary-grid">
+          <article class="boundary-card good">
+            <h3>适合使用微调的情况</h3>
+            <ul>
+              <li>角色风格需要长期稳定保持</li>
+              <li>存在较高质量且可授权的数据</li>
+              <li>固定输出格式需要更高合规率</li>
+              <li>Prompt 已验证但稳定性仍不足</li>
+            </ul>
+          </article>
+          <article class="boundary-card warn">
+            <h3>必须持续监控的风险</h3>
+            <ul>
+              <li>敏感数据泄露与未经授权训练</li>
+              <li>小数据集过拟合和机械复读</li>
+              <li>角色记忆与事实准确性混淆</li>
+              <li>模型升级后评测口径不可比较</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="shell section" id="delivery">
+        <div class="section-head">
+          <div>
+            <div class="section-index">05 · Delivery</div>
+            <h2>项目交付物</h2>
+          </div>
+          <p class="section-intro">
+            不足两周完成需求、数据、训练、评测、部署和 API 调用闭环，并沉淀可复用的交付材料。
+          </p>
+        </div>
+
+        <div class="delivery-grid">
+          <article class="card"><span class="card-number">A</span><h3>数据模板</h3><p>JSONL 字段规范、数据清洗规则、训练与验证集拆分方法。</p></article>
+          <article class="card"><span class="card-number">B</span><h3>标准测试集</h3><p>26 条固定测试 Prompt，覆盖角色、记忆、情绪、边界和格式场景。</p></article>
+          <article class="card"><span class="card-number">C</span><h3>评测与交付说明</h3><p>25 分制评分卡、版本对比方法、API 调用示例和部署说明。</p></article>
+        </div>
+      </section>
+
+      <section class="shell section" style="padding-top: 28px">
+        <div class="cta">
+          <div>
+            <h2>继续查看完整作品集</h2>
+            <p>返回张滨文的 AI 产品、技术产品与解决方案项目主页。</p>
+          </div>
+          <a class="cta-link" href="/resume/#projects">返回作品集 →</a>
+        </div>
+        <p class="footnote">页面性质：项目案例展示。页面中的流程与数据口径依据简历项目记录整理，不代表已公开训练数据或模型权重。</p>
+      </section>
+    </main>
   </body>
 </html>
