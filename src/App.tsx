@@ -9,9 +9,9 @@ import ImpactCards from './components/ImpactCards';
 import AboutSection from './components/AboutSection';
 import GuoyangFeature from './components/GuoyangFeature';
 import GuoyangWorkflow from './components/GuoyangWorkflow';
+import ProjectsCatalog from './components/ProjectsCatalog';
 import CareerTimeline from './components/CareerTimeline';
 import EducationSection from './components/EducationSection';
-import ProjectsCatalog from './components/ProjectsCatalog';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 
@@ -30,9 +30,9 @@ export default function App() {
         <AboutSection />
         <GuoyangFeature />
         <GuoyangWorkflow />
+        <ProjectsCatalog />
         <CareerTimeline />
         <EducationSection />
-        <ProjectsCatalog />
         <ContactSection />
       </main>
       <Footer />
