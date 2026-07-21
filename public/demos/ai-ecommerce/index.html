@@ -1,73 +1,20 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#f6e2de" />
-  <meta name="description" content="AI 电商主图生成器交互原型：商品理解、风格生成、约束校验与批量导出。" />
-  <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=6" />
-  <link rel="stylesheet" href="../shared/motionsites-showcase.css" />
-  <title>PixelForge — AI 电商主图生成器</title>
-  <style>
-    :root{--page-bg:#f6e2de;--ink:#201817;--font:'Inter',sans-serif}
-    .showcase-page{background:#f6e2de}
-    .showcase-page::before{width:920px;height:920px;border:1px solid rgba(226,87,76,.55);left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 160px rgba(226,87,76,.12),0 0 0 320px rgba(255,255,255,.32)}
-    .showcase-page::after{width:360px;height:360px;background:#e2574c;left:50%;top:50%;transform:translate(-50%,-50%);filter:blur(120px);opacity:.16}
-    .phone{--screen-bg:#fdbdb4;--status:#1d1716;--indicator:rgba(0,0,0,.28);--delay:.08s}
-    .phone:nth-child(2){--delay:.2s}.phone:nth-child(3){--delay:.32s}
-    .screen-pad{position:relative;height:100%;padding:62px 20px 22px;overflow:hidden}
-    .hero-screen{background:#f1afa6;color:#fff}
-    .hero-screen::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(90,28,22,.04),rgba(91,28,22,.08) 44%,rgba(84,25,20,.72));pointer-events:none}
-    .hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) contrast(1.04);animation:ken 16s ease-out both}
-    .hero-badge{position:relative;z-index:3;width:max-content;padding:11px 17px;border-radius:999px;background:#fff;color:#5d2a26;font-size:12px;font-weight:700;box-shadow:0 8px 24px rgba(120,50,43,.18)}
-    .hero-play{position:absolute;right:18px;top:270px;z-index:3;width:82px;height:82px;border:1px solid rgba(255,235,228,.8);background:rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(10px);font-size:20px}
-    .hero-copy{position:absolute;left:25px;right:25px;bottom:88px;z-index:3}.hero-kicker{font-size:22px;font-weight:400;color:#ffd6d0;letter-spacing:.04em}.hero-copy h1{margin-top:5px;font-size:61px;line-height:.9;letter-spacing:-.06em;font-weight:600}.hero-copy p{margin-top:17px;max-width:290px;font-size:13px;line-height:1.55;color:rgba(255,255,255,.8)}
-    .work-screen{background:#fdbdb4}.top-row{display:flex;align-items:center;gap:10px}.search{flex:1;height:50px;display:flex;align-items:center;gap:9px;padding:0 16px;border-radius:999px;background:#fff;color:#7b6966;font-size:13px}.avatar{width:50px;height:50px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.7)}
-    .sheet{position:absolute;left:0;right:0;top:126px;bottom:0;padding:44px 18px 82px;border-radius:54px 54px 0 0;background:#fbe7e2;overflow:auto}.sheet-head{display:flex;justify-content:space-between;align-items:flex-start}.sheet h2{font-size:36px;line-height:.95;letter-spacing:-.05em;font-weight:500}.sheet-menu{font-size:22px;letter-spacing:2px}
-    .filters{display:flex;gap:8px;margin:24px 0 17px;overflow:auto}.filter{border:1.5px solid #251d1b;border-radius:999px;background:transparent;padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}.filter.active{background:#171313;color:#fff}
-    .variant-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.variant-card{position:relative;aspect-ratio:1/1.13;border:0;border-radius:22px;background:#f2cfcb;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s}.variant-card:hover,.variant-card.active{transform:translateY(-3px);box-shadow:0 13px 30px rgba(108,54,48,.16)}.variant-card.active::after{content:"✓";position:absolute;right:10px;top:10px;display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#171313;color:#fff;font-size:12px}.variant-card img{width:100%;height:76%;object-fit:cover}.variant-meta{padding:8px 10px;text-align:left}.variant-meta strong{display:block;font-size:12px}.variant-meta span{font-size:10px;color:#8b7772}
-    .batch-pill{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:7px 8px 7px 17px;border-radius:999px;background:#171313;color:#fff;box-shadow:0 12px 30px rgba(60,20,15,.3);font-size:11px}.batch-pill i{display:grid;place-items:center;width:31px;height:31px;border-radius:50%;background:#fff;color:#171313;font-style:normal}
-    .detail-screen{background:#fdbdb4}.detail-top{display:flex;justify-content:space-between;color:#fff;font-size:22px}.preview{display:block;width:310px;height:310px;margin:35px auto 8px;border-radius:35px;object-fit:cover;box-shadow:0 24px 54px rgba(123,61,54,.24);transition:opacity .2s,transform .3s}.preview.switching{opacity:.45;transform:scale(.97)}
-    .style-row{display:flex;justify-content:center;gap:8px}.style-chip{width:65px;height:65px;border:0;border-radius:20px;background:#fbdfd9;padding:7px;cursor:pointer;transition:transform .2s}.style-chip:hover,.style-chip.active{transform:translateY(-4px);box-shadow:0 10px 22px rgba(110,52,47,.17)}.style-chip span{display:block;width:100%;height:100%;border-radius:15px;background:var(--chip)}
-    .detail-sheet{position:absolute;left:0;right:0;bottom:0;min-height:305px;padding:30px 24px 38px;border-radius:52px 52px 0 0;background:#fbe7e2}.detail-sheet h2{font-size:39px;letter-spacing:-.05em;font-weight:500}.detail-sheet>p{margin-top:8px;color:#9a8883;font-size:13px;line-height:1.5}.constraint-list{display:grid;gap:7px;margin:18px 0}.constraint{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.66);font-size:11px}.constraint b{font-size:10px;color:#2d8a58}.export-row{display:flex;align-items:center;justify-content:space-between;margin-top:12px}.export-row strong{font-size:18px}.export-btn{border:0;border-radius:999px;background:#f6c6be;padding:13px 19px;font-size:12px;font-weight:700;cursor:pointer}.export-btn.done{background:#171313;color:#fff}
-    @keyframes ken{from{transform:scale(1.13)}to{transform:scale(1)}}
-  </style>
-</head>
-<body>
-<a class="portfolio-back" href="/resume/#projects">← 返回作品集</a>
-<main class="showcase-page">
-  <div class="device-stage" aria-label="AI 电商主图生成器三屏展示">
-    <article class="phone">
-      <div class="dynamic-island"></div><div class="statusbar"><span>9:41</span><span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="battery"></span></span></div><div class="home-indicator"></div>
-      <section class="phone-screen hero-screen">
-        <img class="hero-photo" src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=900&q=85" alt="护肤商品原始素材" />
-        <div class="screen-pad"><div class="hero-badge rise">✦ 24 NEW OUTPUTS</div><button class="hero-play round-button pop" aria-label="播放生成过程">▶</button><div class="hero-copy rise" style="--d:.28s"><p class="hero-kicker">RAW PRODUCT → CAMPAIGN</p><h1>From raw<br>to ready.</h1><p>自动识别主体、材质与卖点，在保持包装文字和品牌色不变的前提下生成多渠道主图。</p></div></div>
-      </section>
-    </article>
-
-    <article class="phone">
-      <div class="dynamic-island"></div><div class="statusbar"><span>9:41</span><span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="battery"></span></span></div><div class="home-indicator"></div>
-      <section class="phone-screen work-screen"><div class="screen-pad"><div class="top-row rise"><div class="search">⌕ Search project / SKU</div><img class="avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="用户头像" /></div><div class="sheet no-scrollbar"><div class="sheet-head rise" style="--d:.1s"><h2>Generate<br>variants</h2><span class="sheet-menu">☰</span></div><div class="filters rise" style="--d:.18s"><button class="filter active">All</button><button class="filter">Minimal</button><button class="filter">Lifestyle</button><button class="filter">Premium</button></div><div class="variant-grid">
-        <button class="variant-card active rise" style="--d:.25s" data-img="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=900&q=85"><img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=500&q=85" alt="极简生成图"><span class="variant-meta"><strong>Clean Studio</strong><span>1:1 · 2048px</span></span></button>
-        <button class="variant-card rise" style="--d:.32s" data-img="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=900&q=85"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=500&q=85" alt="生活方式生成图"><span class="variant-meta"><strong>Soft Lifestyle</strong><span>4:5 · 2048px</span></span></button>
-        <button class="variant-card rise" style="--d:.39s" data-img="https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=900&q=85"><img src="https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=500&q=85" alt="高级生成图"><span class="variant-meta"><strong>Premium Glow</strong><span>4:5 · 2048px</span></span></button>
-        <button class="variant-card rise" style="--d:.46s" data-img="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=85"><img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=500&q=85" alt="社媒生成图"><span class="variant-meta"><strong>Social Pop</strong><span>9:16 · 1920px</span></span></button>
-      </div><div class="batch-pill rise" style="--d:.56s"><span>12 outputs selected</span><i>↗</i></div></div></div></section>
-    </article>
-
-    <article class="phone">
-      <div class="dynamic-island"></div><div class="statusbar"><span>9:41</span><span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="battery"></span></span></div><div class="home-indicator"></div>
-      <section class="phone-screen detail-screen"><div class="screen-pad"><div class="detail-top rise"><span>⋮</span><span>☰</span></div><img id="selectedPreview" class="preview pop" src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=900&q=85" alt="当前选择的主图"><div class="style-row rise" style="--d:.16s"><button class="style-chip active" style="--chip:#ef8177" aria-label="珊瑚风格"><span></span></button><button class="style-chip" style="--chip:#1e3a6e" aria-label="深蓝风格"><span></span></button><button class="style-chip" style="--chip:#9fd6a0" aria-label="绿色风格"><span></span></button><button class="style-chip" style="--chip:#c9c2c0" aria-label="灰色风格"><span></span></button></div><div class="detail-sheet rise" style="--d:.24s"><h2>Quality gate</h2><p>结构化校验生成结果，防止模型修改商品主体和包装关键信息。</p><div class="constraint-list"><div class="constraint"><span>Logo 与包装文字</span><b>LOCKED</b></div><div class="constraint"><span>主体颜色与材质</span><b>PASS 98%</b></div><div class="constraint"><span>平台安全区</span><b>PASS</b></div></div><div class="export-row"><strong>12 assets</strong><button id="exportBtn" class="export-btn">Export batch ↗</button></div></div></div></section>
-    </article>
-  </div>
-</main>
-<script>
-  const cards=[...document.querySelectorAll('.variant-card')];
-  const preview=document.getElementById('selectedPreview');
-  cards.forEach(card=>card.addEventListener('click',()=>{cards.forEach(x=>x.classList.remove('active'));card.classList.add('active');preview.classList.add('switching');setTimeout(()=>{preview.src=card.dataset.img;preview.classList.remove('switching')},180)}));
-  document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}));
-  document.querySelectorAll('.style-chip').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.style-chip').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}));
-  document.getElementById('exportBtn').addEventListener('click',e=>{e.currentTarget.classList.add('done');e.currentTarget.textContent='Exported ✓'});
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=2" />
+    <title>电商主图生成器 — AI E-commerce Image Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/resume/demos/ai-ecommerce/assets/index-CZVcH8US.js"></script>
+    <link rel="stylesheet" crossorigin href="/resume/demos/ai-ecommerce/assets/index-BlOY9UZ8.css">
+    <link rel="stylesheet" href="/resume/demos/mobile-overrides.css">
+  </head>
+  <body>
+    <div class="demo-context-bar"><a href="/resume/#projects">← 返回作品集</a><span>交互原型 · 展示核心产品流程</span></div>
+    <div id="root"></div>
+  </body>
 </html>

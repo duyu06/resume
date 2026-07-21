@@ -1,45 +1,17 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#09090b" />
-  <meta name="description" content="叫魂者多 Agent 叙事对话系统：角色卡片、真相进度、信息隔离与分支剧情。" />
-  <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=6" />
-  <link rel="stylesheet" href="../shared/motionsites-showcase.css" />
-  <title>叫魂者 — 多 Agent 叙事系统</title>
-  <style>
-    :root{--page-bg:#f4f3f1;--ink:#fff;--font:'Inter',sans-serif}
-    .showcase-page{background:#f5f4f1}.showcase-page::before{width:680px;height:680px;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.14);filter:blur(160px)}
-    .phone{--phone-w:375px;--phone-h:780px;--phone-radius:52px;--bezel:#1a1a1e;--screen-bg:#000;--status:#fff;--indicator:rgba(255,255,255,.68)}
-    .cinema{position:relative;height:100%;overflow:hidden;background:#000;color:#fff}.backdrop{position:absolute;inset:-42px;background:center/cover no-repeat;filter:blur(38px) brightness(.42) saturate(.7);transform:scale(1.14);transition:background-image .35s}.backdrop::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.28)}
-    .tabs{position:relative;z-index:5;display:flex;align-items:flex-end;padding-top:56px}.tab-side{padding:10px 18px;color:rgba(255,255,255,.48);font-size:10px;font-weight:600}.tab-main{position:relative;flex:1;display:flex;align-items:center;padding:15px 13px;border-radius:27px 27px 0 0;background:#000}.tab-main::before{content:"";position:absolute;left:-28px;bottom:0;width:28px;height:28px;background:radial-gradient(circle at 0 0,transparent 28px,#000 29px)}.tab-main button{border:0;background:transparent;color:#fff;font-size:10px;font-weight:600;cursor:pointer}.tab-main button:last-child{margin-left:auto;color:rgba(255,255,255,.55)}
-    .content{position:relative;z-index:4;height:calc(100% - 102px);display:flex;flex-direction:column;background:#000;border-radius:28px 0 0 0;padding:16px 18px 22px}.chapter{text-align:center;font-size:55px;line-height:.9;font-weight:800;letter-spacing:-.07em}.chapter span{font-size:27px;color:rgba(255,255,255,.72)}.truth-line{margin:7px auto 0;width:125px;height:4px;border-radius:999px;background:rgba(255,255,255,.13);overflow:hidden}.truth-line i{display:block;height:100%;width:38%;border-radius:inherit;background:#fff;transition:width .35s}
-    .stack{position:relative;height:450px;margin-top:39px;perspective:1200px}.agent-card{position:absolute;inset:0;border-radius:22px;overflow:hidden;background:#222;transform:translateY(calc(var(--pos) * -23px)) scale(calc(1 - var(--pos) * .048));opacity:calc(1 - var(--pos) * .18);z-index:calc(10 - var(--pos));transition:transform .48s cubic-bezier(.4,0,.2,1),opacity .48s;touch-action:none;user-select:none;will-change:transform,opacity}.agent-card img{width:100%;height:100%;object-fit:cover;pointer-events:none;filter:saturate(.72) contrast(1.05)}.agent-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),transparent 46%,rgba(0,0,0,.75))}.agent-card.front{cursor:grab}.agent-card.dragging{transition:none;cursor:grabbing}.agent-card.dropping{animation:drop .48s ease forwards}.card-badges{position:absolute;left:13px;top:13px;z-index:3;display:grid;gap:6px}.badge{width:max-content;padding:6px 10px;border-radius:999px;background:#000;color:#fff;font-size:9px}.card-copy{position:absolute;left:16px;right:16px;bottom:18px;z-index:3}.card-copy small{font-size:9px;color:rgba(255,255,255,.66);text-transform:uppercase;letter-spacing:.13em}.card-copy h2{margin-top:5px;font-size:31px;line-height:.95;letter-spacing:-.045em}.card-copy p{margin-top:8px;font-size:10px;line-height:1.45;color:rgba(255,255,255,.72)}
-    .hint{text-align:center;margin-top:10px;color:rgba(255,255,255,.4);font-size:8px;letter-spacing:.1em;text-transform:uppercase}.bottom-nav{position:absolute;left:50%;bottom:20px;z-index:20;transform:translateX(-50%);display:flex;align-items:center;gap:2px;padding:6px;border-radius:999px;background:rgba(255,255,255,.06);backdrop-filter:blur(12px);box-shadow:inset 0 1px rgba(255,255,255,.12)}.bottom-nav button{display:flex;align-items:center;gap:6px;height:39px;padding:0 13px;border:0;border-radius:999px;background:transparent;color:rgba(255,255,255,.4);font-size:12px;cursor:pointer}.bottom-nav button.active{background:rgba(255,255,255,.11);color:#fff}.bottom-nav span{font-size:8px}
-    .case-meta{position:absolute;left:17px;bottom:71px;z-index:8;font-size:8px;color:rgba(255,255,255,.45)}
-    @keyframes drop{0%{opacity:1}60%{opacity:.25}100%{transform:translateY(130%) scale(.8) rotate(8deg);opacity:0}}
-  </style>
-</head>
-<body>
-<a class="portfolio-back" href="/resume/#projects">← 返回作品集</a>
-<main class="showcase-page"><div class="device-stage" aria-label="叫魂者多 Agent 叙事系统">
-  <article class="phone"><div class="dynamic-island"></div><div class="statusbar"><span>9:41</span><span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="battery"></span></span></div><div class="home-indicator"></div><section class="phone-screen cinema"><div id="backdrop" class="backdrop"></div><div class="tabs rise"><span class="tab-side">案件</span><div class="tab-main"><button>角色审讯</button><button>真相 ›</button></div></div><div class="content"><div class="chapter rise" style="--d:.1s">03 <span>章</span></div><div class="truth-line rise" style="--d:.15s"><i id="truthBar"></i></div><div id="stack" class="stack pop" style="--d:.25s"></div><p class="hint rise" style="--d:.36s">向下拖拽角色卡 · 推进叙事</p></div><div class="case-meta">角色信息隔离开启 · 世界状态同步</div><nav class="bottom-nav rise" style="--d:.45s"><button>▦</button><button class="active">◉ <span>角色</span></button><button>◇</button><button>○</button></nav></section></article>
-</div></main>
-<script>
- const agents=[
-  {name:'审判官',role:'Judge Agent',truth:38,img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=85',desc:'掌握案件规则与公开证据，但不会透露未解锁的核心事实。'},
-  {name:'沈墨',role:'Scholar Agent',truth:47,img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=85',desc:'熟悉地方志与仪式记录，回答受角色身份和记忆边界约束。'},
-  {name:'林霜',role:'Witness Agent',truth:56,img:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=85',desc:'目击过关键事件，但她的叙述会受到恐惧与关系状态影响。'},
-  {name:'守夜人',role:'Gatekeeper Agent',truth:64,img:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=700&q=85',desc:'负责控制地点、时间与行动权限，阻止角色越界。'},
-  {name:'纸人',role:'Echo Agent',truth:72,img:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=700&q=85',desc:'以碎片化话语复述历史记忆，提供隐晦线索而非直接答案。'},
-  {name:'叙事者',role:'Narrator Agent',truth:81,img:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=85',desc:'维护世界状态、剧情分支与真相进度，协调所有 Agent。'}
- ];
- let order=[0,1,2,3,4,5],dragY=0,startY=0,dragging=null;
- const stack=document.getElementById('stack'),backdrop=document.getElementById('backdrop'),truthBar=document.getElementById('truthBar');
- function render(){stack.innerHTML='';order.slice(0,4).forEach((idx,pos)=>{const a=agents[idx],card=document.createElement('article');card.className='agent-card'+(pos===0?' front':'');card.style.setProperty('--pos',pos);card.innerHTML=`<img src="${a.img}" alt="${a.name}"><div class="card-badges"><span class="badge">◷ 记忆层 ${pos+1}</span><span class="badge">✦ 真相 ${a.truth}%</span></div><div class="card-copy"><small>${a.role}</small><h2>${a.name}</h2><p>${a.desc}</p></div>`;if(pos===0)bind(card);stack.appendChild(card)});const current=agents[order[0]];backdrop.style.backgroundImage=`url("${current.img}")`;truthBar.style.width=current.truth+'%'}
- function bind(card){card.addEventListener('pointerdown',e=>{dragging=card;startY=e.clientY;dragY=0;card.setPointerCapture(e.pointerId);card.classList.add('dragging')});card.addEventListener('pointermove',e=>{if(dragging!==card)return;dragY=Math.max(0,e.clientY-startY);card.style.transform=`translateY(${dragY}px) rotate(${dragY*.015}deg)`;card.style.opacity=String(Math.max(.2,1-dragY/280))});card.addEventListener('pointerup',()=>{if(dragging!==card)return;card.classList.remove('dragging');if(dragY>75){card.classList.add('dropping');setTimeout(()=>{order.push(order.shift());render()},460)}else{card.style.transform='';card.style.opacity=''}dragging=null})}
- render();
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=2" />
+    <title>SoulCaller — 叫魂者多 Agent 叙事对话系统</title>
+    <script type="module" crossorigin src="/resume/demos/soulcaller/assets/index-CyMeDNwh.js"></script>
+    <link rel="stylesheet" crossorigin href="/resume/demos/soulcaller/assets/index-B6AjalHq.css">
+    <link rel="stylesheet" href="/resume/demos/mobile-overrides.css">
+  </head>
+  <body>
+    <div class="demo-context-bar"><a href="/resume/#projects">← 返回作品集</a><span>实验项目 · 展示多 Agent 协作与状态管理</span></div>
+    <div id="root"></div>
+  </body>
 </html>
