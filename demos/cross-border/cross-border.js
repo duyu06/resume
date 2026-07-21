@@ -42,6 +42,7 @@
   function createScrubber(video, options = {}) {
     const state = {
       duration: 0,
+      targetProgress: 0,
       targetTime: 0,
       currentTime: 0,
       lastSeekAt: 0,
@@ -60,17 +61,28 @@
     video.preload = isMobile ? 'metadata' : 'auto';
     video.pause();
 
+    const syncTarget = () => {
+      if (state.duration > 0) state.targetTime = state.targetProgress * Math.max(0, state.duration - 0.03);
+    };
     const markReady = () => {
       state.duration = Number.isFinite(video.duration) ? video.duration : 0;
       state.currentTime = video.currentTime || 0;
+      syncTarget();
       video.pause();
       video.classList.add('is-ready');
     };
-    const markError = () => video.classList.add('is-error');
+    const markBuffering = () => video.classList.remove('is-ready');
+    const markError = () => {
+      video.classList.remove('is-ready');
+      video.classList.add('is-error');
+    };
 
     video.addEventListener('loadedmetadata', markReady, { passive: true });
     video.addEventListener('loadeddata', markReady, { passive: true });
     video.addEventListener('canplay', markReady, { passive: true });
+    video.addEventListener('seeked', markReady, { passive: true });
+    video.addEventListener('waiting', markBuffering, { passive: true });
+    video.addEventListener('stalled', markBuffering, { passive: true });
     video.addEventListener('error', markError, { passive: true });
 
     function tick(now) {
@@ -94,8 +106,8 @@
 
     const controller = {
       setProgress(progress) {
-        const safeProgress = Math.max(0, Math.min(1, progress));
-        if (state.duration > 0) state.targetTime = safeProgress * Math.max(0, state.duration - 0.03);
+        state.targetProgress = Math.max(0, Math.min(1, progress));
+        syncTarget();
       },
       destroy() {
         state.destroyed = true;
@@ -103,6 +115,9 @@
         video.removeEventListener('loadedmetadata', markReady);
         video.removeEventListener('loadeddata', markReady);
         video.removeEventListener('canplay', markReady);
+        video.removeEventListener('seeked', markReady);
+        video.removeEventListener('waiting', markBuffering);
+        video.removeEventListener('stalled', markBuffering);
         video.removeEventListener('error', markError);
       },
     };
@@ -213,9 +228,7 @@
       const chars = card.querySelectorAll('.stat-char');
       const words = card.querySelectorAll('.detail-word');
       const subtext = card.querySelector('.card-subtext');
-      const timeline = gsap.timeline({
-        scrollTrigger: { trigger: card, start: 'top 72%', once: true },
-      });
+      const timeline = gsap.timeline({ scrollTrigger: { trigger: card, start: 'top 72%', once: true } });
       timeline.from(chars, {
         yPercent: 105,
         opacity: 0,
