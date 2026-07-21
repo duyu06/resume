@@ -3,13 +3,13 @@ import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
 
 const features = [
-  { icon: Image, title: 'AI 图片生成', desc: '文字描述秒级出图，支持 2K/4K 高清' },
-  { icon: Video, title: 'AI 视频生成', desc: '文生视频 / 图生视频，首尾帧精准控制' },
-  { icon: Package, title: '商品组图', desc: '电商产品图专业生成与批量产出' },
-  { icon: MessageSquare, title: '对话式创作', desc: '多轮对话迭代修改，持续打磨效果' },
+  { icon: Image, title: 'AI 图片生成', desc: '支持多模型图片生成、参考图控制与 2K/4K 高清输出' },
+  { icon: Video, title: 'AI 视频生成', desc: '支持文生视频、图生视频及首尾帧控制' },
+  { icon: Package, title: '商品组图', desc: '面向电商场景进行产品图生成与批量产出' },
+  { icon: MessageSquare, title: '对话式创作', desc: '通过多轮对话和版本记录持续迭代生成结果' },
 ];
 
-const models = ['Nano Banana Pro', 'Doubao-Seedream-5.0', 'Doubao-Seedance-2.0', 'Gemini 3.1 Pro'];
+const models = ['OpenAI', 'Gemini', 'Kling', 'Seedream', 'Seedance', 'Veo'];
 
 const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`;
 
@@ -22,7 +22,7 @@ export default function GuoyangFeature() {
             <div>
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[0.7rem] uppercase tracking-[0.18em] text-accent">
                 <Sparkles className="h-3.5 w-3.5" />
-                Featured Project · Live
+                公司项目 · 线上产品
               </div>
               <h2
                 className="hero-heading font-display font-black uppercase leading-none tracking-tight"
@@ -31,10 +31,10 @@ export default function GuoyangFeature() {
                 果漾 AI
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-dim md:text-base">
-                剧本导入 → 角色四视图 → 智能分镜 → 首尾帧 → 视频生成 → FFmpeg 成片
+                剧本导入 → 角色四视图 → 智能分镜 → 参考帧 / 首尾帧 → 视频生成 → FFmpeg 成片
               </p>
               <p className="mt-1.5 max-w-xl text-sm text-ink/80 md:text-base">
-                guoyang.xin — 产品与技术协同 / 核心参与者 · 持续迭代中
+                长沙果漾商贸有限公司 · 产品与技术协同 / 核心参与者 · 2025—至今
               </p>
             </div>
             <ContactButton
@@ -87,26 +87,26 @@ export default function GuoyangFeature() {
             {features.map((f, i) => {
               const Icon = f.icon;
               return (
-                <FadeIn key={f.title} delay={0.12 + i * 0.06} y={24}>
-                  <div className="glass group flex gap-4 rounded-[22px] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-accent/35 sm:p-5">
+                <FadeIn key={f.title} delay={0.12 + i * 0.06} y={24} className="w-full">
+                  <div className="glass group flex w-full min-w-0 gap-4 rounded-[22px] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-accent/35 sm:p-5">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/30 to-accent-3/20 text-ink">
                       <Icon className="h-5 w-5" strokeWidth={1.75} />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="font-display text-base font-semibold text-ink sm:text-lg">
                         {f.title}
                       </h3>
-                      <p className="mt-1 text-sm leading-relaxed text-ink-dim">{f.desc}</p>
+                      <p className="mt-1 break-words text-sm leading-relaxed text-ink-dim">{f.desc}</p>
                     </div>
                   </div>
                 </FadeIn>
               );
             })}
 
-            <FadeIn delay={0.4} y={20}>
-              <div className="rounded-[22px] border border-dashed border-ink/20 bg-white/[0.03] px-5 py-4 text-sm leading-relaxed text-ink-dim">
+            <FadeIn delay={0.4} y={20} className="w-full">
+              <div className="w-full rounded-[22px] border border-dashed border-ink/20 bg-white/[0.03] px-5 py-4 text-sm leading-relaxed text-ink-dim">
                 <span className="font-medium text-ink">我的角色：</span>
-                梳理端到端任务流，设计异步队列与 WebSocket 进度回传，多模型选型与成本核算，为套餐分层与计费预留扩展。
+                参与端到端任务流、异步任务、WebSocket 状态回传、失败重试、结果留存及多模型接口统一设计，并为额度、套餐、成本核算和计费体系预留扩展能力。
               </div>
             </FadeIn>
           </div>
