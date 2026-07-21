@@ -1,794 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blue Nile — Cross-border Store</title>
-  <meta name="theme-color" content="#E96B00" />
-  <meta name="description" content="Blue Nile luxury jewelry storefront interaction prototype." />
-  <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=5" />
-  <link href="https://db.onlinewebfonts.com/c/7973d1644865c7217230fea96daae6fe?family=Test+Founders+Grotesk+Light" rel="stylesheet">
-  <link href="https://db.onlinewebfonts.com/c/12487acadbf8efa35235fe8d339411ec?family=NimbusSanExt" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="YOLA 跨境精品独立站交互原型：滚动视频、横向商品展示、品牌数据与固定页脚揭示。" />
+  <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=3" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet" />
+  <link rel="preload" as="image" href="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" />
+  <link rel="stylesheet" href="./cross-border.css" />
+  <title>YOLA — 跨境精品独立站</title>
   <style>
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Test Founders Grotesk Light', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow: hidden;
-    }
-
-    /* ===== ANIMATIONS ===== */
-    @keyframes fade-in-up {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fade-in-down {
-      from { opacity: 0; transform: translateY(-24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fade-in-scale {
-      from { opacity: 0; transform: translate(-50%, 0) scale(0.95); }
-      to { opacity: 1; transform: translate(-50%, 0) scale(1); }
-    }
-
-    @keyframes fade-in {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes line-grow {
-      from { transform: scaleY(0); }
-      to { transform: scaleY(1); }
-    }
-
-    .animate-fade-in-up {
-      animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    .animate-fade-in-down {
-      animation: fade-in-down 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    .animate-fade-in-scale {
-      animation: fade-in-scale 1s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    .animate-fade-in {
-      animation: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    .animate-line-grow {
-      transform-origin: top;
-      animation: line-grow 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    /* ===== LAYOUT ===== */
-    .page-wrapper {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .hero-section {
-      position: relative;
-      flex: 1;
-      width: 100%;
-      background-color: #E96B00;
-      overflow: hidden;
-    }
-
-    /* ===== GRADIENT GLOW ===== */
-    .gradient-glow {
-      position: absolute;
-      left: -96px;
-      top: 33%;
-      width: 1360px;
-      height: 1360px;
-      border-radius: 50%;
-      background: rgba(246, 187, 126, 0.4);
-      filter: blur(450px);
-    }
-
-    /* ===== GRID LINES ===== */
-    .grid-lines {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .grid-line {
-      position: absolute;
-      top: 0;
-      width: 1px;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.16);
-    }
-
-    /* ===== NAVIGATION ===== */
-    .nav {
-      position: relative;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 28px 24px 0;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      font-size: 20px;
-      line-height: 1.25;
-      transition: opacity 0.2s;
-    }
-
-    .nav-links a:hover {
-      opacity: 0.8;
-    }
-
-    .cart-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      background: black;
-      border-radius: 50%;
-      color: white;
-      font-size: 13px;
-      line-height: 1;
-    }
-
-    .cart-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* ===== LARGE HEADING ===== */
-    .hero-heading-wrapper {
-      position: absolute;
-      top: 5%;
-      left: 0;
-      right: 0;
-      z-index: 10;
-      text-align: center;
-    }
-
-    .hero-heading {
-      font-family: 'NimbusSanExt', sans-serif;
-      font-weight: bold;
-      color: white;
-      font-size: clamp(12rem, 24vw, 30rem);
-      line-height: 0.85;
-      letter-spacing: -0.10em;
-      white-space: nowrap;
-    }
-
-    /* ===== CENTER HERO IMAGE ===== */
-    .hero-image-wrapper {
-      position: absolute;
-      top: 8%;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      width: 54%;
-      max-width: 760px;
-    }
-
-    .hero-image-wrapper img {
-      width: 100%;
-      height: auto;
-      object-fit: cover;
-      position: relative;
-      z-index: 10;
-    }
-
-    /* ===== LEFT COLUMN ===== */
-    .left-column {
-      position: absolute;
-      left: 0;
-      top: 42%;
-      bottom: 0;
-      z-index: 30;
-      width: calc(25.4% + 86px);
-      max-width: 451px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .exclusive-card {
-      position: relative;
-      background: white;
-      aspect-ratio: 280 / 160;
-      overflow: hidden;
-      flex-shrink: 0;
-      width: calc(100% - 86px);
-    }
-
-    .exclusive-card .label {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      color: black;
-      font-size: 18px;
-      font-weight: 500;
-      z-index: 10;
-    }
-
-    .exclusive-card img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .left-middle-row {
-      display: flex;
-      flex: 1;
-    }
-
-    .left-middle-text {
-      flex: 1;
-      padding: 16px 12px;
-    }
-
-    .left-middle-text p {
-      color: white;
-      font-size: 20px;
-      line-height: 1.625;
-    }
-
-    .arrow-button {
-      width: 86px;
-      height: 84px;
-      background: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      align-self: flex-start;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .arrow-button:hover {
-      background: rgba(0, 0, 0, 0.9);
-    }
-
-    .arrow-button svg {
-      width: 20px;
-      height: 20px;
-      color: white;
-    }
-
-    .explore-button {
-      width: calc(100% - 86px);
-      height: 88px;
-      background: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: background-color 0.2s;
-    }
-
-    .explore-button:hover {
-      background: rgba(0, 0, 0, 0.9);
-    }
-
-    .explore-button span {
-      color: white;
-      font-size: 20px;
-      font-weight: 500;
-    }
-
-    /* ===== AWARDS SECTION ===== */
-    .awards-section {
-      display: flex;
-      position: absolute;
-      right: 24px;
-      top: 42%;
-      z-index: 30;
-      width: calc(25.4% - 24px);
-      max-width: 341px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .awards-number {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .awards-bracket {
-      color: white;
-      font-size: 48px;
-      font-weight: 300;
-    }
-
-    .awards-value-wrapper {
-      display: flex;
-      align-items: flex-start;
-    }
-
-    .awards-value {
-      color: white;
-      font-size: 48px;
-      font-weight: 700;
-    }
-
-    .awards-plus {
-      color: white;
-      font-size: 20px;
-      font-weight: 700;
-      position: relative;
-      top: -4px;
-    }
-
-    .awards-text {
-      text-align: right;
-    }
-
-    .awards-text p {
-      color: white;
-      font-size: 20px;
-      text-transform: uppercase;
-      line-height: 1.375;
-      letter-spacing: 0.025em;
-    }
-
-    /* ===== SINCE 2017 ===== */
-    .since-2017 {
-      position: absolute;
-      right: 24px;
-      top: 60%;
-      z-index: 30;
-    }
-
-    .since-2017 span {
-      color: white;
-      font-size: 20px;
-    }
-
-    /* ===== PRODUCT CARD (DESKTOP) ===== */
-    .product-card-desktop {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      z-index: 30;
-      width: 25.4%;
-      max-width: 365px;
-    }
-
-    .product-card {
-      background: white;
-      padding: 12px;
-      height: 276px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-    }
-
-    .product-card h3 {
-      color: black;
-      font-size: 20px;
-      font-weight: 500;
-      line-height: 1.25;
-    }
-
-    .product-card .subtitle {
-      color: rgba(0, 0, 0, 0.6);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
-    .product-card .center-image {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 75%;
-      height: auto;
-      object-fit: contain;
-    }
-
-    .product-card .price-label {
-      color: rgba(11, 33, 34, 0.64);
-      font-size: 14px;
-    }
-
-    .product-card .price {
-      color: #0B2122;
-      font-size: 20px;
-      font-weight: 500;
-    }
-
-    .product-arrow {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 92px;
-      height: 84px;
-      background: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .product-arrow:hover {
-      background: rgba(0, 0, 0, 0.9);
-    }
-
-    .product-arrow svg {
-      width: 20px;
-      height: 20px;
-      color: white;
-    }
-
-    /* ===== MOBILE STYLES ===== */
-    .mobile-only { display: none; }
-    .mobile-logo { display: none; }
-    .hamburger { display: none; }
-    .mobile-menu { display: none; }
-    .mobile-product-card { display: none; }
-    .mobile-grid-line { display: none; }
-    .desktop-grid-line { display: block; }
-
-    @media (max-width: 1023px) {
-      .page-wrapper {
-        height: 100vh;
-      }
-
-      .mobile-only { display: block; }
-      .desktop-only { display: none; }
-      .mobile-grid-line { display: block; }
-      .desktop-grid-line { display: none; }
-
-      .nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding: 20px 16px 0;
-      }
-
-      .nav-links { display: none; }
-
-      .mobile-logo {
-        display: block;
-        font-family: 'NimbusSanExt', sans-serif;
-        color: white;
-        font-size: 24px;
-        font-weight: bold;
-        line-height: 1;
-      }
-
-      .hamburger {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
-        position: relative;
-        z-index: 50;
-      }
-
-      .hamburger svg {
-        width: 24px;
-        height: 24px;
-      }
-
-      .hero-heading-wrapper { display: none; }
-
-      .hero-image-wrapper {
-        top: auto;
-        bottom: -40px;
-        width: 132%;
-        max-width: none;
-      }
-
-      .left-column { display: none; }
-
-      .awards-section {
-        left: 16px;
-        right: 16px;
-        top: auto;
-        bottom: 16px;
-        width: auto;
-        max-width: none;
-      }
-
-      .awards-bracket { font-size: 72px; }
-      .awards-value { font-size: 72px; }
-      .awards-plus { font-size: 24px; }
-
-      .since-2017 { display: none; }
-      .product-card-desktop { display: none; }
-
-      .mobile-product-card {
-        display: block;
-        position: relative;
-        width: 100%;
-        flex-shrink: 0;
-      }
-
-      .mobile-product-card .product-card {
-        height: 260px;
-      }
-    }
-
-
-    .portfolio-back {
-      position: fixed;
-      left: 24px;
-      bottom: 20px;
-      z-index: 80;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 42px;
-      padding: 0 16px;
-      background: rgba(0,0,0,0.92);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.18);
-      text-decoration: none;
-      font-size: 13px;
-      letter-spacing: 0.02em;
-      backdrop-filter: blur(10px);
-      transition: transform .2s, background-color .2s;
-    }
-    .portfolio-back:hover { transform: translateY(-2px); background: #000; }
-    @media (max-width: 1023px) {
-      .portfolio-back { left: 16px; bottom: 12px; min-height: 40px; font-size: 12px; }
-    }
-
-    /* ===== SVG ICON ===== */
-    .icon-arrow-up-right {
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
+    .menu-panel{position:fixed;top:88px;right:32px;z-index:130;width:min(320px,calc(100vw - 32px));padding:22px;border:1px solid rgba(0,0,0,.14);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);opacity:0;visibility:hidden;transform:translateY(-10px);transition:.25s}
+    .menu-panel.is-open{opacity:1;visibility:visible;transform:none}.menu-panel nav{display:grid}.menu-panel a{padding:14px 0;border-bottom:1px solid rgba(0,0,0,.14);font-size:14px;text-transform:uppercase}.menu-panel a:last-child{border-bottom:0}
+    @media(max-width:768px){.menu-panel{top:68px;right:16px}}
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="./cross-border.js" defer></script>
 </head>
 <body>
-  <a class="portfolio-back" href="/resume/#projects">← Portfolio</a>
-  <div class="page-wrapper">
-    <!-- MAIN HERO SECTION -->
-    <section class="hero-section">
-
-      <!-- Gradient Glow -->
-      <div class="gradient-glow"></div>
-
-      <!-- Grid Lines -->
-      <div class="grid-lines">
-        <!-- Mobile lines -->
-        <div class="grid-line mobile-grid-line animate-line-grow" style="left: 33.333%; animation-delay: 0.2s;"></div>
-        <div class="grid-line mobile-grid-line animate-line-grow" style="left: 66.666%; animation-delay: 0.35s;"></div>
-        <!-- Desktop lines -->
-        <div class="grid-line desktop-grid-line animate-line-grow" style="left: 25%; animation-delay: 0.2s;"></div>
-        <div class="grid-line desktop-grid-line animate-line-grow" style="left: 50%; animation-delay: 0.35s;"></div>
-        <div class="grid-line desktop-grid-line animate-line-grow" style="left: 75%; animation-delay: 0.5s;"></div>
-      </div>
-
-      <!-- Navigation -->
-      <nav class="nav animate-fade-in-down" style="animation-delay: 0.1s;">
-        <!-- Desktop left links -->
-        <div class="nav-links desktop-only">
-          <a href="#">Search</a>
-          <a href="#">Catalog</a>
-          <a href="#">About</a>
-        </div>
-
-        <!-- Desktop right links -->
-        <div class="nav-links desktop-only">
-          <a href="/resume/#projects">Portfolio</a>
-          <a href="#">Favorites</a>
-          <a href="#" class="cart-link">
-            Cart
-            <span class="cart-badge">2</span>
-          </a>
-        </div>
-
-        <!-- Mobile logo -->
-        <div class="mobile-logo">Blue<br>Nile</div>
-
-        <!-- Mobile hamburger -->
-        <button class="hamburger" aria-label="Toggle menu" onclick="toggleMenu()">
-          <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="4" x2="20" y1="12" y2="12"></line>
-            <line x1="4" x2="20" y1="6" y2="6"></line>
-            <line x1="4" x2="20" y1="18" y2="18"></line>
-          </svg>
-          <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none; position:absolute;">
-            <path d="M18 6 6 18"></path>
-            <path d="m6 6 12 12"></path>
-          </svg>
+  <header class="site-header">
+    <a class="brand-logo" href="#hero" aria-label="YOLA 首页">
+      <svg viewBox="0 0 122 60" role="img" aria-label="YOLA">
+        <text x="1" y="41" fill="currentColor" font-family="Georgia,serif" font-size="32" letter-spacing="-2">YOLA</text>
+      </svg>
+    </a>
+    <nav class="header-nav" aria-label="主要导航">
+      <a href="#about">ABOUT</a>
+      <div class="header-actions">
+        <button class="menu-button" type="button" aria-label="打开菜单" aria-expanded="false">
+          <span class="menu-lines" aria-hidden="true"><span></span><span></span></span>
         </button>
-      </nav>
+        <button class="header-action" type="button" data-scroll-target="#collection">[ BAG ]</button>
+      </div>
+    </nav>
+  </header>
 
-      <!-- Mobile Menu Overlay -->
-      <div id="mobile-menu" class="mobile-menu" style="position:fixed; inset:0; z-index:40; visibility:hidden; transition: all 0.5s cubic-bezier(0.77,0,0.18,1);">
-        <div id="menu-backdrop" style="position:absolute; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); opacity:0; transition: opacity 0.5s cubic-bezier(0.77,0,0.18,1);" onclick="toggleMenu()"></div>
-        <div id="menu-panel" style="position:absolute; top:0; left:0; height:100%; width:80%; max-width:320px; background:#E96B00; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); transform:translateX(-100%); transition: transform 0.5s cubic-bezier(0.77,0,0.18,1);">
-          <div style="display:flex; flex-direction:column; gap:4px; padding:96px 24px 0;">
-            <a href="#" class="menu-item" style="color:white; text-decoration:none; font-size:30px; font-weight:500; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.1); transition: all 0.3s; opacity:0; transform:translateX(-20px);">Search</a>
-            <a href="#" class="menu-item" style="color:white; text-decoration:none; font-size:30px; font-weight:500; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.1); transition: all 0.3s; opacity:0; transform:translateX(-20px);">Catalog</a>
-            <a href="#" class="menu-item" style="color:white; text-decoration:none; font-size:30px; font-weight:500; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.1); transition: all 0.3s; opacity:0; transform:translateX(-20px);">About</a>
-            <a href="/resume/#projects" class="menu-item" style="color:white; text-decoration:none; font-size:30px; font-weight:500; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.1); transition: all 0.3s; opacity:0; transform:translateX(-20px);">Portfolio</a>
-            <a href="#" class="menu-item" style="color:white; text-decoration:none; font-size:30px; font-weight:500; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.1); transition: all 0.3s; opacity:0; transform:translateX(-20px);">Favorites</a>
-          </div>
+  <aside class="menu-panel" aria-label="快捷导航">
+    <nav>
+      <a href="#hero">Measured Purity</a>
+      <a href="#collection">Collection</a>
+      <a href="#about">Our Method</a>
+      <a href="#footer">Newsletter</a>
+      <a href="/resume/#projects">Return to Portfolio</a>
+    </nav>
+  </aside>
+
+  <a class="demo-back" href="/resume/#projects">← 返回作品集</a>
+
+  <div class="page-shell">
+    <section class="hero-scroll" id="hero" aria-label="YOLA 品牌主视觉">
+      <div class="hero-sticky">
+        <video class="hero-video" muted playsinline preload="auto" poster="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_212146_743b92b3-40a3-46cb-988d-7bf716564ec3.mp4"></video>
+        <div class="hero-overlay" aria-hidden="true"></div>
+        <div class="hero-content">
+          <h1 class="hero-title">
+            <span class="hero-title-line"><span class="hero-title-line-inner">MEASURED</span></span>
+            <span class="hero-title-line"><span class="hero-title-line-inner">PURITY</span></span>
+          </h1>
+          <button class="capsule-button" type="button" data-scroll-target="#collection"><span>Discover</span><span class="capsule-icon" aria-hidden="true"></span></button>
         </div>
       </div>
-
-      <!-- Large "Blue Nile" Heading (desktop) -->
-      <div class="hero-heading-wrapper desktop-only animate-fade-in" style="animation-delay: 0.3s;">
-        <h1 class="hero-heading">Blue Nile</h1>
-      </div>
-
-      <!-- Center Hero Image -->
-      <div class="hero-image-wrapper animate-fade-in-scale" style="animation-delay: 0.5s;">
-        <img src="https://soft-zoom-63098134.figma.site/_assets/v11/9028130a3e77802079d3a2e663b85ee12d365b61.png" alt="Model showcasing jewelry" />
-      </div>
-
-      <!-- Left Column (desktop) -->
-      <div class="left-column desktop-only animate-fade-in-up" style="animation-delay: 0.7s;">
-        <!-- Exclusive Card -->
-        <div class="exclusive-card">
-          <span class="label">Exclusive</span>
-          <img src="https://soft-zoom-63098134.figma.site/_assets/v11/d499425c000b01d01831365b4b9df4feb1bead8a.png" alt="Exclusive jewelry piece" />
-        </div>
-        <!-- Middle Row -->
-        <div class="left-middle-row">
-          <div class="left-middle-text">
-            <p>Each design reflects the dialogue between craftsmanship and feeling</p>
-          </div>
-          <div class="arrow-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 7h10v10"></path>
-              <path d="M7 17 17 7"></path>
-            </svg>
-          </div>
-        </div>
-        <!-- Explore Button -->
-        <div class="explore-button">
-          <span>Explore Collection</span>
-        </div>
-      </div>
-
-      <!-- Awards Section -->
-      <div class="awards-section animate-fade-in-up" style="animation-delay: 0.9s;">
-        <div class="awards-number">
-          <span class="awards-bracket">[</span>
-          <div class="awards-value-wrapper">
-            <span class="awards-value">12</span>
-            <span class="awards-plus">+</span>
-          </div>
-          <span class="awards-bracket">]</span>
-        </div>
-        <div class="awards-text">
-          <p>Awards<br>Celebrate<br>Innovation</p>
-        </div>
-      </div>
-
-      <!-- Since 2017 (desktop) -->
-      <div class="since-2017 desktop-only animate-fade-in" style="animation-delay: 1.1s;">
-        <span>[ Since 2017 ]</span>
-      </div>
-
-      <!-- Product Card Desktop -->
-      <div class="product-card-desktop desktop-only animate-fade-in-up" style="animation-delay: 1.0s;">
-        <div class="product-card">
-          <div>
-            <h3>Coco Crush ring</h3>
-            <p class="subtitle">18K yellow</p>
-          </div>
-          <img class="center-image" src="https://soft-zoom-63098134.figma.site/_assets/v11/6297b1b8b8a1c0720cbd098274da6619ad35b486.png" alt="Coco Crush ring" />
-          <div>
-            <p class="price-label">From</p>
-            <p class="price">$25,550</p>
-          </div>
-        </div>
-        <div class="product-arrow">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 7h10v10"></path>
-            <path d="M7 17 17 7"></path>
-          </svg>
-        </div>
-      </div>
-
     </section>
 
-    <!-- Mobile Product Card (below hero section) -->
-    <div class="mobile-product-card animate-fade-in-up" style="animation-delay: 0.8s;">
-      <div class="product-card">
-        <div>
-          <h3>Coco Crush ring</h3>
-          <p class="subtitle">18K yellow</p>
+    <section class="awards-section" id="collection" aria-label="YOLA 产品系列">
+      <div class="awards-pin">
+        <div class="awards-grid">
+          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" alt="Obsidian Coil 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Obsidian Coil</h2><p class="product-price">$480</p></div></article>
+          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min.webp" alt="Void Arc 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Void Arc</h2><p class="product-price">$560</p></div></article>
+          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144747_f21bc119-e460-45be-a071-851291bd71c5_min.webp" alt="Onyx Hex 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Onyx Hex</h2><p class="product-price">$620</p></div></article>
+          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_215521_100b78bd-d24a-4225-b2e8-5bb30d44af73_min.webp" alt="Shadow Sigil 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Shadow Sigil</h2><p class="product-price">$740</p></div></article>
+          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" alt="Eclipse Band 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Eclipse Band</h2><p class="product-price">$820</p></div></article>
+          <article class="product-card"><div class="product-image-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min.webp" alt="Matte Skull 黑色手工戒指" /></div><div class="product-meta"><h2 class="product-name">Matte Skull</h2><p class="product-price">$950</p></div></article>
         </div>
-        <img class="center-image" src="https://soft-zoom-63098134.figma.site/_assets/v11/6297b1b8b8a1c0720cbd098274da6619ad35b486.png" alt="Coco Crush ring" />
-        <div>
-          <p class="price-label">From</p>
-          <p class="price">$25,550</p>
+        <div class="video-scaling-wrapper" aria-hidden="true">
+          <video class="reveal-video" muted playsinline preload="auto" poster="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min.webp" src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_122130_8b16d300-75cb-49f5-82ce-afd6b79c2d79.mp4"></video>
         </div>
       </div>
-      <div class="product-arrow">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M7 7h10v10"></path>
-          <path d="M7 17 17 7"></path>
-        </svg>
+    </section>
+
+    <section class="stats-copy-section" id="about">
+      <div class="stats-left">
+        <h2 class="fade-target" data-fade-slide-in>Made Without Compromise</h2>
+        <div class="stats-copy">
+          <p class="fade-target" data-fade-slide-in>Each ring is forged by a single pair of hands — no factory floor, no assembly line. The material is chosen first; the form follows its nature.</p>
+          <p class="fade-target" data-fade-slide-in>We work in oxidized silver, blackened bronze, and raw brass. Weights are deliberate. Edges are left where they fall. Nothing is smoothed for comfort.</p>
+          <p class="fade-target" data-fade-slide-in>YOLA exists for those who wear jewelry that means something. Not decoration — declaration. One piece at a time, made to last a lifetime.</p>
+        </div>
+        <button class="capsule-button fade-target" type="button" data-fade-slide-in data-scroll-target="#collection"><span>View Collection</span><span class="capsule-icon" aria-hidden="true"></span></button>
       </div>
-    </div>
+      <div class="stats-right">
+        <article class="stat-card"><div class="stomp-wrapper"><div class="stomp-stack"><h3>100%</h3><h3 class="heading-style-h1">100%</h3></div><div class="stomp-stack"><h3>Handmade</h3><h3 class="heading-style-h1">Handmade</h3></div></div><p class="detail-paragraph">Every ring crafted by a single artisan, start to finish</p></article>
+        <article class="stat-card"><div class="stomp-wrapper"><div class="stomp-stack"><h3>14-92g</h3><h3 class="heading-style-h1">14-92g</h3></div><div class="stomp-stack"><h3>Per piece</h3><h3 class="heading-style-h1">Per piece</h3></div></div><p class="detail-paragraph">Deliberate weight — each ring is a physical presence you feel</p></article>
+        <article class="stat-card"><div class="stomp-wrapper"><div class="stomp-stack"><h3>Sterling</h3><h3 class="heading-style-h1">Sterling</h3></div><div class="stomp-stack"><h3>&amp; Silver</h3><h3 class="heading-style-h1">&amp; Silver</h3></div></div><p class="detail-paragraph">Oxidized metals only — no plating, no compromise</p></article>
+        <article class="stat-card"><div class="stomp-wrapper"><div class="stomp-stack"><h3>Lifetime</h3><h3 class="heading-style-h1">Lifetime</h3></div><div class="stomp-stack"><h3>Guarantee</h3><h3 class="heading-style-h1">Guarantee</h3></div></div><div><p class="detail-paragraph">We stand behind every piece we make, forever</p><p class="card-subtext">Est. YOLA Studio, 2019.</p></div></article>
+      </div>
+    </section>
+
+    <div class="footer-spacer" aria-hidden="true"></div>
   </div>
 
-  <script>
-    let menuOpen = false;
-
-    function toggleMenu() {
-      menuOpen = !menuOpen;
-      const overlay = document.getElementById('mobile-menu');
-      const backdrop = document.getElementById('menu-backdrop');
-      const panel = document.getElementById('menu-panel');
-      const menuIcon = document.getElementById('menu-icon');
-      const closeIcon = document.getElementById('close-icon');
-      const items = document.querySelectorAll('.menu-item');
-
-      items.forEach((item) => { if (!item.dataset.bound) { item.dataset.bound = 'true'; item.addEventListener('click', () => { if (menuOpen) toggleMenu(); }); } });
-
-      if (menuOpen) {
-        overlay.style.visibility = 'visible';
-        backdrop.style.opacity = '1';
-        panel.style.transform = 'translateX(0)';
-        menuIcon.style.display = 'none';
-        closeIcon.style.display = 'block';
-        items.forEach((item, i) => {
-          setTimeout(() => {
-            item.style.opacity = '1';
-            item.style.transform = 'translateX(0)';
-          }, 80 + i * 50);
-        });
-      } else {
-        backdrop.style.opacity = '0';
-        panel.style.transform = 'translateX(-100%)';
-        menuIcon.style.display = 'block';
-        closeIcon.style.display = 'none';
-        items.forEach((item) => {
-          item.style.opacity = '0';
-          item.style.transform = 'translateX(-20px)';
-        });
-        setTimeout(() => {
-          overlay.style.visibility = 'hidden';
-        }, 500);
-      }
-    }
-  </script>
+  <footer class="site-footer" id="footer">
+    <section class="footer-column"><a href="/resume/#projects">Return to portfolio</a><p class="credits">Handcrafted in small batches<br />YOLA Studio<br /><br />Based in Berlin<br />(c) YOLA 2026<br />All pieces are original designs.</p></section>
+    <section class="footer-column"><a href="#collection">Instagram</a><nav class="footer-links"><a href="#footer">Refund Policy</a><a href="#footer">Privacy Policy</a><a href="#footer">Terms of Service</a></nav></section>
+    <section class="footer-column"><h3>Newsletter</h3><p class="newsletter-copy">Join our list. Be first to know new drops. 10% off your first order.</p><form class="newsletter-form"><input type="email" placeholder="Email" aria-label="Email" required /><button class="capsule-button" type="submit"><span>Subscribe</span><span class="capsule-icon" aria-hidden="true"></span></button></form></section>
+  </footer>
 </body>
 </html>
