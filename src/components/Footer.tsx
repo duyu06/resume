@@ -13,7 +13,7 @@ export default function Footer() {
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
-      className="border-t border-white/10 bg-black px-6 py-8"
+      className="border-t border-white/10 bg-black px-6 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-8 md:pb-8"
     >
       <div className="mx-auto max-w-[1200px]">
         <div className="flex flex-col gap-1">
