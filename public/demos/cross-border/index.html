@@ -2,15 +2,47 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/resume/demos/cross-border/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=2" />
+    <link rel="preload" as="image" href="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet" />
     <title>OYLA — 跨境精品</title>
+    <style>
+      html,
+      body,
+      #root {
+        min-height: 100%;
+        background: #000;
+      }
+
+      video {
+        background: #111 center / cover no-repeat;
+        backface-visibility: hidden;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+      }
+
+      video:not(.scrub-video-ready) {
+        background-image: url("https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp");
+      }
+
+      .scrub-video-failed {
+        opacity: 0 !important;
+      }
+
+      @media (max-width: 768px) {
+        video {
+          will-change: auto !important;
+        }
+      }
+    </style>
+    <script src="/resume/demos/cross-border/performance-fix.js"></script>
     <script type="module" crossorigin src="/resume/demos/cross-border/assets/index-DhyL9cqT.js"></script>
-    <link rel="stylesheet" crossorigin href="/resume/demos/cross-border/assets/index-BbWg5pj7.css">
-    <link rel="stylesheet" href="/resume/demos/mobile-overrides.css">
+    <link rel="stylesheet" crossorigin href="/resume/demos/cross-border/assets/index-BbWg5pj7.css" />
+    <link rel="stylesheet" href="/resume/demos/mobile-overrides.css" />
   </head>
   <body>
     <div class="demo-context-bar"><a href="/resume/#projects">← 返回作品集</a><span>交互原型 · 展示核心交易流程</span></div>
