@@ -1,212 +1,119 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#020715" />
-    <meta
-      name="description"
-      content="张滨文数字人风格对话模型微调项目案例：融合 MotionSites AI Interface 叙事语言，展示数据治理、Prompt 架构、训练验证、模型评测与 API 交付。"
-    />
-    <title>数字人风格对话模型微调｜AI Interface</title>
-    <link rel="stylesheet" href="./ai-interface-1.css" />
-    <link rel="stylesheet" href="./ai-interface-2.css" />
-    <link rel="stylesheet" href="./ai-interface-3.css" />
-    <link rel="stylesheet" href="./ai-interface-4.css" />
-  </head>
-  <body>
-    <canvas id="neural-background" aria-hidden="true"></canvas>
-    <div class="noise" aria-hidden="true"></div>
-
-    <header class="site-nav">
-      <div class="nav-inner">
-        <button class="nav-mark" type="button" aria-label="返回页面顶部">✳</button>
-        <nav class="nav-links" aria-label="案例导航">
-          <a href="#overview" aria-current="true">概览</a>
-          <a href="#data">数据</a>
-          <a href="#interface">界面</a>
-          <a href="#evaluation">评测</a>
-        </nav>
-        <a class="back-link" href="/resume/#projects">← 返回作品集</a>
-      </div>
-    </header>
-
-    <main>
-      <section class="hero shell" id="overview">
-        <div class="hero-grid">
-          <div class="hero-main">
-            <div class="hero-kicker">核心案例 · AI Application</div>
-            <h1 aria-label="Digital Mind. Fine-tuned.">
-              <span class="title-line" data-split="Digital Mind."></span>
-              <span class="title-line" data-split="Fine-tuned." data-line-delay="140"></span>
-            </h1>
-            <div class="hero-actions">
-              <a class="primary-link" href="#interface">进入模型界面</a>
-              <a class="secondary-link" href="#evaluation">查看评测方法</a>
-            </div>
-          </div>
-
-          <aside class="hero-concept reveal">
-            <div class="concept-index">001 — Concept</div>
-            <p>数字人不是一段固定人设，而是一套持续维持角色身份、历史记忆、上下文关系与输出格式的模型交互系统。</p>
-          </aside>
-        </div>
-        <div class="hero-scroll">Scroll to calibrate</div>
-      </section>
-
-      <section class="manifesto shell" id="data">
-        <div>
-          <div class="section-label reveal">002 — Data Extension</div>
-          <p class="manifesto-copy reveal">
-            ① 将 1W+ 条原始历史多模态对话转化为可训练、可验证、可追踪的数据资产，再用统一输入结构连接角色设定、当前上下文、历史记忆与输出约束。
-          </p>
-        </div>
-
-        <div class="manifesto-bottom">
-          <div class="evidence-row reveal" aria-label="项目核心数据">
-            <div class="evidence"><strong>1W+</strong><span>原始历史多模态对话</span></div>
-            <div class="evidence"><strong>7,328</strong><span>清洗后的有效训练数据</span></div>
-            <div class="evidence"><strong>26</strong><span>标准测试 Prompt</span></div>
-            <div class="evidence"><strong>25 分</strong><span>五维模型评分卡</span></div>
-          </div>
-
-          <div class="reveal">
-            <div class="section-label" style="margin-bottom: 18px">Capabilities</div>
-            <div class="capability-list">
-              <a href="#interface">数据治理与结构化</a>
-              <a href="#interface">Prompt 与记忆架构</a>
-              <a href="#evaluation">标准评测与 API 交付</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="interface-story" id="interface" aria-label="数字人微调流程交互界面">
-        <div class="interface-stage" data-stage="0">
-          <div class="interface-progress" aria-hidden="true"></div>
-          <div class="interface-shell shell">
-            <div class="stage-copy-wrap">
-              <article class="stage-copy is-active" data-stage-copy="0">
-                <div class="stage-label">003 — Data Governance</div>
-                <h2>Raw dialogue.<br />Structured signal.</h2>
-                <p>清洗、去重、脱敏、角色归属确认和低质量样本剔除，将原始记录整理为可训练、可追踪的数据集。</p>
-              </article>
-              <article class="stage-copy" data-stage-copy="1">
-                <div class="stage-label">004 — Prompt Architecture</div>
-                <h2>Context.<br />Memory.</h2>
-                <p>使用角色设定、当前上下文、历史记忆与输出约束四层结构，让训练、在线调用与问题定位使用同一输入协议。</p>
-              </article>
-              <article class="stage-copy" data-stage-copy="2">
-                <div class="stage-label">005 — Training Verification</div>
-                <h2>Train.<br />Validate.</h2>
-                <p>划分训练集与验证集，观察训练过程和异常样本表现，不把“任务完成”误当成“模型可用”。</p>
-              </article>
-              <article class="stage-copy" data-stage-copy="3">
-                <div class="stage-label">006 — Evaluation</div>
-                <h2>Measure.<br />Compare.</h2>
-                <p>通过 26 条标准测试 Prompt 与 25 分制评分卡，对人物一致性、上下文、自然度、稳定性和格式合规进行统一评估。</p>
-              </article>
-              <article class="stage-copy" data-stage-copy="4">
-                <div class="stage-label">007 — API Delivery</div>
-                <h2>Model.<br />In product.</h2>
-                <p>完成部署与 API 调用闭环，同时保留隐私边界、版本记录和可回归评测能力，让模型进入真实产品流程。</p>
-              </article>
-            </div>
-
-            <div class="interface-visual" aria-live="polite">
-              <div class="neural-core" aria-hidden="true">
-                <div class="core-grid"></div>
-                <div class="core-ring" style="--ring-inset: 4%; --ring-opacity: .28; --ring-speed: 22s"></div>
-                <div class="core-ring" style="--ring-inset: 15%; --ring-opacity: .42; --ring-speed: 15s; animation-direction: reverse"></div>
-                <div class="core-ring" style="--ring-inset: 29%; --ring-opacity: .55; --ring-speed: 10s"></div>
-                <div class="core-value"><strong id="core-value">1W+</strong><span id="core-label">Raw dialogues</span></div>
-              </div>
-
-              <div class="hud-node" data-node="data"><strong>Data Layer</strong><span>1W+ 原始记录 → 7,328 条有效数据</span></div>
-              <div class="hud-node" data-node="prompt"><strong>Memory Protocol</strong><span>角色 · 上下文 · 历史 · 输出约束</span></div>
-              <div class="hud-node" data-node="training"><strong>Training Loop</strong><span>训练集 / 验证集 / 异常样本检查</span></div>
-              <div class="hud-node" data-node="evaluation"><strong>Evaluation Layer</strong><span>26 Prompts · 25 分制 · API 回归</span></div>
-
-              <div class="mobile-stage-panel">
-                <strong id="mobile-stage-title">Data Layer</strong>
-                <span id="mobile-stage-desc">1W+ 原始记录 → 7,328 条有效数据</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="stage-navigation" aria-label="流程阶段">
-            <button class="stage-button" type="button" data-stage-button="0" aria-label="数据治理" aria-current="true"></button>
-            <button class="stage-button" type="button" data-stage-button="1" aria-label="Prompt 架构"></button>
-            <button class="stage-button" type="button" data-stage-button="2" aria-label="训练验证"></button>
-            <button class="stage-button" type="button" data-stage-button="3" aria-label="模型评测"></button>
-            <button class="stage-button" type="button" data-stage-button="4" aria-label="API 交付"></button>
-          </div>
-        </div>
-      </section>
-
-      <section class="details" id="evaluation">
-        <div class="shell">
-          <div class="details-head reveal">
-            <div>
-              <div class="section-label">008 — Product Design</div>
-              <h2>Interface beneath<br />the interface.</h2>
-            </div>
-            <p class="details-intro">视觉界面只是表层。真正决定数字人质量的是输入协议、数据治理、评测口径以及对失败场景的持续记录。</p>
-          </div>
-
-          <div class="case-grid">
-            <article class="case-panel reveal">
-              <h3>四层 Prompt 结构</h3>
-              <div class="prompt-layers">
-                <div class="prompt-layer"><strong>角色设定</strong><span>身份、语气、关系、价值观、禁区和行为边界。</span></div>
-                <div class="prompt-layer"><strong>当前上下文</strong><span>本轮输入、当前任务和即时情绪线索。</span></div>
-                <div class="prompt-layer"><strong>历史记忆</strong><span>需要持续保持的人物关系、事件和用户偏好。</span></div>
-                <div class="prompt-layer"><strong>输出约束</strong><span>回答长度、表达风格及 [emoji]、[voice] 等格式标记。</span></div>
-              </div>
-            </article>
-
-            <article class="case-panel reveal">
-              <div class="score-head">
-                <div><div class="section-label">Evaluation Card</div><h3 style="margin: 10px 0 0">五维评分卡</h3></div>
-                <strong>25</strong>
-              </div>
-              <div class="score-list">
-                <div class="score-row"><span>人物一致性</span><span>5 分</span><div class="score-track"></div></div>
-                <div class="score-row"><span>上下文连贯性</span><span>5 分</span><div class="score-track"></div></div>
-                <div class="score-row"><span>表达自然度</span><span>5 分</span><div class="score-track"></div></div>
-                <div class="score-row"><span>回复稳定性</span><span>5 分</span><div class="score-track"></div></div>
-                <div class="score-row"><span>格式合规性</span><span>5 分</span><div class="score-track"></div></div>
-              </div>
-            </article>
-          </div>
-
-          <div class="boundary-grid" aria-label="方案边界">
-            <article class="info-card reveal"><small>01 / PRIVACY</small><h3>数据授权与脱敏</h3><p>不公开原始历史对话、训练权重或敏感业务数据；训练前需要确认授权范围并完成隐私处理。</p></article>
-            <article class="info-card reveal"><small>02 / QUALITY</small><h3>过拟合与机械复读</h3><p>不能只观察训练是否结束，需要检查重复表达、角色僵化、事实混淆和异常样本表现。</p></article>
-            <article class="info-card reveal"><small>03 / DECISION</small><h3>Prompt 与微调边界</h3><p>先使用 Prompt 验证方向；只有当长期角色稳定性与格式合规仍不足时，才评估微调投入。</p></article>
-          </div>
-
-          <div class="delivery-grid" aria-label="项目交付物">
-            <article class="info-card reveal"><small>A / DATA</small><h3>数据模板</h3><p>JSONL 字段规范、清洗规则以及训练集和验证集划分方法。</p></article>
-            <article class="info-card reveal"><small>B / TEST</small><h3>标准测试集</h3><p>26 条固定测试 Prompt，覆盖角色、记忆、情绪、边界和格式场景。</p></article>
-            <article class="info-card reveal"><small>C / DELIVERY</small><h3>评测与调用说明</h3><p>25 分制评分卡、版本对比方法、API 调用示例和部署交付说明。</p></article>
-          </div>
-        </div>
-      </section>
-
-      <section class="closing">
-        <div class="shell">
-          <div class="closing-inner">
-            <div>
-              <h2>Return to the full portfolio.</h2>
-              <p>继续查看 AI 产品、技术产品与解决方案项目。</p>
-            </div>
-            <a class="primary-link" href="/resume/#projects">返回作品集</a>
-          </div>
-          <p class="legal-note">页面性质：项目案例展示与交互原型。数据口径依据简历项目记录整理；未展示真实对话内容、训练权重或虚构的模型提升百分比。</p>
-        </div>
-      </section>
-    </main>
-    <script src="./ai-interface.js" defer></script>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="description" content="张滨文数字人风格对话模型微调项目：数据治理、Prompt 架构、模型训练、标准评测与 API 交付。" />
+<title>SoulAI｜数字人风格对话模型微调</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;min-width:320px;min-height:100%;overflow-x:hidden;background:#000;color:#fff;font-family:"Space Mono",monospace;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth}a{text-decoration:none;color:inherit}button{border:0;background:none;color:inherit;font:inherit;cursor:pointer}
+#video-layer{position:fixed;inset:0;z-index:1;overflow:hidden;background:radial-gradient(circle at 50% 45%,#18333a 0,#071319 35%,#000 78%)}
+#video-layer video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;will-change:transform,filter,opacity}
+#video-layer::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.3) 45%,rgba(0,0,0,.72));pointer-events:none}
+#bottom-blur{position:fixed;left:0;bottom:0;z-index:30;width:100%;height:150px;pointer-events:none;background:linear-gradient(to bottom,transparent,#000);-webkit-mask-image:linear-gradient(to top,#000 50%,transparent);mask-image:linear-gradient(to top,#000 50%,transparent);backdrop-filter:blur(4px)}
+#main-header{position:fixed;top:0;left:0;right:0;z-index:50;height:80px;padding:env(safe-area-inset-top) 2rem 0;display:flex;align-items:center;justify-content:space-between;opacity:0;transition:opacity .8s ease-out}
+#main-header.visible{opacity:1}.desktop-header,.mobile-header{width:100%;height:100%;align-items:center;justify-content:space-between}.header-left{display:flex;align-items:center;gap:8px}
+.logo-pill,.menu-pill,.logo-pill-m,.menu-pill-m{background:rgba(255,255,255,.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.logo-pill{height:48px;padding:0 20px;border-radius:14px;display:flex;align-items:center;gap:10px;transition:.2s}.logo-pill:hover{background:rgba(255,255,255,.22);transform:scale(1.02)}
+.logo-pill svg{width:18px;height:18px}.logo-pill span{font-size:16px;white-space:nowrap}
+.menu-pill{height:48px;width:48px;border-radius:14px;display:flex;align-items:center;overflow:hidden;transition:width .35s cubic-bezier(.22,1,.36,1)}.menu-pill.open{width:310px}
+.hamburger-btn{width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.menu-pill.open .hamburger-btn{width:36px;height:36px;margin-left:6px;border-radius:11px;background:rgba(255,255,255,.1)}
+.hamburger-icon,.hamburger-icon-m{position:relative;width:18px;height:12px}.hamburger-icon span,.hamburger-icon-m span{position:absolute;left:0;width:100%;height:1.5px;background:#fff;border-radius:2px;transition:transform .3s,opacity .3s}.hamburger-icon span:nth-child(1),.hamburger-icon-m span:nth-child(1){top:0}.hamburger-icon span:nth-child(2),.hamburger-icon-m span:nth-child(2){top:5px}.hamburger-icon span:nth-child(3),.hamburger-icon-m span:nth-child(3){top:10px}.open .hamburger-icon span:nth-child(1),.open .hamburger-icon-m span:nth-child(1){transform:translateY(5px) rotate(45deg)}.open .hamburger-icon span:nth-child(2),.open .hamburger-icon-m span:nth-child(2){opacity:0}.open .hamburger-icon span:nth-child(3),.open .hamburger-icon-m span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+.menu-links,.menu-links-m{display:flex;align-items:center;gap:22px;margin-left:auto;padding-right:22px;opacity:0;transform:translateX(15px);transition:.2s;pointer-events:none;white-space:nowrap}.open .menu-links,.open .menu-links-m{opacity:1;transform:none;pointer-events:auto}.menu-links button,.menu-links-m button{font-size:14px;color:rgba(255,255,255,.78)}.menu-links button:hover,.menu-links-m button:hover{color:#fff}
+.portfolio-btn,.portfolio-btn-m{background:#fff;color:#000;border-radius:999px;display:flex;align-items:center;gap:9px;transition:.2s}.portfolio-btn{height:48px;padding:0 23px}.portfolio-btn:hover,.portfolio-btn-m:hover{background:#e7e7e7;transform:scale(1.03)}
+#main-content{position:relative;z-index:10;width:100%;padding:80px 2rem max(144px,calc(110px + env(safe-area-inset-bottom)));display:flex;flex-direction:column;opacity:0;transition:opacity 1s ease-out}#main-content.visible{opacity:1}
+.dot-grid{position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:24px 24px;opacity:.05;pointer-events:none}
+#hero-section{position:relative;width:100%;max-width:1280px;margin:0 auto;min-height:80svh;padding:32px 0 64px;display:flex;flex-direction:column;justify-content:space-between;transition:opacity .1s linear,transform .1s linear}
+.hero-grid,.hero-grid-bottom{display:grid;grid-template-columns:1fr 1fr;gap:48px;width:100%}.hero-grid-bottom{margin-top:auto;padding-top:48px;align-items:end}.hero-title{font-weight:300;font-size:clamp(50px,8vw,100px);line-height:.95;letter-spacing:-.04em;display:flex;flex-direction:column;user-select:none}.hero-title.right{align-items:flex-end;text-align:right}.hero-desc{max-width:440px;font-size:15px;color:rgba(255,255,255,.64);line-height:1.7}.hero-desc strong{display:block;margin-bottom:12px;color:#fff;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+#cinematic-section{position:relative;width:100%;max-width:1080px;margin:0 auto;padding:96px 24px 128px;perspective:400px;pointer-events:none}#cinematic-inner{transform-style:preserve-3d;text-align:center}#cinematic-inner h2{font-weight:400;font-size:clamp(22px,3.4vw,42px);line-height:1.42;letter-spacing:-.025em;padding:0 24px}
+#stats-section{position:relative;width:100vw;margin-left:calc(-50vw + 50%);margin-top:64px;overflow:hidden;opacity:0;transform:translateY(40px) scale(.98);transition:opacity .6s ease-out,transform .6s ease-out}#stats-section.revealed{opacity:1;transform:none}
+.stats-heading{width:min(calc(100% - 32px),1280px);margin:0 auto 36px;display:flex;justify-content:space-between;align-items:end;gap:24px}.stats-heading h2{font-size:clamp(30px,4vw,56px);font-weight:400;letter-spacing:-.04em}.stats-heading p{max-width:470px;color:rgba(255,255,255,.55);font-size:13px;line-height:1.7}
+.swiper{width:100%;height:520px;padding-bottom:20px!important;overflow:visible!important}.swiper-slide{width:380px;max-width:85%;height:480px}.stat-card-outer{height:480px;padding:6px;border-radius:28px;background:rgba(255,255,255,.05);backdrop-filter:blur(12px);display:flex;flex-direction:column}.stat-card-inner{flex:1;padding:32px;border:1px solid rgba(255,255,255,.07);border-radius:23px;background:rgba(0,0,0,.5);backdrop-filter:blur(14px);display:flex;flex-direction:column;justify-content:space-between}.stat-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.82)}.stat-value{margin-top:24px;font-size:clamp(58px,6vw,76px);font-weight:400;letter-spacing:-.05em;line-height:1}.stat-details{display:flex;flex-direction:column;gap:9px;padding-top:16px}.stat-detail{display:flex;gap:8px;font-size:11px;line-height:1.55;color:rgba(255,255,255,.62)}.stat-detail .dot{width:6px;height:6px;margin-top:5px;border-radius:50%;background:rgba(255,255,255,.34);flex-shrink:0}.stat-footer{padding:12px 24px 10px;font-size:10px;color:rgba(255,255,255,.55);letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.project-note{width:min(calc(100% - 32px),900px);margin:80px auto 0;padding:26px 28px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(0,0,0,.4);backdrop-filter:blur(14px);color:rgba(255,255,255,.62);font-size:12px;line-height:1.8}.project-note strong{color:#fff}
+.mobile-header{display:none}.scramble-line{display:inline-block}
+@media(max-width:639px){#main-header{height:72px;padding:env(safe-area-inset-top) 16px 0}.desktop-header{display:none!important}.mobile-header{display:flex!important}.mobile-left{display:flex;align-items:center;height:36px;flex:1;min-width:0;margin-right:10px}.logo-pill-m{height:36px;width:104px;padding:0 11px;border-radius:10px;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;transition:.35s}.logo-pill-m.collapsed{width:0;opacity:0;padding:0}.logo-pill-m svg{width:14px;height:14px}.logo-pill-m span{font-size:12px}.menu-pill-m{height:36px;width:36px;border-radius:10px;display:flex;align-items:center;overflow:hidden;transition:width .35s cubic-bezier(.22,1,.36,1)}.menu-pill-m.open{width:100%}.hamburger-btn-m{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.hamburger-icon-m{width:15px;height:10px}.hamburger-icon-m span:nth-child(2){top:4px}.hamburger-icon-m span:nth-child(3){top:8px}.open .hamburger-icon-m span:nth-child(1){transform:translateY(4px) rotate(45deg)}.open .hamburger-icon-m span:nth-child(3){transform:translateY(-4px) rotate(-45deg)}.menu-links-m{gap:12px;padding-right:12px}.menu-links-m button{font-size:12px}.portfolio-btn-m{height:36px;padding:0 13px;font-size:12px;flex-shrink:0}#main-content{padding:72px 16px max(128px,calc(96px + env(safe-area-inset-bottom)))}#hero-section{min-height:82svh;padding-top:34px}.hero-grid,.hero-grid-bottom{grid-template-columns:1fr;gap:28px}.hero-grid-bottom{padding-top:16px}.hero-title.right{align-items:flex-start;text-align:left}.hero-title{font-size:clamp(48px,15.5vw,72px)}.hero-desc{font-size:13px}.hero-desc strong{font-size:10px}#cinematic-section{padding:68px 8px 94px}#cinematic-inner h2{padding:0;font-size:clamp(21px,6vw,30px)}.stats-heading{align-items:flex-start;flex-direction:column}.swiper{height:465px}.swiper-slide{width:315px;height:430px}.stat-card-outer{height:430px}.stat-card-inner{padding:25px}.stat-value{font-size:56px}.project-note{margin-top:52px;padding:22px}.desktop-header{display:none}}
+@media(min-width:640px){.desktop-header{display:flex!important}.mobile-header{display:none!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="video-layer"><video id="bg-video" loop muted playsinline preload="auto" src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260613_120544_a609e0c2-e52d-4bd5-b10f-b66ac51f1965.mp4"></video></div>
+<div id="bottom-blur"></div>
+<header id="main-header">
+  <div class="desktop-header">
+    <div class="header-left">
+      <button class="logo-pill js-top" type="button" aria-label="返回页面顶部">
+        <svg viewBox="-50 -50 100 100" aria-hidden="true"><g fill="currentColor"><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(90)"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(180)"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(270)"/></g></svg>
+        <span>SoulAI</span>
+      </button>
+      <div class="menu-pill" id="menu-pill"><button class="hamburger-btn" id="hamburger-btn" type="button" aria-label="展开导航"><span class="hamburger-icon"><span></span><span></span><span></span></span></button><div class="menu-links"><button type="button" data-target="cinematic-section">项目</button><button type="button" data-target="stats-section">数据</button><button type="button" data-target="project-note">边界</button></div></div>
+    </div>
+    <a class="portfolio-btn" href="/resume/#projects"><i class="bi bi-arrow-left"></i><span>返回作品集</span></a>
+  </div>
+  <div class="mobile-header">
+    <div class="mobile-left">
+      <button class="logo-pill-m js-top" id="logo-pill-m" type="button" aria-label="返回页面顶部"><svg viewBox="-50 -50 100 100" aria-hidden="true"><g fill="currentColor"><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(90)"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(180)"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(270)"/></g></svg><span>SoulAI</span></button>
+      <div class="menu-pill-m" id="menu-pill-m"><button class="hamburger-btn-m" id="hamburger-btn-m" type="button" aria-label="展开移动导航"><span class="hamburger-icon-m"><span></span><span></span><span></span></span></button><div class="menu-links-m"><button type="button" data-target="cinematic-section">项目</button><button type="button" data-target="stats-section">数据</button></div></div>
+    </div>
+    <a class="portfolio-btn-m" href="/resume/#projects"><i class="bi bi-arrow-left"></i><span>作品集</span></a>
+  </div>
+</header>
+<main id="main-content">
+  <div class="dot-grid"></div>
+  <section id="hero-section">
+    <div class="hero-grid"><div class="hero-title"><span class="scramble-line" data-scramble-in data-text="Style" data-delay="100">&nbsp;</span><span class="scramble-line" data-scramble-in data-text="And Memory" data-delay="300">&nbsp;</span></div><div></div></div>
+    <div class="hero-grid-bottom">
+      <div class="hero-desc" id="hero-desc"><strong>Digital Human Fine-tuning · 2026.04</strong><p>面向个性化数字人对话，治理历史多模态数据，统一角色、上下文、记忆与输出约束，并通过标准评测验证模型版本。</p></div>
+      <div class="hero-title right"><span class="scramble-line" data-scramble-in data-text="One" data-delay="200">&nbsp;</span><span class="scramble-line" data-scramble-in data-text="Persona" data-delay="400">&nbsp;</span></div>
+    </div>
+  </section>
+  <section id="cinematic-section"><div id="cinematic-inner"><h2>一套面向数字人风格对话的模型微调流程。将原始历史对话转化为结构化训练数据，让人物身份、表达语气、长期记忆和格式标记成为可训练、可评测、可回归的产品能力，而不是只依赖一段固定角色 Prompt。</h2></div></section>
+  <section id="stats-section">
+    <div class="stats-heading"><h2>Project evidence.</h2><p>所有指标均来自项目记录，不展示原始隐私对话、训练权重，也不虚构模型提升百分比。</p></div>
+    <div class="swiper" id="stats-swiper"><div class="swiper-wrapper" id="swiper-wrapper"></div></div>
+  </section>
+  <aside class="project-note" id="project-note"><strong>项目边界：</strong>页面展示的是交互原型和项目方法。训练前需要确认数据授权并完成脱敏；微调不是默认答案，应先用 Prompt 验证方向，并持续检查过拟合、机械复读、事实混淆和格式异常。</aside>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+(()=>{
+"use strict";
+const GLYPHS="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~|}{[]:;?><";
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const statsData=[
+{title:"RAW DIALOGUES",value:"1W+",footer:"HISTORICAL MULTIMODAL RECORDS",details:["原始历史多模态对话","覆盖文本、表情与语音标记","进入清洗、去重与脱敏流程"]},
+{title:"TRAINING DATA",value:"7,328",footer:"VALID JSONL SAMPLES",details:["清洗后的有效训练数据","统一角色、上下文和输出字段","划分训练集与验证集"]},
+{title:"TEST PROMPTS",value:"26",footer:"STANDARD REGRESSION SET",details:["覆盖角色、记忆、情绪和边界","固定输入用于版本横向比较","支持部署后的回归评测"]},
+{title:"EVALUATION",value:"25",footer:"FIVE-DIMENSION SCORECARD",details:["人物一致性与上下文连贯性","表达自然度与回复稳定性","格式合规性"]},
+{title:"PROMPT LAYERS",value:"4",footer:"SHARED INPUT PROTOCOL",details:["角色设定","当前上下文与历史记忆","输出约束及 [emoji] / [voice] 标记"]},
+{title:"DELIVERY",value:"<2W",footer:"END-TO-END PROJECT LOOP",details:["需求、数据、训练和评测","部署与 API 调用验证","沉淀模板、测试集和交付说明"]}
+];
+const video=document.getElementById("bg-video"),header=document.getElementById("main-header"),main=document.getElementById("main-content"),hero=document.getElementById("hero-section"),desc=document.getElementById("hero-desc"),cinematic=document.getElementById("cinematic-inner"),stats=document.getElementById("stats-section");
+const wrapper=document.getElementById("swiper-wrapper");
+statsData.forEach(card=>{const slide=document.createElement("div");slide.className="swiper-slide";slide.innerHTML=`<article class="stat-card-outer"><div class="stat-card-inner"><div><span class="stat-title">${card.title}</span><div class="stat-value">${card.value}</div></div><div class="stat-details">${card.details.map(item=>`<div class="stat-detail"><span class="dot"></span><span>${item}</span></div>`).join("")}</div></div><div class="stat-footer">${card.footer}</div></article>`;wrapper.appendChild(slide)});
+new Swiper("#stats-swiper",{effect:"coverflow",grabCursor:true,slidesPerView:"auto",centeredSlides:true,loop:true,spaceBetween:32,coverflowEffect:{rotate:30,stretch:0,depth:100,modifier:1,slideShadows:false},observer:true,observeParents:true});
+const menu=document.getElementById("menu-pill"),menuM=document.getElementById("menu-pill-m"),logoM=document.getElementById("logo-pill-m");
+document.getElementById("hamburger-btn").addEventListener("click",()=>menu.classList.toggle("open"));document.getElementById("hamburger-btn-m").addEventListener("click",()=>{menuM.classList.toggle("open");logoM.classList.toggle("collapsed",menuM.classList.contains("open"))});
+document.querySelectorAll("[data-target]").forEach(btn=>btn.addEventListener("click",()=>{document.getElementById(btn.dataset.target)?.scrollIntoView({behavior:reduceMotion?"auto":"smooth"});menu.classList.remove("open");menuM.classList.remove("open");logoM.classList.remove("collapsed")}));document.querySelectorAll(".js-top").forEach(btn=>btn.addEventListener("click",()=>scrollTo({top:0,behavior:reduceMotion?"auto":"smooth"})));
+const scrambleStates=[...document.querySelectorAll("[data-scramble-in]")].map(el=>({el,text:el.dataset.text,delay:Number(el.dataset.delay||0),start:0,done:false}));let ready=false,scrollProgress=0,smooth=0,statsShown=false;
+function reveal(){ready=true;header.classList.add("visible");main.classList.add("visible");scrambleStates.forEach(state=>state.start=performance.now()+state.delay)}
+let safety=setTimeout(reveal,1800);video.addEventListener("canplay",()=>{clearTimeout(safety);reveal()},{once:true});video.load();
+function scramble(now){if(!ready)return;scrambleStates.forEach(state=>{if(state.done||now<state.start)return;const p=Math.min(1,(now-state.start)/900);let result="";for(let i=0;i<state.text.length;i++){const char=state.text[i];if(char===" "){result+=" ";continue}const threshold=i/state.text.length;result+=p>=threshold+.15?char:p>=threshold-.1?GLYPHS[Math.floor(Math.random()*GLYPHS.length)]:"\u00a0"}state.el.textContent=result;if(p>=1){state.done=true;state.el.textContent=state.text}})}
+function onScroll(){const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);scrollProgress=scrollY/max;if(!statsShown&&stats.getBoundingClientRect().top<innerHeight*.9){statsShown=true;stats.classList.add("revealed")}}
+addEventListener("scroll",onScroll,{passive:true});onScroll();
+let seeking=false,nextSeek=null;video.addEventListener("seeking",()=>seeking=true);video.addEventListener("seeked",()=>{seeking=false;if(nextSeek!==null){const t=nextSeek;nextSeek=null;video.currentTime=t}});video.addEventListener("loadedmetadata",()=>video.pause());
+function tick(now){smooth+=(scrollProgress-smooth)*.12;const blur=Math.max(0,(smooth-.1)/.8)*34,scale=1.04+smooth*.08;video.style.opacity=ready?String(Math.max(.2,1-smooth*.55)):"0";video.style.filter=`blur(${blur}px)`;video.style.transform=`scale(${scale})`;if(video.duration&&video.readyState>=1){const target=Math.min(video.duration,smooth*video.duration);if(Math.abs(video.currentTime-target)>.015){if(!seeking&&!video.seeking){seeking=true;video.currentTime=target}else nextSeek=target}}
+const heroP=Math.min(1,scrollY/Math.max(innerHeight,1));hero.style.opacity=String(1-heroP);hero.style.transform=`scale(${1-heroP*.04})`;desc.style.opacity=String(Math.max(0,1-heroP*1.7));desc.style.transform=`translateY(${-30*heroP}px)`;const rect=document.getElementById("cinematic-section").getBoundingClientRect(),center=1-Math.min(1,Math.abs(rect.top+rect.height/2-innerHeight/2)/(innerHeight*.8));cinematic.style.opacity=String(Math.max(0,center));cinematic.style.transform=`rotateX(${24-center*20}deg) translateY(${(1-center)*70}px) translateZ(15px)`;scramble(now);requestAnimationFrame(tick)}
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
 </html>
