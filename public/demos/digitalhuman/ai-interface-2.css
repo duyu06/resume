@@ -1,0 +1,180 @@
+.interface-story {
+  position: relative;
+  min-height: 430vh;
+}
+.interface-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 620px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 72% 45%, rgba(0, 204, 255, 0.18), transparent 34rem),
+    linear-gradient(180deg, rgba(1, 7, 19, 0.22), rgba(2, 18, 40, 0.7));
+}
+.interface-shell {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+  align-items: center;
+  gap: clamp(30px, 6vw, 90px);
+  padding-top: 88px;
+  padding-bottom: 40px;
+}
+.stage-copy-wrap { position: relative; min-height: 390px; }
+.stage-copy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  filter: blur(16px);
+  transform: translateY(70px);
+  transition: opacity 620ms var(--ease), filter 620ms var(--ease), transform 620ms var(--ease);
+}
+.stage-copy.is-active { pointer-events: auto; opacity: 1; filter: blur(0); transform: translateY(0); }
+.stage-copy.is-before { transform: translateY(-70px); }
+.stage-copy h2 {
+  max-width: 680px;
+  margin: 22px 0 24px;
+  font-size: clamp(48px, 7vw, 102px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+.stage-copy p { max-width: 590px; margin-bottom: 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
+.interface-visual {
+  position: relative;
+  min-height: min(72svh, 720px);
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.interface-visual::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  z-index: -2;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  transform: scale(calc(0.92 + var(--stage-progress) * 0.1));
+}
+.neural-core {
+  position: relative;
+  width: clamp(230px, 28vw, 390px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.9), transparent 7%),
+    radial-gradient(circle at 50% 45%, rgba(137, 234, 255, 0.78), rgba(31, 133, 213, 0.35) 34%, rgba(6, 25, 60, 0.12) 66%, transparent 72%);
+  box-shadow:
+    0 0 80px rgba(68, 211, 255, 0.38),
+    inset 0 0 70px rgba(255, 255, 255, 0.12);
+  transform: scale(calc(0.94 + var(--stage-progress) * 0.08));
+  transition: transform 250ms linear, filter 400ms ease;
+}
+.core-grid {
+  position: absolute;
+  inset: 13%;
+  border-radius: 50%;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(circle, black 35%, transparent 74%);
+}
+.core-ring {
+  position: absolute;
+  inset: var(--ring-inset);
+  border: 1px solid rgba(175, 238, 255, var(--ring-opacity));
+  border-radius: 50%;
+  animation: orbit var(--ring-speed) linear infinite;
+}
+.core-ring::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 16px var(--cyan);
+}
+@keyframes orbit { to { transform: rotate(360deg); } }
+.core-value { position: relative; z-index: 2; text-align: center; }
+.core-value strong { display: block; font-size: clamp(42px, 6vw, 72px); font-weight: 400; line-height: 1; letter-spacing: -0.06em; }
+.core-value span { display: block; margin-top: 9px; color: rgba(255, 255, 255, 0.65); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+.hud-node {
+  position: absolute;
+  width: min(210px, 34%);
+  padding: 14px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(3, 11, 27, 0.58);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: opacity 350ms ease, transform 450ms var(--ease), border-color 350ms ease;
+}
+.hud-node strong { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600; }
+.hud-node span { display: block; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.hud-node::before {
+  content: "";
+  position: absolute;
+  width: 54px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(128, 231, 255, 0.5), transparent);
+}
+.hud-node[data-node="data"] { top: 8%; left: 0; }
+.hud-node[data-node="prompt"] { top: 15%; right: 0; }
+.hud-node[data-node="training"] { bottom: 14%; left: 0; }
+.hud-node[data-node="evaluation"] { bottom: 7%; right: 0; }
+.hud-node[data-node="data"]::before,
+.hud-node[data-node="training"]::before { left: 100%; top: 50%; }
+.hud-node[data-node="prompt"]::before,
+.hud-node[data-node="evaluation"]::before { right: 100%; top: 50%; transform: rotate(180deg); }
+.interface-stage[data-stage="0"] .hud-node[data-node="data"],
+.interface-stage[data-stage="1"] .hud-node[data-node="prompt"],
+.interface-stage[data-stage="2"] .hud-node[data-node="training"],
+.interface-stage[data-stage="3"] .hud-node[data-node="evaluation"],
+.interface-stage[data-stage="4"] .hud-node[data-node="evaluation"] {
+  border-color: rgba(128, 231, 255, 0.58);
+  transform: translateY(-4px) scale(1.03);
+}
+.stage-navigation {
+  position: absolute;
+  left: 50%;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  transform: translateX(-50%);
+}
+.stage-button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition: width 260ms var(--ease), background 260ms ease, border-color 260ms ease;
+}
+.stage-button[aria-current="true"] { width: 38px; border-color: white; background: white; }
+.interface-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  width: calc(var(--stage-progress) * 100%);
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), white);
+  box-shadow: 0 0 18px rgba(128, 231, 255, 0.7);
+}
+.mobile-stage-panel { display: none; }
