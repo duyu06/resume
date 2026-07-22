@@ -84,10 +84,20 @@ async function testProject(browser, device, project) {
     assert((await panel.locator('.demo-mode-boundary').textContent())?.length > 20, `${project.title}: missing demo boundary`);
 
     if (device.isMobile) {
-      const box = await panel.boundingBox();
+      const bounds = await panel.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          left: rect.left,
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          viewportWidth: window.visualViewport?.width ?? window.innerWidth,
+          viewportHeight: window.visualViewport?.height ?? window.innerHeight,
+        };
+      });
       assert(
-        box && box.width <= device.viewport.width + 1 && box.y >= -1 && box.y + box.height <= device.viewport.height + 1,
-        `${project.title}: mobile panel outside viewport`,
+        bounds.left >= -2 && bounds.top >= -2 && bounds.right <= bounds.viewportWidth + 2 && bounds.bottom <= bounds.viewportHeight + 2,
+        `${project.title}: mobile panel outside viewport (${JSON.stringify(bounds)})`,
       );
     }
 
