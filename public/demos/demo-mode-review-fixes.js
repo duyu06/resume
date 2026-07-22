@@ -35,12 +35,14 @@
     }
 
     const viewport = window.visualViewport;
-    const visualHeight = viewport?.height ?? window.innerHeight;
+    const visualHeight = Math.max(0, viewport?.height ?? window.innerHeight);
     const offsetTop = viewport?.offsetTop ?? 0;
     const layoutBottomInset = Math.max(0, window.innerHeight - (offsetTop + visualHeight));
+    const reservedTopGap = Math.min(8, visualHeight);
+    const availableHeight = Math.max(0, visualHeight - reservedTopGap);
 
     panel.style.bottom = `${layoutBottomInset}px`;
-    panel.style.maxHeight = `${Math.max(280, visualHeight - 8)}px`;
+    panel.style.maxHeight = `${Math.min(760, availableHeight)}px`;
   };
 
   fitPanelToVisualViewport();
@@ -150,11 +152,8 @@
   }
 
   if (slug === 'webui' || slug === 'soulcaller') {
-    const oldRunButton = $('[data-demo-action="run"]', panel);
-    if (oldRunButton) {
-      const runButton = oldRunButton.cloneNode(true);
-      oldRunButton.replaceWith(runButton);
-
+    const runButton = $('[data-demo-action="run"]', panel);
+    if (runButton) {
       const internalSelector = slug === 'webui' ? '[data-webui-run]' : '[data-soul-run]';
       const expectedStatus = slug === 'webui' ? '模拟推理完成' : '本轮协作完成';
 
@@ -177,15 +176,21 @@
         setActionsDisabled(false);
       };
 
-      runButton.addEventListener('click', () => {
-        runSyntheticDemo().catch((error) => {
-          document.body.classList.add('demo-mode-error');
-          status.textContent = '演示失败';
-          addLog(error instanceof Error ? error.message : String(error), 'error');
-          showToast('演示流程未完成');
-          setActionsDisabled(false);
-        });
-      });
+      runButton.addEventListener(
+        'click',
+        (event) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          runSyntheticDemo().catch((error) => {
+            document.body.classList.add('demo-mode-error');
+            status.textContent = '演示失败';
+            addLog(error instanceof Error ? error.message : String(error), 'error');
+            showToast('演示流程未完成');
+            setActionsDisabled(false);
+          });
+        },
+        true,
+      );
 
       window.__portfolioDemoMode.run = runSyntheticDemo;
     }
