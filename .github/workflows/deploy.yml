@@ -54,12 +54,21 @@ jobs:
           TEST_TARGET: local-preview
           TEST_OUTPUT_DIR: test-results/full-e2e-local
 
+      - name: Run all-project demo mode suite
+        run: node scripts/all-demo-mode-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: local-preview
+          TEST_OUTPUT_DIR: test-results/all-demo-mode-local
+
       - name: Upload local end-to-end evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: full-e2e-local
-          path: test-results/full-e2e-local
+          path: |
+            test-results/full-e2e-local
+            test-results/all-demo-mode-local
           if-no-files-found: ignore
           retention-days: 14
 
@@ -99,10 +108,12 @@ jobs:
       - name: Wait for deployed project adapters
         run: |
           for attempt in {1..40}; do
+            guoyang=$(curl --fail --silent https://duyu06.github.io/resume/demos/guoyang/ || true)
             prism=$(curl --fail --silent https://duyu06.github.io/resume/demos/ai-ecommerce/ || true)
             human=$(curl --fail --silent https://duyu06.github.io/resume/demos/digitalhuman/ || true)
             rpa=$(curl --fail --silent https://duyu06.github.io/resume/demos/rpa/ || true)
-            if grep -q 'PRISMPIX COMPATIBLE CONSOLE' <<< "$prism" \
+            if grep -q 'LOCAL WORKFLOW DEMO' <<< "$guoyang" \
+              && grep -q 'PRISMPIX COMPATIBLE CONSOLE' <<< "$prism" \
               && grep -q 'TALK-TO-FENGGE-LIVE ADAPTER' <<< "$human" \
               && grep -q 'WEBRPA COMPATIBLE WORKFLOW STUDIO' <<< "$rpa"; then
               exit 0
@@ -117,11 +128,19 @@ jobs:
           TEST_BASE_URL: https://duyu06.github.io/resume
           TEST_TARGET: github-pages
           TEST_OUTPUT_DIR: test-results/full-e2e-live
+      - name: Run deployed all-project demo mode suite
+        run: node scripts/all-demo-mode-e2e.mjs
+        env:
+          TEST_BASE_URL: https://duyu06.github.io/resume
+          TEST_TARGET: github-pages
+          TEST_OUTPUT_DIR: test-results/all-demo-mode-live
       - name: Upload deployed-site end-to-end evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: full-e2e-live
-          path: test-results/full-e2e-live
+          path: |
+            test-results/full-e2e-live
+            test-results/all-demo-mode-live
           if-no-files-found: ignore
           retention-days: 14
