@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="./cross-border.css" />
   <link rel="stylesheet" href="./cross-border-motion.css" />
   <link rel="stylesheet" href="/resume/demos/incremental-enrich.css" />
+  <link rel="stylesheet" href="./cross-border-review-fixes.css" />
   <title>YOLA — Measured Purity</title>
   <style>
     .menu-panel{position:fixed;top:88px;right:32px;z-index:230;width:min(320px,calc(100vw - 32px));padding:22px;border:1px solid rgba(255,255,255,.16);background:rgba(10,10,10,.9);color:#fff;backdrop-filter:blur(18px);opacity:0;visibility:hidden;transform:translateY(-10px);transition:.25s}
@@ -22,6 +23,7 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
   <script src="./cross-border.js" defer></script>
+  <script src="./cross-border-review-fixes.js" defer></script>
   <script src="/resume/demos/incremental-enrich.js" defer></script>
 </head>
 <body data-yola-keyframe="01" data-yola-section="hero">
@@ -95,7 +97,7 @@
 
         <div class="yola-keyframe-rail" aria-hidden="true">
           <span data-yola-rail-label>01</span>
-          <div class="yola-keyframe-track">${Array.from({length:14},(_,index)=>`<i data-yola-marker="${String(index+1).padStart(2,'0')}"></i>`).join('')}</div>
+          <div class="yola-keyframe-track"><i data-yola-marker="01"></i><i data-yola-marker="02"></i><i data-yola-marker="03"></i><i data-yola-marker="04"></i><i data-yola-marker="05"></i><i data-yola-marker="06"></i><i data-yola-marker="07"></i><i data-yola-marker="08"></i><i data-yola-marker="09"></i><i data-yola-marker="10"></i><i data-yola-marker="11"></i><i data-yola-marker="12"></i><i data-yola-marker="13"></i><i data-yola-marker="14"></i></div>
           <span>14</span>
         </div>
       </div>
