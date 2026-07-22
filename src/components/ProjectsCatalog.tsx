@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ExternalLink, X } from 'lucide-react';
+import './ProjectModalMobile.css';
 
 type ProjectGroup = '核心案例' | '实验与补充';
 
@@ -135,118 +136,201 @@ const projects: Project[] = [
 function ProjectDetailModal({ project, onClose }: { project: Project; onClose: () => void }) {
   const [imgIdx, setImgIdx] = useState(0);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const lockedScrollY = useRef(0);
 
   const onKey = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft') setImgIdx((i) => (i > 0 ? i - 1 : project.imgs.length - 1));
-      if (e.key === 'ArrowRight') setImgIdx((i) => (i < project.imgs.length - 1 ? i + 1 : 0));
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (event.key === 'ArrowLeft') {
+        setImgIdx((index) => (index > 0 ? index - 1 : project.imgs.length - 1));
+        return;
+      }
+
+      if (event.key === 'ArrowRight') {
+        setImgIdx((index) => (index < project.imgs.length - 1 ? index + 1 : 0));
+        return;
+      }
+
+      if (event.key !== 'Tab' || !modalRef.current) return;
+
+      const focusable = [...modalRef.current.querySelectorAll<HTMLElement>('button,a[href],[tabindex]:not([tabindex="-1"])')].filter(
+        (element) => !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true',
+      );
+
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     },
     [onClose, project.imgs.length],
   );
 
   useEffect(() => {
+    lockedScrollY.current = window.scrollY;
+    const body = document.body;
+    const previousStyles = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow,
+      paddingRight: body.style.paddingRight,
+    };
+    const scrollbarGap = window.innerWidth - document.documentElement.clientWidth;
+
     document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
+    body.classList.add('project-modal-open');
+    body.style.position = 'fixed';
+    body.style.top = `-${lockedScrollY.current}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+    if (scrollbarGap > 0) body.style.paddingRight = `${scrollbarGap}px`;
     closeRef.current?.focus();
+
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
+      body.classList.remove('project-modal-open');
+      body.style.position = previousStyles.position;
+      body.style.top = previousStyles.top;
+      body.style.left = previousStyles.left;
+      body.style.right = previousStyles.right;
+      body.style.width = previousStyles.width;
+      body.style.overflow = previousStyles.overflow;
+      body.style.paddingRight = previousStyles.paddingRight;
+      window.scrollTo(0, lockedScrollY.current);
     };
   }, [onKey]);
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4 md:p-8"
+      className="fixed inset-0 z-[1200] flex items-end justify-center overflow-hidden p-0 sm:items-center sm:p-4 md:p-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
+      aria-labelledby="project-modal-title"
+      aria-describedby="project-modal-description"
     >
       <button className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} aria-label="关闭项目详情" />
+
       <motion.div
-        className="glass relative max-h-[92svh] w-full max-w-2xl overflow-y-auto rounded-t-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-h-[90vh] sm:rounded-2xl sm:p-6 md:p-8"
+        ref={modalRef}
+        className="project-modal-shell glass relative z-10 flex h-[94dvh] max-h-[94dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[28px] sm:h-[min(90dvh,820px)] sm:max-h-[90dvh] sm:rounded-2xl"
         initial={{ opacity: 0, scale: 0.97, y: 24 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.97, y: 24 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
       >
-        <button
-          ref={closeRef}
-          onClick={onClose}
-          className="absolute right-3 top-3 z-20 rounded-full bg-black/60 p-2 text-white transition-colors hover:bg-black/80 sm:right-4 sm:top-4"
-          aria-label="关闭项目详情"
-        >
-          <X size={20} />
-        </button>
+        <header className="relative z-30 flex shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-white/88 px-4 pb-3 pt-[max(0.85rem,env(safe-area-inset-top))] shadow-[0_8px_28px_rgba(15,23,42,0.06)] backdrop-blur-2xl sm:bg-white/82 sm:px-6 sm:py-4">
+          <div className="min-w-0">
+            <p className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-accent/75">Project {project.n}</p>
+            <p className="mt-1 truncate font-display text-sm font-semibold text-ink sm:text-base">{project.name}</p>
+          </div>
+          <button
+            ref={closeRef}
+            onClick={onClose}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-ink/10 bg-black/75 text-white shadow-[0_10px_28px_rgba(15,23,42,0.18)] transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            aria-label="关闭项目详情"
+          >
+            <X size={20} />
+          </button>
+        </header>
 
-        <div className="group relative mb-6 aspect-video overflow-hidden rounded-xl bg-white/5">
-          <img src={`${IMG_BASE}${project.imgs[imgIdx]}`} alt={`${project.name} 截图 ${imgIdx + 1}`} className="h-full w-full object-cover" />
-          {project.imgs.length > 1 && (
-            <>
-              <button
-                onClick={() => setImgIdx((i) => (i > 0 ? i - 1 : project.imgs.length - 1))}
-                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/60 p-2.5 text-white opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-                aria-label="上一张"
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <button
-                onClick={() => setImgIdx((i) => (i < project.imgs.length - 1 ? i + 1 : 0))}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/60 p-2.5 text-white opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-                aria-label="下一张"
-              >
-                <ArrowRight size={18} />
-              </button>
-              <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-2">
-                {project.imgs.map((_, i) => (
-                  <button key={i} onClick={() => setImgIdx(i)} className={`h-2.5 w-2.5 rounded-full ${i === imgIdx ? 'bg-white' : 'bg-white/40'}`} aria-label={`第 ${i + 1} 张`} />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+        <div className="project-modal-scroll min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
+          <div className="group relative mb-6 aspect-video overflow-hidden rounded-xl bg-white/5">
+            <img src={`${IMG_BASE}${project.imgs[imgIdx]}`} alt={`${project.name} 截图 ${imgIdx + 1}`} className="h-full w-full object-cover" />
+            {project.imgs.length > 1 && (
+              <>
+                <button
+                  onClick={() => setImgIdx((index) => (index > 0 ? index - 1 : project.imgs.length - 1))}
+                  className="absolute left-2 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-black/65 text-white opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                  aria-label="上一张"
+                >
+                  <ArrowLeft size={18} />
+                </button>
+                <button
+                  onClick={() => setImgIdx((index) => (index < project.imgs.length - 1 ? index + 1 : 0))}
+                  className="absolute right-2 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-black/65 text-white opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                  aria-label="下一张"
+                >
+                  <ArrowRight size={18} />
+                </button>
+                <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-2">
+                  {project.imgs.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setImgIdx(index)}
+                      className={`h-3 w-3 rounded-full border border-black/20 ${index === imgIdx ? 'bg-white' : 'bg-white/40'}`}
+                      aria-label={`第 ${index + 1} 张`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
 
-        <div className="mb-3 flex flex-wrap gap-2">
-          <span className="pill-grad rounded-full px-3 py-1 text-xs text-ink-dim">{project.group}</span>
-          <span className="pill-grad rounded-full px-3 py-1 text-xs text-ink-dim">{project.cat}</span>
-          <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-ink/55">{project.nature}</span>
-        </div>
+          <div className="mb-3 flex flex-wrap gap-2">
+            <span className="pill-grad rounded-full px-3 py-1 text-xs text-ink-dim">{project.group}</span>
+            <span className="pill-grad rounded-full px-3 py-1 text-xs text-ink-dim">{project.cat}</span>
+            <span className="rounded-full border border-ink/10 bg-white/55 px-3 py-1 text-xs text-ink/55">{project.nature}</span>
+          </div>
 
-        <h3 id="modal-title" className="hero-heading mb-2 pr-10 font-display text-2xl md:text-3xl">{project.name}</h3>
-        <p className="mb-4 text-sm text-ink-dim">{project.role}</p>
-        <p className="mb-6 leading-relaxed text-ink-dim/80">{project.desc}</p>
+          <h3 id="project-modal-title" className="hero-heading mb-2 break-words font-display text-2xl md:text-3xl">{project.name}</h3>
+          <p className="mb-4 text-sm text-ink-dim">{project.role}</p>
+          <p id="project-modal-description" className="mb-6 leading-relaxed text-ink-dim/80">{project.desc}</p>
 
-        <div className="mb-6">
-          <h4 className="mb-3 text-xs uppercase tracking-widest text-ink-dim/50">我的工作</h4>
-          <ul className="space-y-2">
-            {project.bullets.map((bullet) => (
-              <li key={bullet} className="flex items-start gap-3 text-sm leading-relaxed text-ink-dim/80">
-                <ArrowRight size={14} className="mt-1 shrink-0 text-ink-dim/30" />
-                <span className="min-w-0 break-words">{bullet}</span>
-              </li>
+          <div className="mb-6">
+            <h4 className="mb-3 text-xs uppercase tracking-widest text-ink-dim/50">我的工作</h4>
+            <ul className="space-y-3">
+              {project.bullets.map((bullet) => (
+                <li key={bullet} className="flex items-start gap-3 text-sm leading-relaxed text-ink-dim/80">
+                  <ArrowRight size={14} className="mt-1 shrink-0 text-ink-dim/30" />
+                  <span className="min-w-0 break-words">{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="glass mb-6 rounded-xl p-4 sm:p-5">
+            <h4 className="mb-2 text-xs uppercase tracking-widest text-ink-dim/50">项目结果</h4>
+            <p className="text-sm leading-relaxed text-ink-dim/90">{project.result}</p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+              <span key={tag} className="pill-grad rounded-full px-3 py-1.5 text-xs text-ink-dim/70">{tag}</span>
             ))}
-          </ul>
+          </div>
         </div>
 
-        <div className="glass mb-6 rounded-xl p-4">
-          <h4 className="mb-2 text-xs uppercase tracking-widest text-ink-dim/50">项目结果</h4>
-          <p className="text-sm leading-relaxed text-ink-dim/90">{project.result}</p>
-        </div>
-
-        <div className="mb-6 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <span key={tag} className="pill-grad rounded-full px-3 py-1 text-xs text-ink-dim/70">{tag}</span>
-          ))}
-        </div>
-
-        <a href={project.link} target="_blank" rel="noopener noreferrer" className="pill-grad inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm transition-colors hover:bg-white/[0.12]">
-          查看交互 Demo
-          <ExternalLink size={14} />
-        </a>
+        <footer className="relative z-30 shrink-0 border-t border-white/10 bg-white/90 px-4 pb-[max(0.8rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-12px_34px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:bg-white/84 sm:px-6 sm:pb-4 md:px-8">
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(37,99,235,0.28)] transition hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:w-auto"
+          >
+            查看交互 Demo
+            <ExternalLink size={16} />
+          </a>
+        </footer>
       </motion.div>
     </motion.div>
   );
