@@ -93,10 +93,10 @@ async function testSharedExperimentalDemo(page, slug, label) {
   await page.waitForSelector('.motion-enrich-launcher', { timeout: 10000 });
   await assertNoHorizontalOverflow(page, label);
   await page.locator('.motion-enrich-launcher').click();
-  await page.waitForSelector('#motion-enrich-drawer.is-open');
-  await page.locator('[data-state="error"]').click();
-  await page.waitForSelector('.motion-enrich-state-demo.is-visible');
-  await page.locator('.motion-enrich-drawer__close').click();
+  await page.waitForFunction(() => document.querySelector('#motion-enrich-drawer')?.classList.contains('is-open'));
+  await page.locator('#motion-enrich-drawer [data-state="error"]').click();
+  await page.waitForFunction(() => document.querySelector('.motion-enrich-state-demo')?.classList.contains('is-visible'));
+  await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('#motion-enrich-drawer')?.classList.contains('is-open'));
 }
 
