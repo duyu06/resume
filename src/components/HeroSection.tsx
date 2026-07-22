@@ -1,46 +1,22 @@
-import { useEffect, useRef } from 'react';
 import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
+import LayeredIntelligence from './LayeredIntelligence';
 
 const tags = ['AI 产品规划', '模型评测与选型', '多模态工作流', '原型开发与部署交付'];
 
 export default function HeroSection() {
-  const root = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (window.matchMedia('(hover: none)').matches) return;
-    const el = root.current;
-    if (!el) return;
-
-    const onMove = (e: MouseEvent) => {
-      const dx = e.clientX - window.innerWidth / 2;
-      const dy = e.clientY - window.innerHeight / 2;
-      el.querySelectorAll<HTMLElement>('[data-depth]').forEach((node) => {
-        const d = parseFloat(node.dataset.depth || '0');
-        node.style.transform = `translate3d(${dx * d}px, ${dy * d}px, 0)`;
-      });
-    };
-
-    window.addEventListener('mousemove', onMove, { passive: true });
-    return () => window.removeEventListener('mousemove', onMove);
-  }, []);
-
   return (
     <section
       id="hero"
-      ref={root}
-      className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden bg-bg px-5 pb-28 pt-20 sm:px-8 md:min-h-dvh md:px-10 md:pb-32 md:pt-24"
+      className="relative isolate flex min-h-[100svh] flex-col justify-between overflow-hidden bg-bg px-5 pb-28 pt-20 sm:px-8 md:min-h-dvh md:px-10 md:pb-32 md:pt-24"
     >
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.045)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
+      <div className="pointer-events-none absolute inset-0 -z-20" aria-hidden>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.045)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent_86%)]" />
         <div className="absolute left-[-12rem] top-[8%] h-[32rem] w-[32rem] rounded-full bg-accent/6 blur-3xl" />
         <div className="absolute right-[-10rem] top-[20%] h-[28rem] w-[28rem] rounded-full bg-accent-2/8 blur-3xl" />
       </div>
 
-      <div className="pointer-events-none absolute inset-0" data-depth="0.05" aria-hidden>
-        <div className="absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-ink/[0.045]" />
-        <div className="absolute left-1/2 top-1/2 h-[90vmin] w-[90vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/[0.055]" />
-      </div>
+      <LayeredIntelligence />
 
       <FadeIn
         delay={0}
@@ -57,21 +33,26 @@ export default function HeroSection() {
       </FadeIn>
 
       <div className="relative z-20 flex flex-1 flex-col items-center justify-center gap-4 py-10 text-center">
-        <FadeIn delay={0.15} y={40} className="w-full overflow-hidden">
-          <h1
-            className="hero-heading font-display text-[14vw] font-black uppercase leading-none tracking-tight sm:text-[15vw] md:text-[16vw] lg:text-[12vw]"
-            data-depth="0.12"
-          >
+        <FadeIn delay={0.12} y={18} className="mb-1">
+          <span className="rounded-full border border-accent/15 bg-white/65 px-3 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-accent shadow-[0_8px_24px_rgba(37,99,235,0.05)] backdrop-blur-xl sm:text-[0.68rem]">
+            Layered Intelligence · AI Product × Technology
+          </span>
+        </FadeIn>
+
+        <FadeIn delay={0.2} y={40} className="w-full overflow-hidden">
+          <h1 className="hero-heading font-display text-[14vw] font-black uppercase leading-none tracking-tight sm:text-[15vw] md:text-[16vw] lg:text-[12vw]">
             张滨文
           </h1>
         </FadeIn>
-        <FadeIn delay={0.28} y={24}>
+
+        <FadeIn delay={0.32} y={24}>
           <p className="font-display text-[clamp(0.95rem,2.8vw,1.75rem)] font-medium tracking-wide text-ink">
             AI 产品经理 · 技术产品经理 · AI 解决方案产品经理
           </p>
         </FadeIn>
-        <FadeIn delay={0.34} y={20}>
-          <div className="mt-1 max-w-2xl">
+
+        <FadeIn delay={0.4} y={20}>
+          <div className="mt-1 max-w-2xl rounded-[28px] border border-white/70 bg-white/62 px-5 py-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:px-7 sm:py-5">
             <p className="font-body text-base font-medium leading-relaxed text-ink md:text-lg">
               将模型能力转化为可评测、可追踪、可交付的 AI 产品。
             </p>
@@ -80,7 +61,8 @@ export default function HeroSection() {
             </p>
           </div>
         </FadeIn>
-        <FadeIn delay={0.4} y={20}>
+
+        <FadeIn delay={0.48} y={20}>
           <div className="mt-2 flex max-w-2xl flex-wrap justify-center gap-2">
             {tags.map((tag) => (
               <span
@@ -95,7 +77,7 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-30 flex flex-wrap items-end justify-between gap-5">
-        <FadeIn delay={0.5} y={20}>
+        <FadeIn delay={0.56} y={20}>
           <div>
             <p className="max-w-[420px] font-display text-[clamp(0.75rem,1.4vw,1.05rem)] font-light uppercase leading-snug tracking-wide text-ink">
               产品设计 + AI 应用落地 + 技术协同 + 原型开发与部署验证
@@ -105,7 +87,7 @@ export default function HeroSection() {
             </p>
           </div>
         </FadeIn>
-        <FadeIn delay={0.6} y={20}>
+        <FadeIn delay={0.64} y={20}>
           <ContactButton href="#projects" label="查看精选项目" />
         </FadeIn>
       </div>
