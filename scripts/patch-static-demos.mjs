@@ -70,6 +70,7 @@ const demoIndexes = [
 const demoStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode.css" />';
 const demoFitStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode-fit.css" />';
 const demoScript = '<script defer src="/resume/demos/demo-mode.js"></script>';
+const demoFixScript = '<script defer src="/resume/demos/demo-mode-review-fixes.js"></script>';
 
 for (const path of demoIndexes) {
   let content = await readFile(path, 'utf8');
@@ -85,7 +86,14 @@ for (const path of demoIndexes) {
     if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
     content = content.replace('</body>', `  ${demoScript}\n</body>`);
   }
+  if (!content.includes('/resume/demos/demo-mode-review-fixes.js')) {
+    if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
+    content = content.replace('</body>', `  ${demoFixScript}\n</body>`);
+  }
   await writeFile(path, content, 'utf8');
 }
 
-console.log(`Patched ${stylesheets.length} static demo stylesheets, 3 demo scripts, and ${demoIndexes.length} demo pages.`);
+const deploymentRevision = process.env.GITHUB_SHA || 'local-build';
+await writeFile('dist/deploy-revision.txt', `${deploymentRevision}\n`, 'utf8');
+
+console.log(`Patched ${stylesheets.length} static demo stylesheets, 3 demo scripts, ${demoIndexes.length} demo pages, and revision ${deploymentRevision}.`);
