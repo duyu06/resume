@@ -40,19 +40,19 @@ export default function HeroSection() {
         </FadeIn>
 
         <FadeIn delay={0.2} y={40} className="w-full overflow-hidden">
-          <h1 className="hero-heading font-display text-[14vw] font-black uppercase leading-none tracking-tight sm:text-[15vw] md:text-[16vw] lg:text-[12vw]">
+          <h1 className="hero-heading hero-name-safe font-display text-[14vw] font-black uppercase leading-none tracking-tight sm:text-[15vw] md:text-[16vw] lg:text-[12vw]">
             张滨文
           </h1>
         </FadeIn>
 
         <FadeIn delay={0.32} y={24}>
-          <p className="font-display text-[clamp(0.95rem,2.8vw,1.75rem)] font-medium tracking-wide text-ink">
+          <p className="hero-role-safe font-display text-[clamp(0.95rem,2.8vw,1.75rem)] font-medium tracking-wide text-ink">
             AI 产品经理 · 技术产品经理 · AI 解决方案产品经理
           </p>
         </FadeIn>
 
         <FadeIn delay={0.4} y={20}>
-          <div className="mt-1 max-w-2xl rounded-[28px] border border-white/70 bg-white/62 px-5 py-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:px-7 sm:py-5">
+          <div className="mt-1 max-w-2xl rounded-[28px] border border-white/70 bg-white/78 px-5 py-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:px-7 sm:py-5">
             <p className="font-body text-base font-medium leading-relaxed text-ink md:text-lg">
               将模型能力转化为可评测、可追踪、可交付的 AI 产品。
             </p>
@@ -67,7 +67,7 @@ export default function HeroSection() {
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-ink/10 bg-white/75 px-3 py-1.5 text-[0.72rem] tracking-wide text-ink-dim shadow-[0_8px_24px_rgba(15,23,42,0.04)] backdrop-blur-md transition-colors duration-300 hover:border-accent/30 hover:bg-accent-soft hover:text-accent"
+                className="rounded-full border border-ink/10 bg-white/82 px-3 py-1.5 text-[0.72rem] tracking-wide text-ink-dim shadow-[0_8px_24px_rgba(15,23,42,0.04)] backdrop-blur-md transition-colors duration-300 hover:border-accent/30 hover:bg-accent-soft hover:text-accent"
               >
                 {tag}
               </span>
