@@ -1,3 +1,24 @@
+/* Core project order:
+   1. 跨境电商独立站
+   2. 数字人模型微调
+   3. 多账号运营 RPA（当前仓库暂无独立 ERP 项目）
+   4. AI 电商主图生成器 */
+#projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(4) {
+  order: 1;
+}
+
+#projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(2) {
+  order: 2;
+}
+
+#projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(3) {
+  order: 3;
+}
+
+#projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(1) {
+  order: 4;
+}
+
 @media (min-width: 1024px) {
   #projects > .mx-auto > div:nth-child(2) > div:last-child {
     grid-template-columns: minmax(0, 1fr);
@@ -15,7 +36,7 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.94);
   }
 
-  #projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(1) {
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(4) {
     top: 96px;
     z-index: 1;
   }
@@ -30,7 +51,7 @@
     z-index: 3;
   }
 
-  #projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(4) {
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(1) {
     top: 144px;
     z-index: 4;
   }
