@@ -37,20 +37,28 @@ export default function GuoyangFeature() {
                 长沙果漾商贸有限公司 · 产品与技术协同 / 核心参与者 · 2025—至今
               </p>
             </div>
-            <ContactButton
-              href="https://guoyang.xin/"
-              label="访问官网 ↗"
-              className="shrink-0"
-            />
+            <div className="flex flex-wrap items-center gap-3">
+              <ContactButton
+                href={`${import.meta.env.BASE_URL}demos/guoyang/`}
+                label="查看交互 Demo"
+                className="shrink-0"
+              />
+              <a
+                href="https://guoyang.xin/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-white/60 px-4 text-sm text-ink-dim transition hover:border-accent/35 hover:text-ink"
+              >
+                访问官网 <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </div>
           </div>
         </FadeIn>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
           <FadeIn delay={0.1} y={40} className="lg:col-span-7">
             <a
-              href="https://guoyang.xin/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href={`${import.meta.env.BASE_URL}demos/guoyang/`}
               className="group relative block overflow-hidden rounded-[32px] border border-ink/15 bg-[#111] shadow-[0_30px_80px_rgba(0,0,0,0.55)] transition duration-500 hover:-translate-y-1 hover:border-accent/40 sm:rounded-[40px]"
             >
               <div className="absolute inset-x-0 top-0 z-10 flex items-center gap-2 border-b border-white/8 bg-black/40 px-4 py-3 backdrop-blur-md">
@@ -58,13 +66,13 @@ export default function GuoyangFeature() {
                 <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
                 <span className="ml-2 truncate font-mono text-[0.7rem] text-ink-dim">
-                  https://guoyang.xin/
+                  /resume/demos/guoyang/
                 </span>
                 <ExternalLink className="ml-auto h-3.5 w-3.5 text-ink-dim opacity-0 transition group-hover:opacity-100" />
               </div>
               <img
                 src={asset('assets/projects/proj-01-a.png')}
-                alt="果漾 AI 官网截图"
+                alt="果漾 AI 项目界面截图"
                 className="aspect-[16/10] w-full object-cover object-top pt-10 transition duration-700 group-hover:scale-[1.03]"
                 loading="lazy"
               />
