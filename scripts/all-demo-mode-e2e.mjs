@@ -7,13 +7,19 @@ const targetName = process.env.TEST_TARGET || 'local-preview';
 const tinyPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2nWQAAAAASUVORK5CYII=', 'base64');
 
 const projects = [
-  { slug: 'guoyang', title: '果漾 AI 多模态平台', timeout: 50000 },
-  { slug: 'cross-border', title: 'YOLA 珠宝独立站', timeout: 40000 },
-  { slug: 'ai-ecommerce', title: 'PrismPix AI 电商', timeout: 70000 },
-  { slug: 'digitalhuman', title: 'talk-to-fengge-live 数字人', timeout: 50000 },
-  { slug: 'rpa', title: 'WebRPA 自动化系统', timeout: 90000 },
-  { slug: 'webui', title: 'Open WebUI 本地模型平台', timeout: 30000 },
-  { slug: 'soulcaller', title: '叫魂者多 Agent 系统', timeout: 30000 },
+  { slug: 'guoyang', title: '果漾 AI 多模态平台', timeout: 50000, resetLocal: [], resetSession: [] },
+  { slug: 'cross-border', title: 'YOLA 珠宝独立站', timeout: 40000, resetLocal: [], resetSession: [] },
+  { slug: 'ai-ecommerce', title: 'PrismPix AI 电商', timeout: 70000, resetLocal: ['prismpix_backend', 'prismpix_real'], resetSession: [] },
+  {
+    slug: 'digitalhuman',
+    title: 'talk-to-fengge-live 数字人',
+    timeout: 50000,
+    resetLocal: ['fengge_backend', 'fengge_region', 'fengge_real', 'fengge_demo_characters', 'fengge_demo_personas'],
+    resetSession: ['fengge_api_key'],
+  },
+  { slug: 'rpa', title: 'WebRPA 自动化系统', timeout: 90000, resetLocal: ['webrpa_backend', 'webrpa_real', 'webrpa_demo_workflow'], resetSession: [] },
+  { slug: 'webui', title: 'Open WebUI 本地模型平台', timeout: 30000, resetLocal: [], resetSession: [], promiseRun: true },
+  { slug: 'soulcaller', title: '叫魂者多 Agent 系统', timeout: 30000, resetLocal: [], resetSession: [], promiseRun: true },
 ];
 
 const devices = [
@@ -101,7 +107,16 @@ async function testProject(browser, device, project) {
       );
     }
 
-    await panel.locator('[data-demo-action="run"]').click();
+    if (project.promiseRun) {
+      const resolvedState = await page.evaluate(async () => {
+        await window.__portfolioDemoMode.run();
+        return window.__portfolioDemoMode.getState();
+      });
+      assert(resolvedState.progress === 100 && resolvedState.status === '演示完成', `${project.title}: run promise resolved before completion`);
+    } else {
+      await panel.locator('[data-demo-action="run"]').click();
+    }
+
     await waitForProgress(page, 100, project.timeout);
     const successStatus = await panel.locator('[data-demo-status]').textContent();
     assert(successStatus && !successStatus.includes('失败'), `${project.title}: full demo ended in failure`);
@@ -111,10 +126,32 @@ async function testProject(browser, device, project) {
     await page.waitForFunction(() => document.querySelector('[data-demo-status]')?.textContent === '异常已捕获', null, { timeout: 30000 });
     assert((await panel.locator('.demo-mode-log li.error').count()) > 0, `${project.title}: error demo produced no error log`);
 
+    if (project.slug === 'rpa') {
+      await page.waitForFunction(() => document.querySelector('#log-list')?.textContent?.includes('人工驳回'), null, { timeout: 20000 });
+      assert((await page.locator('#failure-count').textContent()) === '1', 'WebRPA: rejection did not increment failure count');
+    }
+
     await assertNoHorizontalOverflow(page, `${project.title} after scenarios`);
     await page.screenshot({ path: `${outputDir}/${targetName}-${device.name}-${project.slug}.png`, fullPage: true });
 
+    await page.evaluate(
+      ({ localKeys, sessionKeys }) => {
+        localKeys.forEach((key) => localStorage.setItem(key, 'E2E_PERSISTED_VALUE'));
+        sessionKeys.forEach((key) => sessionStorage.setItem(key, 'E2E_PERSISTED_VALUE'));
+      },
+      { localKeys: project.resetLocal, sessionKeys: project.resetSession },
+    );
+
     await waitForReload(page, () => panel.locator('[data-demo-action="reset"]').click());
+    const remainingKeys = await page.evaluate(
+      ({ localKeys, sessionKeys }) => ({
+        local: localKeys.filter((key) => localStorage.getItem(key) !== null),
+        session: sessionKeys.filter((key) => sessionStorage.getItem(key) !== null),
+      }),
+      { localKeys: project.resetLocal, sessionKeys: project.resetSession },
+    );
+    assert(remainingKeys.local.length === 0 && remainingKeys.session.length === 0, `${project.title}: reset left persisted keys ${JSON.stringify(remainingKeys)}`);
+
     await page.locator('.demo-mode-launcher').click();
     await waitForProgress(page, 0, 10000);
     assert((await page.locator('[data-demo-status]').textContent()) === '等待开始', `${project.title}: reset did not restore initial state`);
