@@ -153,9 +153,17 @@ async function testProject(browser, device, project) {
     assert(successStatus && !successStatus.includes('失败'), `${project.title}: full demo ended in failure`);
     assert((await panel.locator('.demo-mode-log li.success').count()) > 0, `${project.title}: full demo produced no success log`);
 
+    const runAction = panel.locator('[data-demo-action="run"]');
     await panel.locator('[data-demo-action="error"]').click();
+    if (project.promiseRun) {
+      await page.waitForFunction(() => document.body.classList.contains('demo-mode-busy'), null, { timeout: 5000 });
+      assert(await runAction.isDisabled(), `${project.title}: visible run action stayed enabled during the error scenario`);
+      await runAction.evaluate((button) => button.click());
+      assert((await panel.locator('[data-demo-status]').textContent()) !== '准备演示', `${project.title}: disabled run action started a concurrent success flow`);
+    }
     await page.waitForFunction(() => document.querySelector('[data-demo-status]')?.textContent === '异常已捕获', null, { timeout: 30000 });
     assert((await panel.locator('.demo-mode-log li.error').count()) > 0, `${project.title}: error demo produced no error log`);
+    assert(!(await runAction.isDisabled()), `${project.title}: run action remained disabled after the error scenario`);
 
     if (project.slug === 'rpa') {
       await page.waitForFunction(() => document.querySelector('#log-list')?.textContent?.includes('人工驳回'), null, { timeout: 20000 });
@@ -210,10 +218,62 @@ async function testProject(browser, device, project) {
   }
 }
 
+async function testCompactVisualViewport(browser, project) {
+  const deviceName = 'mobile-visual-568x240';
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+    reducedMotion: 'no-preference',
+  });
+  const page = await context.newPage();
+
+  try {
+    await page.goto(`${baseURL}/demos/${project.slug}/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForSelector('.demo-mode-launcher', { timeout: 20000 });
+    await page.locator('.demo-mode-launcher').click();
+    const panel = page.locator('.demo-mode-panel');
+    await panel.waitFor({ state: 'visible' });
+
+    await page.setViewportSize({ width: 568, height: 240 });
+    await page.waitForFunction(() => {
+      const element = document.querySelector('.demo-mode-panel');
+      if (!element) return false;
+      const rect = element.getBoundingClientRect();
+      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      return rect.top >= -2 && rect.bottom <= viewportHeight + 2;
+    }, null, { timeout: 5000 });
+
+    const bounds = await panel.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      return {
+        top: rect.top,
+        bottom: rect.bottom,
+        height: rect.height,
+        maxHeight: Number.parseFloat(getComputedStyle(element).maxHeight),
+        viewportHeight,
+      };
+    });
+    assert(bounds.top >= -2 && bounds.bottom <= bounds.viewportHeight + 2, `${project.title}: compact viewport panel is inaccessible (${JSON.stringify(bounds)})`);
+    assert(bounds.maxHeight <= bounds.viewportHeight + 0.5, `${project.title}: max-height exceeds the visual viewport (${JSON.stringify(bounds)})`);
+    await page.screenshot({ path: `${outputDir}/${targetName}-${deviceName}-${project.slug}.png`, fullPage: true });
+    results.push({ device: deviceName, project: project.slug, status: 'passed' });
+  } catch (error) {
+    await page.screenshot({ path: `${outputDir}/${targetName}-${deviceName}-${project.slug}-failed.png`, fullPage: true }).catch(() => {});
+    results.push({ device: deviceName, project: project.slug, status: 'failed', error: error instanceof Error ? error.message : String(error) });
+  } finally {
+    await context.close();
+  }
+}
+
 await mkdir(outputDir, { recursive: true });
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 for (const device of devices) {
   for (const project of projects) await testProject(browser, device, project);
+}
+for (const project of projects.filter((item) => item.promiseRun)) {
+  await testCompactVisualViewport(browser, project);
 }
 await browser.close();
 
