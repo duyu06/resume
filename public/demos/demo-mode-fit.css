@@ -4,9 +4,11 @@
 }
 
 @media (max-width: 680px) {
-  .demo-mode-panel {
+  .demo-mode-panel,
+  .demo-mode-panel.is-open {
     max-height: calc(100dvh - max(8px, env(safe-area-inset-top)));
-    transform: none;
-    transition: opacity 0.22s, visibility 0.22s;
+    transform: none !important;
+    translate: none !important;
+    transition: opacity 0.22s, visibility 0.22s !important;
   }
 }
