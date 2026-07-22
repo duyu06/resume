@@ -24,9 +24,10 @@ body.project-modal-open .mobile-dock-nav {
 @media (max-width: 639px) {
   .project-modal-shell {
     width: 100%;
-    height: min(94dvh, 900px);
-    max-height: 94dvh;
-    border-radius: 28px 28px 0 0;
+    height: min(91dvh, 900px);
+    max-height: calc(100dvh - max(1rem, env(safe-area-inset-top)) - max(0.75rem, env(safe-area-inset-bottom)));
+    margin-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    border-radius: 28px;
   }
 
   .project-modal-scroll {
@@ -36,9 +37,10 @@ body.project-modal-open .mobile-dock-nav {
 
 @media (max-height: 620px) and (orientation: landscape) {
   .project-modal-shell {
-    height: 100dvh;
-    max-height: 100dvh;
-    border-radius: 0;
+    height: calc(100dvh - max(0.5rem, env(safe-area-inset-top)) - max(0.5rem, env(safe-area-inset-bottom)));
+    max-height: calc(100dvh - max(0.5rem, env(safe-area-inset-top)) - max(0.5rem, env(safe-area-inset-bottom)));
+    margin-bottom: max(0.25rem, env(safe-area-inset-bottom));
+    border-radius: 18px;
   }
 }
 

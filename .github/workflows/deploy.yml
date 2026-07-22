@@ -1,4 +1,4 @@
-name: Build and Deploy GitHub Pages
+name: Build, Deploy and End-to-End Test
 
 on:
   push:
@@ -30,12 +30,12 @@ jobs:
         env:
           VITE_MAXKB_EMBED_URL: ${{ vars.MAXKB_EMBED_URL }}
 
-      - name: Install Chromium smoke-test runtime
+      - name: Install Chromium end-to-end runtime
         run: |
           npm install --no-save playwright
           npx playwright install --with-deps chromium
 
-      - name: Start preview server
+      - name: Start production preview server
         run: |
           npm run preview -- --host 127.0.0.1 > /tmp/resume-preview.log 2>&1 &
           for attempt in {1..30}; do
@@ -47,17 +47,29 @@ jobs:
           cat /tmp/resume-preview.log
           exit 1
 
-      - name: Test integrated demos on desktop and mobile
-        run: node scripts/upstream-demo-smoke.mjs
+      - name: Run legacy deep adapter suite
+        continue-on-error: true
+        run: node scripts/full-e2e.mjs
         env:
           TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: local-preview
+          TEST_OUTPUT_DIR: test-results/full-e2e-local
 
-      - name: Upload integrated demo screenshots
+      - name: Run all-project demo mode suite
+        run: node scripts/all-demo-mode-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: local-preview
+          TEST_OUTPUT_DIR: test-results/all-demo-mode-local
+
+      - name: Upload local end-to-end evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: upstream-demo-dual-device-screenshots
-          path: test-results/upstream-demo-screenshots
+          name: full-e2e-local
+          path: |
+            test-results/full-e2e-local
+            test-results/all-demo-mode-local
           if-no-files-found: ignore
           retention-days: 14
 
@@ -78,3 +90,59 @@ jobs:
     steps:
       - uses: actions/deploy-pages@v4
         id: deployment
+
+  e2e-live:
+    if: github.event_name != 'pull_request'
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium end-to-end runtime
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Wait for deployed project adapters
+        run: |
+          for attempt in {1..40}; do
+            guoyang=$(curl --fail --silent https://duyu06.github.io/resume/demos/guoyang/ || true)
+            prism=$(curl --fail --silent https://duyu06.github.io/resume/demos/ai-ecommerce/ || true)
+            human=$(curl --fail --silent https://duyu06.github.io/resume/demos/digitalhuman/ || true)
+            rpa=$(curl --fail --silent https://duyu06.github.io/resume/demos/rpa/ || true)
+            if grep -q 'LOCAL WORKFLOW DEMO' <<< "$guoyang" \
+              && grep -q 'PRISMPIX COMPATIBLE CONSOLE' <<< "$prism" \
+              && grep -q 'TALK-TO-FENGGE-LIVE ADAPTER' <<< "$human" \
+              && grep -q 'WEBRPA COMPATIBLE WORKFLOW STUDIO' <<< "$rpa"; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo 'Published pages did not expose the expected integration markers in time.'
+          exit 1
+      - name: Run legacy deployed adapter suite
+        continue-on-error: true
+        run: node scripts/full-e2e.mjs
+        env:
+          TEST_BASE_URL: https://duyu06.github.io/resume
+          TEST_TARGET: github-pages
+          TEST_OUTPUT_DIR: test-results/full-e2e-live
+      - name: Run deployed all-project demo mode suite
+        run: node scripts/all-demo-mode-e2e.mjs
+        env:
+          TEST_BASE_URL: https://duyu06.github.io/resume
+          TEST_TARGET: github-pages
+          TEST_OUTPUT_DIR: test-results/all-demo-mode-live
+      - name: Upload deployed-site end-to-end evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-e2e-live
+          path: |
+            test-results/full-e2e-live
+            test-results/all-demo-mode-live
+          if-no-files-found: ignore
+          retention-days: 14
