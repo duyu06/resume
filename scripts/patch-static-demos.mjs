@@ -68,6 +68,7 @@ const demoIndexes = [
 ];
 
 const demoStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode.css" />';
+const demoFitStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode-fit.css" />';
 const demoScript = '<script defer src="/resume/demos/demo-mode.js"></script>';
 
 for (const path of demoIndexes) {
@@ -75,6 +76,10 @@ for (const path of demoIndexes) {
   if (!content.includes('/resume/demos/demo-mode.css')) {
     if (!content.includes('</head>')) throw new Error(`${path}: missing </head>`);
     content = content.replace('</head>', `  ${demoStyle}\n</head>`);
+  }
+  if (!content.includes('/resume/demos/demo-mode-fit.css')) {
+    if (!content.includes('</head>')) throw new Error(`${path}: missing </head>`);
+    content = content.replace('</head>', `  ${demoFitStyle}\n</head>`);
   }
   if (!content.includes('/resume/demos/demo-mode.js')) {
     if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
