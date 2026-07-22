@@ -1,0 +1,10 @@
+.demo-mode-panel,
+.demo-mode-panel * {
+  box-sizing: border-box;
+}
+
+@media (max-width: 680px) {
+  .demo-mode-panel {
+    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)));
+  }
+}
