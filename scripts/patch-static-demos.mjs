@@ -6,12 +6,12 @@ const stylesheets = [
   'dist/demos/rpa/app.css',
 ];
 
-const hiddenRule = '[hidden]{display:none!important}';
+const compatibilityRules = '[hidden]{display:none!important}.toast{pointer-events:none!important}';
 
 for (const path of stylesheets) {
   const content = await readFile(path, 'utf8');
-  if (content.includes(hiddenRule)) continue;
-  await writeFile(path, `${hiddenRule}${content}`, 'utf8');
+  if (content.includes(compatibilityRules)) continue;
+  await writeFile(path, `${compatibilityRules}${content}`, 'utf8');
 }
 
 console.log(`Patched ${stylesheets.length} static demo stylesheets.`);
