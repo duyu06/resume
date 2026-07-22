@@ -6,6 +6,7 @@
   const runningKpi = $('#running-kpi');
   const approvalKpi = $('#approval-kpi');
   const logList = $('#log-list');
+  const approvalList = $('.approval-list');
   let toastTimer = 0;
   let running = true;
   let approvals = 7;
@@ -66,22 +67,24 @@
     notify('重试已进入队列，保留原失败原因与审计记录');
   });
 
-  $$('.approval').forEach((item) => {
+  const approvalRecords = () => $$('.approval', approvalList);
+
+  approvalRecords().forEach((item) => {
     item.addEventListener('click', () => {
-      $$('.approval').forEach((row) => row.classList.toggle('selected', row === item));
+      approvalRecords().forEach((row) => row.classList.toggle('selected', row === item));
       $('#approval-title').textContent = item.dataset.title;
       $('#approval-meta').textContent = `${item.dataset.task} · ${item.dataset.account} · ${item.dataset.env}`;
     });
   });
 
   function resolveApproval(result) {
-    const selected = $('.approval.selected');
+    const selected = $('.approval.selected', approvalList);
     if (!selected) return;
     const title = selected.dataset.title;
     selected.remove();
     approvals = Math.max(0, approvals - 1);
     approvalKpi.textContent = String(approvals);
-    const next = $('.approval');
+    const next = $('.approval', approvalList);
     if (next) {
       next.classList.add('selected');
       $('#approval-title').textContent = next.dataset.title;
