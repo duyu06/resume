@@ -11,6 +11,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  statuses: write
 
 concurrency:
   group: pages-${{ github.ref }}
@@ -106,22 +107,18 @@ jobs:
         run: |
           npm install --no-save playwright
           npx playwright install --with-deps chromium
-      - name: Wait for deployed project adapters
+      - name: Wait for the deployed commit revision
         run: |
-          for attempt in {1..40}; do
-            guoyang=$(curl --fail --silent https://duyu06.github.io/resume/demos/guoyang/ || true)
-            prism=$(curl --fail --silent https://duyu06.github.io/resume/demos/ai-ecommerce/ || true)
-            human=$(curl --fail --silent https://duyu06.github.io/resume/demos/digitalhuman/ || true)
-            rpa=$(curl --fail --silent https://duyu06.github.io/resume/demos/rpa/ || true)
-            if grep -q 'LOCAL WORKFLOW DEMO' <<< "$guoyang" \
-              && grep -q 'PRISMPIX COMPATIBLE CONSOLE' <<< "$prism" \
-              && grep -q 'TALK-TO-FENGGE-LIVE ADAPTER' <<< "$human" \
-              && grep -q 'WEBRPA COMPATIBLE WORKFLOW STUDIO' <<< "$rpa"; then
+          for attempt in {1..60}; do
+            revision=$(curl --fail --silent "https://duyu06.github.io/resume/deploy-revision.txt?attempt=${attempt}" || true)
+            if [[ "$revision" == "$GITHUB_SHA" ]]; then
+              echo "Verified deployed revision: $revision"
               exit 0
             fi
+            echo "Waiting for $GITHUB_SHA; currently published: ${revision:-unavailable}"
             sleep 5
           done
-          echo 'Published pages did not expose the expected integration markers in time.'
+          echo 'The expected commit revision was not published in time.'
           exit 1
       - name: Run legacy deployed adapter suite
         continue-on-error: true
@@ -146,3 +143,24 @@ jobs:
             test-results/all-demo-mode-live
           if-no-files-found: ignore
           retention-days: 14
+      - name: Publish live end-to-end commit status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LIVE_JOB_STATUS: ${{ job.status }}
+        run: |
+          if [[ "$LIVE_JOB_STATUS" == "success" ]]; then
+            state=success
+            description='14/14 live project demo scenarios passed'
+          else
+            state=failure
+            description='Live project demo acceptance failed'
+          fi
+          payload=$(printf '{"state":"%s","context":"e2e-live/all-project-demo-mode","description":"%s","target_url":"%s"}' "$state" "$description" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            -d "$payload"
