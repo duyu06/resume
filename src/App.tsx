@@ -14,6 +14,7 @@ import ProjectsCatalog from './components/ProjectsCatalog';
 import CareerTimeline from './components/CareerTimeline';
 import EducationSection from './components/EducationSection';
 import ContactSection from './components/ContactSection';
+import MaxKBChat from './components/MaxKBChat';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
         <ContactSection />
       </main>
       <Footer />
+      <MaxKBChat />
       <DockNav />
     </>
   );
