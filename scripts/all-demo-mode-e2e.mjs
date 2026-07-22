@@ -6,20 +6,51 @@ const outputDir = process.env.TEST_OUTPUT_DIR || 'test-results/all-demo-mode';
 const targetName = process.env.TEST_TARGET || 'local-preview';
 const tinyPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2nWQAAAAASUVORK5CYII=', 'base64');
 
+const emptyReset = { expectedLocal: {}, absentLocal: [], expectedSession: {}, absentSession: [] };
 const projects = [
-  { slug: 'guoyang', title: '果漾 AI 多模态平台', timeout: 50000, resetLocal: [], resetSession: [] },
-  { slug: 'cross-border', title: 'YOLA 珠宝独立站', timeout: 40000, resetLocal: [], resetSession: [] },
-  { slug: 'ai-ecommerce', title: 'PrismPix AI 电商', timeout: 70000, resetLocal: ['prismpix_backend', 'prismpix_real'], resetSession: [] },
+  { slug: 'guoyang', title: '果漾 AI 多模态平台', timeout: 50000, reset: emptyReset },
+  { slug: 'cross-border', title: 'YOLA 珠宝独立站', timeout: 40000, reset: emptyReset },
+  {
+    slug: 'ai-ecommerce',
+    title: 'PrismPix AI 电商',
+    timeout: 70000,
+    reset: {
+      expectedLocal: { prismpix_backend: '', prismpix_real: '0' },
+      absentLocal: [],
+      expectedSession: {},
+      absentSession: [],
+      modeSelector: '#mode-badge',
+      modeText: '演示模式',
+    },
+  },
   {
     slug: 'digitalhuman',
     title: 'talk-to-fengge-live 数字人',
     timeout: 50000,
-    resetLocal: ['fengge_backend', 'fengge_region', 'fengge_real', 'fengge_demo_characters', 'fengge_demo_personas'],
-    resetSession: ['fengge_api_key'],
+    reset: {
+      expectedLocal: { fengge_backend: 'http://127.0.0.1:8791', fengge_region: 'cn', fengge_real: '0' },
+      absentLocal: ['fengge_demo_characters', 'fengge_demo_personas'],
+      expectedSession: { fengge_api_key: '' },
+      absentSession: [],
+      modeSelector: '#connection-badge',
+      modeText: '演示模式',
+    },
   },
-  { slug: 'rpa', title: 'WebRPA 自动化系统', timeout: 90000, resetLocal: ['webrpa_backend', 'webrpa_real', 'webrpa_demo_workflow'], resetSession: [] },
-  { slug: 'webui', title: 'Open WebUI 本地模型平台', timeout: 30000, resetLocal: [], resetSession: [], promiseRun: true },
-  { slug: 'soulcaller', title: '叫魂者多 Agent 系统', timeout: 30000, resetLocal: [], resetSession: [], promiseRun: true },
+  {
+    slug: 'rpa',
+    title: 'WebRPA 自动化系统',
+    timeout: 90000,
+    reset: {
+      expectedLocal: { webrpa_backend: 'http://127.0.0.1:5921', webrpa_real: '0' },
+      absentLocal: ['webrpa_demo_workflow'],
+      expectedSession: {},
+      absentSession: [],
+      modeSelector: '#mode-badge',
+      modeText: '浏览器演示',
+    },
+  },
+  { slug: 'webui', title: 'Open WebUI 本地模型平台', timeout: 30000, reset: emptyReset, promiseRun: true },
+  { slug: 'soulcaller', title: '叫魂者多 Agent 系统', timeout: 30000, reset: emptyReset, promiseRun: true },
 ];
 
 const devices = [
@@ -134,23 +165,34 @@ async function testProject(browser, device, project) {
     await assertNoHorizontalOverflow(page, `${project.title} after scenarios`);
     await page.screenshot({ path: `${outputDir}/${targetName}-${device.name}-${project.slug}.png`, fullPage: true });
 
-    await page.evaluate(
-      ({ localKeys, sessionKeys }) => {
-        localKeys.forEach((key) => localStorage.setItem(key, 'E2E_PERSISTED_VALUE'));
-        sessionKeys.forEach((key) => sessionStorage.setItem(key, 'E2E_PERSISTED_VALUE'));
-      },
-      { localKeys: project.resetLocal, sessionKeys: project.resetSession },
-    );
+    await page.evaluate((reset) => {
+      const localKeys = [...Object.keys(reset.expectedLocal), ...reset.absentLocal];
+      const sessionKeys = [...Object.keys(reset.expectedSession), ...reset.absentSession];
+      localKeys.forEach((key) => localStorage.setItem(key, 'E2E_PERSISTED_VALUE'));
+      sessionKeys.forEach((key) => sessionStorage.setItem(key, 'E2E_PERSISTED_VALUE'));
+    }, project.reset);
 
     await waitForReload(page, () => panel.locator('[data-demo-action="reset"]').click());
-    const remainingKeys = await page.evaluate(
-      ({ localKeys, sessionKeys }) => ({
-        local: localKeys.filter((key) => localStorage.getItem(key) !== null),
-        session: sessionKeys.filter((key) => sessionStorage.getItem(key) !== null),
-      }),
-      { localKeys: project.resetLocal, sessionKeys: project.resetSession },
-    );
-    assert(remainingKeys.local.length === 0 && remainingKeys.session.length === 0, `${project.title}: reset left persisted keys ${JSON.stringify(remainingKeys)}`);
+    const resetState = await page.evaluate((reset) => ({
+      local: Object.fromEntries([...Object.keys(reset.expectedLocal), ...reset.absentLocal].map((key) => [key, localStorage.getItem(key)])),
+      session: Object.fromEntries([...Object.keys(reset.expectedSession), ...reset.absentSession].map((key) => [key, sessionStorage.getItem(key)])),
+    }), project.reset);
+
+    for (const [key, expected] of Object.entries(project.reset.expectedLocal)) {
+      assert(resetState.local[key] === expected, `${project.title}: localStorage ${key} reset to ${JSON.stringify(resetState.local[key])}, expected ${JSON.stringify(expected)}`);
+    }
+    for (const key of project.reset.absentLocal) {
+      assert(resetState.local[key] === null, `${project.title}: localStorage ${key} should be removed`);
+    }
+    for (const [key, expected] of Object.entries(project.reset.expectedSession)) {
+      assert(resetState.session[key] === expected, `${project.title}: sessionStorage ${key} reset to ${JSON.stringify(resetState.session[key])}, expected ${JSON.stringify(expected)}`);
+    }
+    for (const key of project.reset.absentSession) {
+      assert(resetState.session[key] === null, `${project.title}: sessionStorage ${key} should be removed`);
+    }
+    if (project.reset.modeSelector) {
+      assert((await page.locator(project.reset.modeSelector).textContent())?.includes(project.reset.modeText), `${project.title}: reset did not restore demo mode badge`);
+    }
 
     await page.locator('.demo-mode-launcher').click();
     await waitForProgress(page, 0, 10000);
