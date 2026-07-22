@@ -57,6 +57,22 @@ await replaceRequired('dist/demos/rpa/app.js', [
   ],
 ]);
 
+await replaceRequired('dist/demos/cross-border/cross-border.js', [
+  [
+    'if (!video || reducedMotion || document.hidden) return;',
+    'if (!video || reducedMotion || document.hidden || !video.paused) return;',
+    'avoid repeated play calls while YOLA video is already running',
+  ],
+]);
+
+const yolaMotionCssPath = 'dist/demos/cross-border/cross-border-motion.css';
+const yolaStickyRule = '\n@media (min-width:769px){.awards-pin{position:sticky;top:0}}\n';
+let yolaMotionCss = await readFile(yolaMotionCssPath, 'utf8');
+if (!yolaMotionCss.includes('.awards-pin{position:sticky;top:0}')) {
+  yolaMotionCss += yolaStickyRule;
+  await writeFile(yolaMotionCssPath, yolaMotionCss, 'utf8');
+}
+
 const demoIndexes = [
   'dist/demos/guoyang/index.html',
   'dist/demos/cross-border/index.html',
@@ -121,4 +137,4 @@ for (const path of demoIndexes) {
 const deploymentRevision = process.env.GITHUB_SHA || 'local-build';
 await writeFile('dist/deploy-revision.txt', `${deploymentRevision}\n`, 'utf8');
 
-console.log(`Patched ${stylesheets.length} static demo stylesheets, 3 demo scripts, ${demoIndexes.length} clean demo pages, and revision ${deploymentRevision}.`);
+console.log(`Patched ${stylesheets.length} static demo stylesheets, 4 demo scripts, ${demoIndexes.length} clean demo pages, and revision ${deploymentRevision}.`);
