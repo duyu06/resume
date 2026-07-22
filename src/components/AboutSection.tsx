@@ -1,5 +1,6 @@
 import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
+import './PortfolioEnhancements.css';
 
 const profileText = `我是张滨文，一名偏技术型 AI 产品候选人，能够从业务流程和用户问题出发，完成需求拆解、MVP 规划、模型选型、原型开发、接口联调与部署验证。
 
