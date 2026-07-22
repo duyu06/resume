@@ -7,6 +7,7 @@ import DockNav from './components/DockNav';
 import HeroSection from './components/HeroSection';
 import ImpactCards from './components/ImpactCards';
 import AboutSection from './components/AboutSection';
+import MethodSection from './components/MethodSection';
 import GuoyangFeature from './components/GuoyangFeature';
 import GuoyangWorkflow from './components/GuoyangWorkflow';
 import ProjectsCatalog from './components/ProjectsCatalog';
@@ -28,6 +29,7 @@ export default function App() {
         <HeroSection />
         <ImpactCards />
         <AboutSection />
+        <MethodSection />
         <GuoyangFeature />
         <GuoyangWorkflow />
         <ProjectsCatalog />
