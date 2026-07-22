@@ -87,6 +87,17 @@ async function testWebRPA(page) {
   await page.waitForFunction(() => !document.querySelector('#approval-card')?.hidden, null, { timeout: 15000 });
   assert((await page.locator('#current-node').textContent()) === '人工审批', 'WebRPA: did not stop at approval node');
   await page.locator('#approve').click();
+
+  await page.waitForFunction(() => {
+    const run = document.querySelector('#run');
+    const pause = document.querySelector('#pause');
+    return !run?.disabled || pause?.textContent?.includes('继续');
+  }, null, { timeout: 15000 });
+
+  if ((await page.locator('#pause').textContent())?.includes('继续')) {
+    await page.locator('#pause').click();
+  }
+
   await page.waitForFunction(() => !document.querySelector('#run')?.disabled, null, { timeout: 15000 });
   assert(Number(await page.locator('#success-count').textContent()) >= 7, 'WebRPA: workflow did not complete successfully');
 
