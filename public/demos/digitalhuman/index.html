@@ -1,121 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#000000" />
-<meta name="description" content="张滨文数字人风格对话模型微调项目：数据治理、Prompt 架构、模型训练、标准评测与 API 交付。" />
-<title>SoulAI｜数字人风格对话模型微调</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<link rel="stylesheet" href="/resume/demos/incremental-enrich.css" />
-<style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;min-width:320px;min-height:100%;overflow-x:hidden;background:#000;color:#fff;font-family:"Space Mono",monospace;-webkit-font-smoothing:antialiased}
-html{scroll-behavior:smooth}a{text-decoration:none;color:inherit}button{border:0;background:none;color:inherit;font:inherit;cursor:pointer}
-#video-layer{position:fixed;inset:0;z-index:1;overflow:hidden;background:radial-gradient(circle at 50% 45%,#18333a 0,#071319 35%,#000 78%)}
-#video-layer video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;will-change:transform,filter,opacity}
-#video-layer::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.3) 45%,rgba(0,0,0,.72));pointer-events:none}
-#bottom-blur{position:fixed;left:0;bottom:0;z-index:30;width:100%;height:150px;pointer-events:none;background:linear-gradient(to bottom,transparent,#000);-webkit-mask-image:linear-gradient(to top,#000 50%,transparent);mask-image:linear-gradient(to top,#000 50%,transparent);backdrop-filter:blur(4px)}
-#main-header{position:fixed;top:0;left:0;right:0;z-index:50;height:80px;padding:env(safe-area-inset-top) 2rem 0;display:flex;align-items:center;justify-content:space-between;opacity:0;transition:opacity .8s ease-out}
-#main-header.visible{opacity:1}.desktop-header,.mobile-header{width:100%;height:100%;align-items:center;justify-content:space-between}.header-left{display:flex;align-items:center;gap:8px}
-.logo-pill,.menu-pill,.logo-pill-m,.menu-pill-m{background:rgba(255,255,255,.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.logo-pill{height:48px;padding:0 20px;border-radius:14px;display:flex;align-items:center;gap:10px;transition:.2s}.logo-pill:hover{background:rgba(255,255,255,.22);transform:scale(1.02)}
-.logo-pill svg{width:18px;height:18px}.logo-pill span{font-size:16px;white-space:nowrap}
-.menu-pill{height:48px;width:48px;border-radius:14px;display:flex;align-items:center;overflow:hidden;transition:width .35s cubic-bezier(.22,1,.36,1)}.menu-pill.open{width:310px}
-.hamburger-btn{width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.menu-pill.open .hamburger-btn{width:36px;height:36px;margin-left:6px;border-radius:11px;background:rgba(255,255,255,.1)}
-.hamburger-icon,.hamburger-icon-m{position:relative;width:18px;height:12px}.hamburger-icon span,.hamburger-icon-m span{position:absolute;left:0;width:100%;height:1.5px;background:#fff;border-radius:2px;transition:transform .3s,opacity .3s}.hamburger-icon span:nth-child(1),.hamburger-icon-m span:nth-child(1){top:0}.hamburger-icon span:nth-child(2),.hamburger-icon-m span:nth-child(2){top:5px}.hamburger-icon span:nth-child(3),.hamburger-icon-m span:nth-child(3){top:10px}.open .hamburger-icon span:nth-child(1),.open .hamburger-icon-m span:nth-child(1){transform:translateY(5px) rotate(45deg)}.open .hamburger-icon span:nth-child(2),.open .hamburger-icon-m span:nth-child(2){opacity:0}.open .hamburger-icon span:nth-child(3),.open .hamburger-icon-m span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
-.menu-links,.menu-links-m{display:flex;align-items:center;gap:22px;margin-left:auto;padding-right:22px;opacity:0;transform:translateX(15px);transition:.2s;pointer-events:none;white-space:nowrap}.open .menu-links,.open .menu-links-m{opacity:1;transform:none;pointer-events:auto}.menu-links button,.menu-links-m button{font-size:14px;color:rgba(255,255,255,.78)}.menu-links button:hover,.menu-links-m button:hover{color:#fff}
-.portfolio-btn,.portfolio-btn-m{background:#fff;color:#000;border-radius:999px;display:flex;align-items:center;gap:9px;transition:.2s}.portfolio-btn{height:48px;padding:0 23px}.portfolio-btn:hover,.portfolio-btn-m:hover{background:#e7e7e7;transform:scale(1.03)}
-#main-content{position:relative;z-index:10;width:100%;padding:80px 2rem max(144px,calc(110px + env(safe-area-inset-bottom)));display:flex;flex-direction:column;opacity:0;transition:opacity 1s ease-out}#main-content.visible{opacity:1}
-.dot-grid{position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:24px 24px;opacity:.05;pointer-events:none}
-#hero-section{position:relative;width:100%;max-width:1280px;margin:0 auto;min-height:80svh;padding:32px 0 64px;display:flex;flex-direction:column;justify-content:space-between;transition:opacity .1s linear,transform .1s linear}
-.hero-grid,.hero-grid-bottom{display:grid;grid-template-columns:1fr 1fr;gap:48px;width:100%}.hero-grid-bottom{margin-top:auto;padding-top:48px;align-items:end}.hero-title{font-weight:300;font-size:clamp(50px,8vw,100px);line-height:.95;letter-spacing:-.04em;display:flex;flex-direction:column;user-select:none}.hero-title.right{align-items:flex-end;text-align:right}.hero-desc{max-width:440px;font-size:15px;color:rgba(255,255,255,.64);line-height:1.7}.hero-desc strong{display:block;margin-bottom:12px;color:#fff;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-#cinematic-section{position:relative;width:100%;max-width:1080px;margin:0 auto;padding:96px 24px 128px;perspective:400px;pointer-events:none}#cinematic-inner{transform-style:preserve-3d;text-align:center}#cinematic-inner h2{font-weight:400;font-size:clamp(22px,3.4vw,42px);line-height:1.42;letter-spacing:-.025em;padding:0 24px}
-#stats-section{position:relative;width:100vw;margin-left:calc(-50vw + 50%);margin-top:64px;overflow:hidden;opacity:0;transform:translateY(40px) scale(.98);transition:opacity .6s ease-out,transform .6s ease-out}#stats-section.revealed{opacity:1;transform:none}
-.stats-heading{width:min(calc(100% - 32px),1280px);margin:0 auto 36px;display:flex;justify-content:space-between;align-items:end;gap:24px}.stats-heading h2{font-size:clamp(30px,4vw,56px);font-weight:400;letter-spacing:-.04em}.stats-heading p{max-width:470px;color:rgba(255,255,255,.55);font-size:13px;line-height:1.7}
-.swiper{width:100%;height:520px;padding-bottom:20px!important;overflow:visible!important}.swiper-slide{width:380px;max-width:85%;height:480px}.stat-card-outer{height:480px;padding:6px;border-radius:28px;background:rgba(255,255,255,.05);backdrop-filter:blur(12px);display:flex;flex-direction:column}.stat-card-inner{flex:1;padding:32px;border:1px solid rgba(255,255,255,.07);border-radius:23px;background:rgba(0,0,0,.5);backdrop-filter:blur(14px);display:flex;flex-direction:column;justify-content:space-between}.stat-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.82)}.stat-value{margin-top:24px;font-size:clamp(58px,6vw,76px);font-weight:400;letter-spacing:-.05em;line-height:1}.stat-details{display:flex;flex-direction:column;gap:9px;padding-top:16px}.stat-detail{display:flex;gap:8px;font-size:11px;line-height:1.55;color:rgba(255,255,255,.62)}.stat-detail .dot{width:6px;height:6px;margin-top:5px;border-radius:50%;background:rgba(255,255,255,.34);flex-shrink:0}.stat-footer{padding:12px 24px 10px;font-size:10px;color:rgba(255,255,255,.55);letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.project-note{width:min(calc(100% - 32px),900px);margin:80px auto 0;padding:26px 28px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(0,0,0,.4);backdrop-filter:blur(14px);color:rgba(255,255,255,.62);font-size:12px;line-height:1.8}.project-note strong{color:#fff}
-.mobile-header{display:none}.scramble-line{display:inline-block}
-@media(max-width:639px){#main-header{height:72px;padding:env(safe-area-inset-top) 16px 0}.desktop-header{display:none!important}.mobile-header{display:flex!important}.mobile-left{display:flex;align-items:center;height:36px;flex:1;min-width:0;margin-right:10px}.logo-pill-m{height:36px;width:104px;padding:0 11px;border-radius:10px;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;transition:.35s}.logo-pill-m.collapsed{width:0;opacity:0;padding:0}.logo-pill-m svg{width:14px;height:14px}.logo-pill-m span{font-size:12px}.menu-pill-m{height:36px;width:36px;border-radius:10px;display:flex;align-items:center;overflow:hidden;transition:width .35s cubic-bezier(.22,1,.36,1)}.menu-pill-m.open{width:100%}.hamburger-btn-m{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.hamburger-icon-m{width:15px;height:10px}.hamburger-icon-m span:nth-child(2){top:4px}.hamburger-icon-m span:nth-child(3){top:8px}.open .hamburger-icon-m span:nth-child(1){transform:translateY(4px) rotate(45deg)}.open .hamburger-icon-m span:nth-child(3){transform:translateY(-4px) rotate(-45deg)}.menu-links-m{gap:12px;padding-right:12px}.menu-links-m button{font-size:12px}.portfolio-btn-m{height:36px;padding:0 13px;font-size:12px;flex-shrink:0}#main-content{padding:72px 16px max(128px,calc(96px + env(safe-area-inset-bottom)))}#hero-section{min-height:82svh;padding-top:34px}.hero-grid,.hero-grid-bottom{grid-template-columns:1fr;gap:28px}.hero-grid-bottom{padding-top:16px}.hero-title.right{align-items:flex-start;text-align:left}.hero-title{font-size:clamp(48px,15.5vw,72px)}.hero-desc{font-size:13px}.hero-desc strong{font-size:10px}#cinematic-section{padding:68px 8px 94px}#cinematic-inner h2{padding:0;font-size:clamp(21px,6vw,30px)}.stats-heading{align-items:flex-start;flex-direction:column}.swiper{height:465px}.swiper-slide{width:315px;height:430px}.stat-card-outer{height:430px}.stat-card-inner{padding:25px}.stat-value{font-size:56px}.project-note{margin-top:52px;padding:22px}.desktop-header{display:none}}
-@media(min-width:640px){.desktop-header{display:flex!important}.mobile-header{display:none!important}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#05090b" />
+  <meta name="description" content="talk-to-fengge-live 数字人适配控制台：角色、人设、音色克隆、会话创建与实时通话状态。" />
+  <title>talk-to-fengge-live｜数字人实时通话</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./app.css" />
+  <script defer src="./app.js"></script>
 </head>
 <body>
-<div id="video-layer"><video id="bg-video" loop muted playsinline preload="auto" src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260613_120544_a609e0c2-e52d-4bd5-b10f-b66ac51f1965.mp4"></video></div>
-<div id="bottom-blur"></div>
-<header id="main-header">
-  <div class="desktop-header">
-    <div class="header-left">
-      <button class="logo-pill js-top" type="button" aria-label="返回页面顶部">
-        <svg viewBox="-50 -50 100 100" aria-hidden="true"><g fill="currentColor"><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(90)"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(180)"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(270)"/></g></svg>
-        <span>SoulAI</span>
-      </button>
-      <div class="menu-pill" id="menu-pill"><button class="hamburger-btn" id="hamburger-btn" type="button" aria-label="展开导航"><span class="hamburger-icon"><span></span><span></span><span></span></span></button><div class="menu-links"><button type="button" data-target="cinematic-section">项目</button><button type="button" data-target="stats-section">数据</button><button type="button" data-target="project-note">边界</button></div></div>
+  <header class="topbar">
+    <a href="/resume/#projects">← 返回项目作品集</a>
+    <div class="top-actions">
+      <a href="https://github.com/w466747380/talk-to-fengge-live" target="_blank" rel="noopener noreferrer">上游源码 · MIT ↗</a>
+      <button id="settings-toggle" type="button" aria-expanded="false">⚙ API 配置</button>
+      <span id="connection-badge" class="connection-badge">演示模式</span>
     </div>
-    <a class="portfolio-btn" href="/resume/#projects"><i class="bi bi-arrow-left"></i><span>返回作品集</span></a>
-  </div>
-  <div class="mobile-header">
-    <div class="mobile-left">
-      <button class="logo-pill-m js-top" id="logo-pill-m" type="button" aria-label="返回页面顶部"><svg viewBox="-50 -50 100 100" aria-hidden="true"><g fill="currentColor"><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(90)"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(180)"/><path d="M1.5 23v10C1.5 38.5 6 43 11.5 43h5C22 43 26.5 38.5 26.5 33Q28 28 33 26.5C38.5 26.5 43 22 43 16.5v-5C43 6 38.5 1.5 33 1.5H23Q12 12 1.5 23Z" transform="rotate(270)"/></g></svg><span>SoulAI</span></button>
-      <div class="menu-pill-m" id="menu-pill-m"><button class="hamburger-btn-m" id="hamburger-btn-m" type="button" aria-label="展开移动导航"><span class="hamburger-icon-m"><span></span><span></span><span></span></span></button><div class="menu-links-m"><button type="button" data-target="cinematic-section">项目</button><button type="button" data-target="stats-section">数据</button></div></div>
-    </div>
-    <a class="portfolio-btn-m" href="/resume/#projects"><i class="bi bi-arrow-left"></i><span>作品集</span></a>
-  </div>
-</header>
-<main id="main-content">
-  <div class="dot-grid"></div>
-  <section id="hero-section">
-    <div class="hero-grid"><div class="hero-title"><span class="scramble-line" data-scramble-in data-text="Style" data-delay="100">&nbsp;</span><span class="scramble-line" data-scramble-in data-text="And Memory" data-delay="300">&nbsp;</span></div><div></div></div>
-    <div class="hero-grid-bottom">
-      <div class="hero-desc" id="hero-desc"><strong>Digital Human Fine-tuning · 2026.04</strong><p>面向个性化数字人对话，治理历史多模态数据，统一角色、上下文、记忆与输出约束，并通过标准评测验证模型版本。</p></div>
-      <div class="hero-title right"><span class="scramble-line" data-scramble-in data-text="One" data-delay="200">&nbsp;</span><span class="scramble-line" data-scramble-in data-text="Persona" data-delay="400">&nbsp;</span></div>
-    </div>
+  </header>
+
+  <section id="settings-panel" class="settings-panel" hidden>
+    <label>后端地址<input id="backend-url" type="url" placeholder="http://127.0.0.1:8791" /></label>
+    <label>区域<select id="region"><option value="cn">国内 · api.vidu.cn</option><option value="global">海外 · api.vidu.com</option></select></label>
+    <label>Vidu API Key（仅当前浏览器）<input id="api-key" type="password" placeholder="可留空，由后端 .env 提供" autocomplete="off" /></label>
+    <label class="mode-switch"><input id="real-mode" type="checkbox" /> 使用真实后端</label>
+    <button id="connect-backend" type="button">连接并同步</button>
+    <a id="open-native" href="http://127.0.0.1:8791" target="_blank" rel="noopener noreferrer">打开原生 RTC 控制台 ↗</a>
+    <p>真实视频通话由 talk-to-fengge-live 后端、WebSocket 代理与阿里云 RTC 完成。本页负责角色配置、音色克隆、会话创建和状态展示。</p>
   </section>
-  <section id="cinematic-section"><div id="cinematic-inner"><h2>一套面向数字人风格对话的模型微调流程。将原始历史对话转化为结构化训练数据，让人物身份、表达语气、长期记忆和格式标记成为可训练、可评测、可回归的产品能力，而不是只依赖一段固定角色 Prompt。</h2></div></section>
-  <section id="stats-section">
-    <div class="stats-heading"><h2>Project evidence.</h2><p>所有指标均来自项目记录，不展示原始隐私对话、训练权重，也不虚构模型提升百分比。</p></div>
-    <div class="swiper" id="stats-swiper"><div class="swiper-wrapper" id="swiper-wrapper"></div></div>
-  </section>
-  <aside class="project-note" id="project-note"><strong>项目边界：</strong>页面展示的是交互原型和项目方法。训练前需要确认数据授权并完成脱敏；微调不是默认答案，应先用 Prompt 验证方向，并持续检查过拟合、机械复读、事实混淆和格式异常。</aside>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-(()=>{
-"use strict";
-const GLYPHS="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~|}{[]:;?><";
-const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const statsData=[
-{title:"RAW DIALOGUES",value:"1W+",footer:"HISTORICAL MULTIMODAL RECORDS",details:["原始历史多模态对话","覆盖文本、表情与语音标记","进入清洗、去重与脱敏流程"]},
-{title:"TRAINING DATA",value:"7,328",footer:"VALID JSONL SAMPLES",details:["清洗后的有效训练数据","统一角色、上下文和输出字段","划分训练集与验证集"]},
-{title:"TEST PROMPTS",value:"26",footer:"STANDARD REGRESSION SET",details:["覆盖角色、记忆、情绪和边界","固定输入用于版本横向比较","支持部署后的回归评测"]},
-{title:"EVALUATION",value:"25",footer:"FIVE-DIMENSION SCORECARD",details:["人物一致性与上下文连贯性","表达自然度与回复稳定性","格式合规性"]},
-{title:"PROMPT LAYERS",value:"4",footer:"SHARED INPUT PROTOCOL",details:["角色设定","当前上下文与历史记忆","输出约束及 [emoji] / [voice] 标记"]},
-{title:"DELIVERY",value:"<2W",footer:"END-TO-END PROJECT LOOP",details:["需求、数据、训练和评测","部署与 API 调用验证","沉淀模板、测试集和交付说明"]}
-];
-const video=document.getElementById("bg-video"),header=document.getElementById("main-header"),main=document.getElementById("main-content"),hero=document.getElementById("hero-section"),desc=document.getElementById("hero-desc"),cinematic=document.getElementById("cinematic-inner"),stats=document.getElementById("stats-section");
-const wrapper=document.getElementById("swiper-wrapper");
-statsData.forEach(card=>{const slide=document.createElement("div");slide.className="swiper-slide";slide.innerHTML=`<article class="stat-card-outer"><div class="stat-card-inner"><div><span class="stat-title">${card.title}</span><div class="stat-value">${card.value}</div></div><div class="stat-details">${card.details.map(item=>`<div class="stat-detail"><span class="dot"></span><span>${item}</span></div>`).join("")}</div></div><div class="stat-footer">${card.footer}</div></article>`;wrapper.appendChild(slide)});
-new Swiper("#stats-swiper",{effect:"coverflow",grabCursor:true,slidesPerView:"auto",centeredSlides:true,loop:true,spaceBetween:32,coverflowEffect:{rotate:30,stretch:0,depth:100,modifier:1,slideShadows:false},observer:true,observeParents:true});
-const menu=document.getElementById("menu-pill"),menuM=document.getElementById("menu-pill-m"),logoM=document.getElementById("logo-pill-m");
-document.getElementById("hamburger-btn").addEventListener("click",()=>menu.classList.toggle("open"));document.getElementById("hamburger-btn-m").addEventListener("click",()=>{menuM.classList.toggle("open");logoM.classList.toggle("collapsed",menuM.classList.contains("open"))});
-document.querySelectorAll("[data-target]").forEach(btn=>btn.addEventListener("click",()=>{document.getElementById(btn.dataset.target)?.scrollIntoView({behavior:reduceMotion?"auto":"smooth"});menu.classList.remove("open");menuM.classList.remove("open");logoM.classList.remove("collapsed")}));document.querySelectorAll(".js-top").forEach(btn=>btn.addEventListener("click",()=>scrollTo({top:0,behavior:reduceMotion?"auto":"smooth"})));
-const scrambleStates=[...document.querySelectorAll("[data-scramble-in]")].map(el=>({el,text:el.dataset.text,delay:Number(el.dataset.delay||0),start:0,done:false}));let ready=false,scrollProgress=0,smooth=0,statsShown=false;
-function reveal(){ready=true;header.classList.add("visible");main.classList.add("visible");scrambleStates.forEach(state=>state.start=performance.now()+state.delay)}
-let safety=setTimeout(reveal,1800);video.addEventListener("canplay",()=>{clearTimeout(safety);reveal()},{once:true});video.load();
-function scramble(now){if(!ready)return;scrambleStates.forEach(state=>{if(state.done||now<state.start)return;const p=Math.min(1,(now-state.start)/900);let result="";for(let i=0;i<state.text.length;i++){const char=state.text[i];if(char===" "){result+=" ";continue}const threshold=i/state.text.length;result+=p>=threshold+.15?char:p>=threshold-.1?GLYPHS[Math.floor(Math.random()*GLYPHS.length)]:"\u00a0"}state.el.textContent=result;if(p>=1){state.done=true;state.el.textContent=state.text}})}
-function onScroll(){const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);scrollProgress=scrollY/max;if(!statsShown&&stats.getBoundingClientRect().top<innerHeight*.9){statsShown=true;stats.classList.add("revealed")}}
-addEventListener("scroll",onScroll,{passive:true});onScroll();
-let seeking=false,nextSeek=null;video.addEventListener("seeking",()=>seeking=true);video.addEventListener("seeked",()=>{seeking=false;if(nextSeek!==null){const t=nextSeek;nextSeek=null;video.currentTime=t}});video.addEventListener("loadedmetadata",()=>video.pause());
-function tick(now){smooth+=(scrollProgress-smooth)*.12;const blur=Math.max(0,(smooth-.1)/.8)*34,scale=1.04+smooth*.08;video.style.opacity=ready?String(Math.max(.2,1-smooth*.55)):"0";video.style.filter=`blur(${blur}px)`;video.style.transform=`scale(${scale})`;if(video.duration&&video.readyState>=1){const target=Math.min(video.duration,smooth*video.duration);if(Math.abs(video.currentTime-target)>.015){if(!seeking&&!video.seeking){seeking=true;video.currentTime=target}else nextSeek=target}}
-const heroP=Math.min(1,scrollY/Math.max(innerHeight,1));hero.style.opacity=String(1-heroP);hero.style.transform=`scale(${1-heroP*.04})`;desc.style.opacity=String(Math.max(0,1-heroP*1.7));desc.style.transform=`translateY(${-30*heroP}px)`;const rect=document.getElementById("cinematic-section").getBoundingClientRect(),center=1-Math.min(1,Math.abs(rect.top+rect.height/2-innerHeight/2)/(innerHeight*.8));cinematic.style.opacity=String(Math.max(0,center));cinematic.style.transform=`rotateX(${24-center*20}deg) translateY(${(1-center)*70}px) translateZ(15px)`;scramble(now);requestAnimationFrame(tick)}
-requestAnimationFrame(tick);
-})();
-</script>
-<script defer src="/resume/demos/incremental-enrich.js"></script>
+
+  <main class="page">
+    <aside class="intro">
+      <span class="eyebrow">TALK-TO-FENGGE-LIVE ADAPTER</span>
+      <h1>实时数字人<br />视频与语音通话</h1>
+      <p>形象、音色和人格解耦。选择角色后创建 Vidu Live 会话，完成创建会话、RTC 参数、控制通道与数字人准备状态。</p>
+      <div class="capabilities">
+        <div><i>脸</i><span><b>数字人形象</b><small>上传图片或公网地址</small></span></div>
+        <div><i>声</i><span><b>音色与克隆</b><small>内置音色或参考音频</small></span></div>
+        <div><i>脑</i><span><b>人格注入</b><small>人设库独立于角色保存</small></span></div>
+        <div><i>话</i><span><b>实时会话</b><small>Vidu Live + RTC + WS</small></span></div>
+      </div>
+      <div class="boundary">GitHub Pages 不保存密钥，也不能运行 Python / WebSocket 代理。未连接后端时页面使用完整演示流程。</div>
+    </aside>
+
+    <section class="console">
+      <nav class="view-tabs" aria-label="数字人功能">
+        <button class="active" data-view="library" type="button">角色库</button>
+        <button data-view="editor" type="button">角色编辑器</button>
+        <button data-view="call" type="button">通话控制台</button>
+        <button data-view="diagnostics" type="button">诊断与设备</button>
+      </nav>
+
+      <section id="view-library" class="view active">
+        <div class="section-head"><div><small>CHARACTER LIBRARY</small><h2>选择一个角色开始通话</h2></div><button id="new-character" class="primary" type="button">＋ 新建角色</button></div>
+        <div id="character-grid" class="character-grid"></div>
+        <div class="persona-library">
+          <div class="section-head"><div><small>PERSONA LIBRARY</small><h3>人格库</h3></div><span id="persona-count">0 个</span></div>
+          <div id="persona-list" class="persona-list"></div>
+        </div>
+      </section>
+
+      <section id="view-editor" class="view">
+        <div class="section-head"><div><small>CHARACTER COMPOSER</small><h2 id="editor-title">新建角色</h2></div><button id="back-library" type="button">返回角色库</button></div>
+        <form id="character-form" class="editor-grid">
+          <div class="avatar-editor">
+            <div id="avatar-preview" class="avatar-preview"><span>上传形象</span></div>
+            <input id="avatar-file" type="file" accept="image/png,image/jpeg,image/webp" />
+            <label class="upload" for="avatar-file">选择本地图片</label>
+            <input id="avatar-url" type="url" placeholder="或粘贴公网图片地址" />
+          </div>
+          <div class="fields">
+            <label>角色名称<input id="character-name" required value="峰哥数字人" /></label>
+            <div class="two">
+              <label>音色<select id="voice"><option value="Tina">Tina · 温暖女声</option><option value="Raymond">Raymond · 沉稳男声</option><option value="Ethan">Ethan · 阳光男声</option><option value="__custom__">自定义 / 克隆音色</option></select></label>
+              <label>通话模式<select id="call-mode"><option value="video">视频通话</option><option value="audio">语音通话</option></select></label>
+            </div>
+            <label id="custom-voice-row" hidden>自定义音色<input id="custom-voice" placeholder="voice_name" /></label>
+            <label>套用人格<select id="persona-preset"><option value="">不套用</option></select></label>
+            <label>人设<textarea id="persona" rows="8">你是一位表达直接、观点鲜明但保持诚实边界的数字人。使用口语化短句，先回应问题核心，再给出判断依据。</textarea></label>
+            <details class="voice-clone"><summary>克隆新音色（可选）</summary><div><input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a" /><input id="audio-url" type="url" placeholder="或填写公网音频地址" /><input id="clone-name" value="fengge_voice" maxlength="16" placeholder="音色名称" /><button id="clone-voice" type="button">克隆音色</button><small id="clone-status"></small></div></details>
+            <div class="form-actions"><button id="save-character" type="submit">保存角色</button><button id="save-call" class="primary" type="button">保存并开始通话</button></div>
+          </div>
+        </form>
+      </section>
+
+      <section id="view-call" class="view">
+        <div class="call-grid">
+          <div class="stage">
+            <div id="remote-stage" class="remote-stage"><div id="active-avatar" class="active-avatar"></div><div class="scan"></div><p id="stage-message">等待创建数字人会话</p><span id="call-timer">00:00</span></div>
+            <div class="call-controls"><button id="mic-toggle" type="button" disabled>🎙 麦克风</button><button id="cam-toggle" type="button" disabled>📷 摄像头</button><button id="query-live" type="button" disabled>查询状态</button><button id="hangup" class="danger" type="button" disabled>挂断</button></div>
+          </div>
+          <aside class="call-side">
+            <article class="card"><h3>连接进度</h3><ol id="stepper"><li data-step="create"><i></i><span>创建会话<small></small></span></li><li data-step="rtc"><i></i><span>获取 RTC 参数<small></small></span></li><li data-step="ws"><i></i><span>连接控制通道<small></small></span></li><li data-step="init"><i></i><span>数字人准备<small></small></span></li><li data-step="ready"><i></i><span>就绪 · 可对话<small></small></span></li></ol></article>
+            <article class="card facts"><h3>会话信息</h3><div><span>状态</span><b id="live-status">-</b></div><div><span>Live ID</span><b id="live-id">-</b></div><div><span>RTC 频道</span><b id="rtc-channel">-</b></div><div><span>RTC 用户</span><b id="rtc-user">-</b></div><button id="open-native-call" type="button">在原生控制台继续 RTC 通话 ↗</button></article>
+          </aside>
+        </div>
+      </section>
+
+      <section id="view-diagnostics" class="view">
+        <div class="diagnostic-grid">
+          <article class="card"><h3>设备检测</h3><button id="device-check" class="primary" type="button">请求摄像头与麦克风权限</button><video id="local-preview" autoplay muted playsinline></video><div id="device-result">尚未检测</div></article>
+          <article class="card"><div class="section-head"><h3>诊断日志</h3><button id="clear-log" type="button">清空</button></div><div id="log" class="log" role="log" aria-live="polite"></div></article>
+        </div>
+      </section>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
