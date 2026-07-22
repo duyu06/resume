@@ -19,6 +19,32 @@
   order: 4;
 }
 
+/* Generated project visuals replace the original placeholder screenshots in
+   both the project cards and the first slide of the shared project modal. */
+img[src$='proj-03-a.png'] {
+  content: url('/resume/assets/projects/generated/yola-cover.svg');
+}
+
+img[src$='proj-04-a.png'] {
+  content: url('/resume/assets/projects/generated/digitalhuman-cover.svg');
+}
+
+img[src$='proj-07-a.png'] {
+  content: url('/resume/assets/projects/generated/rpa-cover.svg');
+}
+
+img[src$='proj-02-a.png'] {
+  content: url('/resume/assets/projects/generated/ai-ecommerce-cover.svg');
+}
+
+#projects img[src$='proj-03-a.png'],
+#projects img[src$='proj-04-a.png'],
+#projects img[src$='proj-07-a.png'],
+#projects img[src$='proj-02-a.png'] {
+  background: #0b0c0f;
+  object-position: center;
+}
+
 @media (min-width: 1024px) {
   #projects > .mx-auto > div:nth-child(2) > div:last-child {
     grid-template-columns: minmax(0, 1fr);
