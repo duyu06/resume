@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import './LayeredIntelligence.css';
+import './LayeredIntelligenceReadability.css';
 
 const productSteps = ['业务问题', '用户任务', 'MVP', '产品价值'];
 const deliverySteps = ['PROMPT', 'API', 'QUEUE', 'WEBSOCKET', 'DELIVERY'];
@@ -15,13 +16,13 @@ export default function LayeredIntelligence() {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 
     if (reducedMotion.matches) {
-      root.style.setProperty('--spot-x', '68%');
-      root.style.setProperty('--spot-y', '42%');
+      root.style.setProperty('--spot-x', '82%');
+      root.style.setProperty('--spot-y', '34%');
       return;
     }
 
-    let targetX = 0.68;
-    let targetY = 0.42;
+    let targetX = 0.82;
+    let targetY = 0.34;
     let currentX = targetX;
     let currentY = targetY;
     let rafId = 0;
@@ -38,13 +39,16 @@ export default function LayeredIntelligence() {
         event.clientY <= rect.bottom;
 
       if (!inside) {
-        targetX = 0.68;
-        targetY = 0.42;
+        targetX = 0.82;
+        targetY = 0.34;
         return;
       }
 
-      targetX = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-      targetY = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+      const pointerX = (event.clientX - rect.left) / rect.width;
+      const pointerY = (event.clientY - rect.top) / rect.height;
+
+      targetX = Math.min(0.94, Math.max(0.7, pointerX));
+      targetY = Math.min(0.72, Math.max(0.18, pointerY));
     };
 
     const observer = new IntersectionObserver(
@@ -63,12 +67,12 @@ export default function LayeredIntelligence() {
     const tick = (time: number) => {
       if (visible) {
         if (!finePointer.matches) {
-          targetX = 0.55 + Math.sin(time / 2200) * 0.18;
-          targetY = 0.46 + Math.cos(time / 2800) * 0.12;
+          targetX = 0.82 + Math.sin(time / 2400) * 0.07;
+          targetY = 0.36 + Math.cos(time / 3000) * 0.1;
         }
 
-        currentX += (targetX - currentX) * 0.085;
-        currentY += (targetY - currentY) * 0.085;
+        currentX += (targetX - currentX) * 0.075;
+        currentY += (targetY - currentY) * 0.075;
         root.style.setProperty('--spot-x', `${currentX * 100}%`);
         root.style.setProperty('--spot-y', `${currentY * 100}%`);
       }
