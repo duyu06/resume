@@ -1,0 +1,59 @@
+@media (min-width: 1024px) {
+  #projects > .mx-auto > div:nth-child(2) > div:last-child {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button {
+    position: sticky;
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+    min-height: 430px;
+    transform-origin: center top;
+    box-shadow:
+      0 30px 90px rgba(15, 23, 42, 0.11),
+      inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  }
+
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(1) {
+    top: 96px;
+    z-index: 1;
+  }
+
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(2) {
+    top: 112px;
+    z-index: 2;
+  }
+
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(3) {
+    top: 128px;
+    z-index: 3;
+  }
+
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button:nth-child(4) {
+    top: 144px;
+    z-index: 4;
+  }
+
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button > div:first-child {
+    min-height: 100%;
+    aspect-ratio: auto;
+  }
+
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button > div:first-child img {
+    min-height: 100%;
+  }
+
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button > div:last-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(2rem, 4vw, 3.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #projects > .mx-auto > div:nth-child(2) > div:last-child > button {
+    scroll-margin-top: 112px;
+  }
+}
