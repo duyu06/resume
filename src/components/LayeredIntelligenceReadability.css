@@ -1,0 +1,102 @@
+.layered-intelligence {
+  --spot-x: 82%;
+  --spot-y: 34%;
+  --spot-radius: clamp(150px, 16vw, 235px);
+}
+
+.layered-intelligence::after {
+  content: '';
+  position: absolute;
+  inset: 14% 18% 18%;
+  z-index: 3;
+  border-radius: 42%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.68) 38%,
+    rgba(255, 255, 255, 0.28) 62%,
+    transparent 82%
+  );
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.layered-intelligence__technology {
+  opacity: 0.78;
+  clip-path: inset(0 0 0 62% round 0 34px 34px 0);
+  background:
+    radial-gradient(circle at 78% 30%, rgba(14, 165, 233, 0.2), transparent 25%),
+    linear-gradient(135deg, rgba(8, 20, 38, 0.9), rgba(15, 23, 42, 0.86));
+}
+
+.layered-intelligence__spot-ring {
+  opacity: 0.34;
+}
+
+.hero-name-safe {
+  position: relative;
+  isolation: isolate;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 24px rgba(255, 255, 255, 0.96),
+    0 0 60px rgba(255, 255, 255, 0.7);
+}
+
+.hero-role-safe {
+  border: 1px solid rgba(255, 255, 255, 0.84);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.5rem 1rem;
+  box-shadow:
+    0 14px 38px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+@media (max-width: 1023px) {
+  .layered-intelligence__technology {
+    clip-path: inset(0 0 0 68% round 0 28px 28px 0);
+    opacity: 0.66;
+  }
+
+  .layered-intelligence::after {
+    inset: 18% 12% 22%;
+  }
+}
+
+@media (max-width: 767px) {
+  .layered-intelligence {
+    --spot-radius: 150px;
+  }
+
+  .layered-intelligence__technology {
+    clip-path: inset(0 0 0 72% round 0 24px 24px 0);
+    opacity: 0.42;
+  }
+
+  .layered-intelligence::after {
+    inset: 16% 4% 24%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.94) 0%,
+      rgba(255, 255, 255, 0.72) 52%,
+      transparent 84%
+    );
+  }
+
+  .layered-intelligence__spot-ring {
+    display: none;
+  }
+
+  .hero-role-safe {
+    border-radius: 22px;
+    padding: 0.55rem 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layered-intelligence__technology {
+    clip-path: inset(0 0 0 66% round 0 30px 30px 0);
+  }
+}
