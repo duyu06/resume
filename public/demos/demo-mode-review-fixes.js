@@ -27,6 +27,27 @@
   const toast = $('.demo-mode-toast');
   let toastTimer = 0;
 
+  const fitPanelToVisualViewport = () => {
+    if (!panel || !matchMedia('(max-width: 680px)').matches) {
+      panel?.style.removeProperty('bottom');
+      panel?.style.removeProperty('max-height');
+      return;
+    }
+
+    const viewport = window.visualViewport;
+    const visualHeight = viewport?.height ?? window.innerHeight;
+    const offsetTop = viewport?.offsetTop ?? 0;
+    const layoutBottomInset = Math.max(0, window.innerHeight - (offsetTop + visualHeight));
+
+    panel.style.bottom = `${layoutBottomInset}px`;
+    panel.style.maxHeight = `${Math.max(280, visualHeight - 8)}px`;
+  };
+
+  fitPanelToVisualViewport();
+  window.addEventListener('resize', fitPanelToVisualViewport, { passive: true });
+  window.visualViewport?.addEventListener('resize', fitPanelToVisualViewport, { passive: true });
+  window.visualViewport?.addEventListener('scroll', fitPanelToVisualViewport, { passive: true });
+
   const setProgress = (value, label) => {
     const safe = Math.max(0, Math.min(100, Math.round(value)));
     track.style.width = `${safe}%`;
