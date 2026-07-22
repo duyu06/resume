@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
 
-const tags = ['AI 产品规划', '模型评测与选型', '多模态应用', '原型与交付'];
+const tags = ['AI 产品规划', '模型评测与选型', '多模态工作流', '原型开发与部署交付'];
 
 export default function HeroSection() {
   const root = useRef<HTMLElement>(null);
@@ -29,11 +29,17 @@ export default function HeroSection() {
     <section
       id="hero"
       ref={root}
-      className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pb-28 pt-20 sm:px-8 md:min-h-dvh md:px-10 md:pb-32 md:pt-24"
+      className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden bg-bg px-5 pb-28 pt-20 sm:px-8 md:min-h-dvh md:px-10 md:pb-32 md:pt-24"
     >
-      <div className="depth-layer pointer-events-none absolute inset-0" data-depth="0.05" aria-hidden>
-        <div className="absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.03]" />
-        <div className="absolute left-1/2 top-1/2 h-[90vmin] w-[90vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.015]" />
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.045)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
+        <div className="absolute left-[-12rem] top-[8%] h-[32rem] w-[32rem] rounded-full bg-accent/6 blur-3xl" />
+        <div className="absolute right-[-10rem] top-[20%] h-[28rem] w-[28rem] rounded-full bg-accent-2/8 blur-3xl" />
+      </div>
+
+      <div className="pointer-events-none absolute inset-0" data-depth="0.05" aria-hidden>
+        <div className="absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-ink/[0.045]" />
+        <div className="absolute left-1/2 top-1/2 h-[90vmin] w-[90vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/[0.055]" />
       </div>
 
       <FadeIn
@@ -41,16 +47,16 @@ export default function HeroSection() {
         y={-20}
         className="relative z-30 flex flex-col items-start gap-3 sm:flex-row sm:items-start sm:justify-between"
       >
-        <div className="font-display text-sm font-extrabold tracking-wide sm:text-base md:text-lg">
+        <div className="font-display text-sm font-extrabold tracking-wide text-ink sm:text-base md:text-lg">
           ZHANG<span className="text-accent">.</span>BINWEN
         </div>
-        <div className="glass inline-flex max-w-full items-center gap-2 rounded-full px-3 py-2 text-[0.65rem] leading-relaxed tracking-wide sm:whitespace-nowrap sm:text-[0.72rem]">
-          <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#51e08a] shadow-[0_0_12px_#51e08a]" />
+        <div className="glass inline-flex max-w-full items-center gap-2 rounded-full px-3 py-2 text-[0.65rem] leading-relaxed tracking-wide text-ink-dim sm:whitespace-nowrap sm:text-[0.72rem]">
+          <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#22c55e] shadow-[0_0_12px_rgba(34,197,94,0.65)]" />
           <span>2026 届毕业生 · 现居长沙 · 意向北上广深、苏州、佛山</span>
         </div>
       </FadeIn>
 
-      <div className="relative z-20 flex flex-1 flex-col items-center justify-center gap-3 py-10 text-center">
+      <div className="relative z-20 flex flex-1 flex-col items-center justify-center gap-4 py-10 text-center">
         <FadeIn delay={0.15} y={40} className="w-full overflow-hidden">
           <h1
             className="hero-heading font-display text-[14vw] font-black uppercase leading-none tracking-tight sm:text-[15vw] md:text-[16vw] lg:text-[12vw]"
@@ -65,18 +71,23 @@ export default function HeroSection() {
           </p>
         </FadeIn>
         <FadeIn delay={0.34} y={20}>
-          <p className="mt-1 max-w-2xl font-body text-sm leading-relaxed text-ink-dim md:text-base">
-            聚焦 AI 内容生产、电商与自动化场景，将模型能力转化为可使用、可评测、可追踪、可交付的产品流程。
-          </p>
+          <div className="mt-1 max-w-2xl">
+            <p className="font-body text-base font-medium leading-relaxed text-ink md:text-lg">
+              将模型能力转化为可评测、可追踪、可交付的 AI 产品。
+            </p>
+            <p className="mt-2 font-body text-sm leading-relaxed text-ink-dim md:text-base">
+              从业务场景、需求拆解、模型选型和 Prompt 设计，到产品原型、接口联调、部署验证与交付文档，在产品、模型与工程之间建立完整连接。
+            </p>
+          </div>
         </FadeIn>
         <FadeIn delay={0.4} y={20}>
           <div className="mt-2 flex max-w-2xl flex-wrap justify-center gap-2">
-            {tags.map((t) => (
+            {tags.map((tag) => (
               <span
-                key={t}
-                className="rounded-full border border-ink/15 bg-white/5 px-3 py-1.5 text-[0.72rem] tracking-wide backdrop-blur-md transition-colors duration-300 hover:border-white/30 hover:bg-white/10"
+                key={tag}
+                className="rounded-full border border-ink/10 bg-white/75 px-3 py-1.5 text-[0.72rem] tracking-wide text-ink-dim shadow-[0_8px_24px_rgba(15,23,42,0.04)] backdrop-blur-md transition-colors duration-300 hover:border-accent/30 hover:bg-accent-soft hover:text-accent"
               >
-                {t}
+                {tag}
               </span>
             ))}
           </div>
@@ -85,12 +96,17 @@ export default function HeroSection() {
 
       <div className="relative z-30 flex flex-wrap items-end justify-between gap-5">
         <FadeIn delay={0.5} y={20}>
-          <p className="max-w-[360px] font-display text-[clamp(0.75rem,1.4vw,1.05rem)] font-light uppercase leading-snug tracking-wide text-ink">
-            产品设计 + AI 应用落地 + 技术协同 + 原型开发与部署验证
-          </p>
+          <div>
+            <p className="max-w-[420px] font-display text-[clamp(0.75rem,1.4vw,1.05rem)] font-light uppercase leading-snug tracking-wide text-ink">
+              产品设计 + AI 应用落地 + 技术协同 + 原型开发与部署验证
+            </p>
+            <p className="mt-2 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-ink/40">
+              PRODUCT · MODEL · ENGINEERING · DELIVERY
+            </p>
+          </div>
         </FadeIn>
         <FadeIn delay={0.6} y={20}>
-          <ContactButton href="#projects" label="查看作品集" />
+          <ContactButton href="#projects" label="查看精选项目" />
         </FadeIn>
       </div>
     </section>
