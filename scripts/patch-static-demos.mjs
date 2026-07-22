@@ -57,4 +57,30 @@ await replaceRequired('dist/demos/rpa/app.js', [
   ],
 ]);
 
-console.log(`Patched ${stylesheets.length} static demo stylesheets and 3 demo scripts.`);
+const demoIndexes = [
+  'dist/demos/guoyang/index.html',
+  'dist/demos/cross-border/index.html',
+  'dist/demos/ai-ecommerce/index.html',
+  'dist/demos/digitalhuman/index.html',
+  'dist/demos/rpa/index.html',
+  'dist/demos/webui/index.html',
+  'dist/demos/soulcaller/index.html',
+];
+
+const demoStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode.css" />';
+const demoScript = '<script defer src="/resume/demos/demo-mode.js"></script>';
+
+for (const path of demoIndexes) {
+  let content = await readFile(path, 'utf8');
+  if (!content.includes('/resume/demos/demo-mode.css')) {
+    if (!content.includes('</head>')) throw new Error(`${path}: missing </head>`);
+    content = content.replace('</head>', `  ${demoStyle}\n</head>`);
+  }
+  if (!content.includes('/resume/demos/demo-mode.js')) {
+    if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
+    content = content.replace('</body>', `  ${demoScript}\n</body>`);
+  }
+  await writeFile(path, content, 'utf8');
+}
+
+console.log(`Patched ${stylesheets.length} static demo stylesheets, 3 demo scripts, and ${demoIndexes.length} demo pages.`);
