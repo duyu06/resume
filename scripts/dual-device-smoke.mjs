@@ -21,12 +21,60 @@ async function assertNoHorizontalOverflow(page, label) {
   assert(dimensions.scrollWidth <= dimensions.innerWidth + 2, `${label}: horizontal overflow ${dimensions.scrollWidth}px > ${dimensions.innerWidth}px`);
 }
 
-async function prepareVisualCapture(page) {
+async function prepareVisualCapture(page, target = null) {
+  if (target) {
+    await page.locator(target).scrollIntoViewIfNeeded();
+  } else {
+    await page.evaluate(() => window.scrollTo(0, 0));
+  }
   await page.evaluate(() => {
-    window.scrollTo(0, 0);
     document.querySelectorAll('.toast,.motion-enrich-state-demo').forEach((element) => element.classList.remove('show', 'is-visible'));
   });
   await page.waitForTimeout(220);
+}
+
+async function testMainPortfolio(page) {
+  await page.goto(`${baseURL}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#projects');
+  await assertNoHorizontalOverflow(page, 'Main portfolio');
+
+  const assets = [
+    'yola-cover.svg',
+    'digitalhuman-cover.svg',
+    'rpa-cover.svg',
+    'ai-ecommerce-cover.svg',
+  ];
+  for (const asset of assets) {
+    const response = await page.request.get(`${baseURL}/assets/projects/generated/${asset}`);
+    assert(response.ok(), `Main portfolio: generated asset ${asset} failed with ${response.status()}`);
+  }
+
+  const expectedOrder = [
+    ['跨境电商购物独立站', 'yola-cover.svg'],
+    ['数字人风格对话模型微调', 'digitalhuman-cover.svg'],
+    ['多账号运营 RPA 自动化系统', 'rpa-cover.svg'],
+    ['AI 电商主图生成器', 'ai-ecommerce-cover.svg'],
+  ];
+  const positions = [];
+  for (const [title, asset] of expectedOrder) {
+    const card = page.locator('#projects button').filter({ hasText: title }).first();
+    await card.waitFor();
+    const y = await card.evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
+    const content = await card.locator('img').evaluate((element) => getComputedStyle(element).content);
+    assert(content.includes(asset), `Main portfolio: ${title} is not using ${asset}`);
+    positions.push({ title, y });
+  }
+  for (let index = 1; index < positions.length; index += 1) {
+    assert(positions[index].y >= positions[index - 1].y, `Main portfolio: project order is incorrect near ${positions[index].title}`);
+  }
+
+  const firstCard = page.locator('#projects button').filter({ hasText: expectedOrder[0][0] }).first();
+  await firstCard.click();
+  await page.waitForSelector('[role="dialog"]');
+  assert(await page.locator('[role="dialog"] a').filter({ hasText: '查看交互 Demo' }).isVisible(), 'Main portfolio: demo action is not visible');
+  assert(await page.locator('[role="dialog"] header button[aria-label="关闭项目详情"]').isVisible(), 'Main portfolio: close button is not visible');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('[role="dialog"]'));
 }
 
 async function testYola(page) {
@@ -108,18 +156,19 @@ try {
     const page = await context.newPage();
     page.on('pageerror', (error) => results.push({ device: device.name, pageError: error.message }));
     const tests = [
-      ['yola', 'YOLA', testYola],
-      ['digitalhuman', 'Digital human', testDigitalHuman],
-      ['rpa', 'RPA', testRpa],
-      ['ai-ecommerce', 'AI ecommerce', testAiEcommerce],
-      ['webui', 'Open WebUI', (targetPage) => testSharedExperimentalDemo(targetPage, 'webui', 'Open WebUI')],
-      ['soulcaller', 'SoulCaller', (targetPage) => testSharedExperimentalDemo(targetPage, 'soulcaller', 'SoulCaller')],
+      ['portfolio-projects', 'Main portfolio', testMainPortfolio, '#projects'],
+      ['yola', 'YOLA', testYola, null],
+      ['digitalhuman', 'Digital human', testDigitalHuman, null],
+      ['rpa', 'RPA', testRpa, null],
+      ['ai-ecommerce', 'AI ecommerce', testAiEcommerce, null],
+      ['webui', 'Open WebUI', (targetPage) => testSharedExperimentalDemo(targetPage, 'webui', 'Open WebUI'), null],
+      ['soulcaller', 'SoulCaller', (targetPage) => testSharedExperimentalDemo(targetPage, 'soulcaller', 'SoulCaller'), null],
     ];
-    for (const [slug, name, test] of tests) {
+    for (const [slug, name, test, captureTarget] of tests) {
       const started = Date.now();
       try {
         await test(page);
-        await prepareVisualCapture(page);
+        await prepareVisualCapture(page, captureTarget);
         await page.screenshot({ path: `${outputDir}/${device.name}-${slug}.png`, fullPage: false });
         results.push({ device: device.name, demo: name, status: 'passed', ms: Date.now() - started });
       } catch (error) {
