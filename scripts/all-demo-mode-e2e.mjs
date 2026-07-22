@@ -85,7 +85,10 @@ async function testProject(browser, device, project) {
 
     if (device.isMobile) {
       const box = await panel.boundingBox();
-      assert(box && box.width <= device.viewport.width + 1 && box.bottom <= device.viewport.height + 1, `${project.title}: mobile panel outside viewport`);
+      assert(
+        box && box.width <= device.viewport.width + 1 && box.y >= -1 && box.y + box.height <= device.viewport.height + 1,
+        `${project.title}: mobile panel outside viewport`,
+      );
     }
 
     await panel.locator('[data-demo-action="run"]').click();
