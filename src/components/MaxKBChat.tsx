@@ -23,7 +23,7 @@ export default function MaxKBChat() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group fixed bottom-[max(5.4rem,calc(env(safe-area-inset-bottom)+5.4rem))] right-4 z-[920] flex items-center gap-3 rounded-full border border-accent/15 bg-white/92 p-2 pr-4 text-left shadow-[0_18px_50px_rgba(15,23,42,0.16)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-accent/35 hover:shadow-[0_22px_58px_rgba(37,99,235,0.22)] md:bottom-6 md:right-6"
+        className="group fixed bottom-24 right-4 z-[920] flex items-center gap-3 rounded-full border border-accent/15 bg-white/92 p-2 pr-4 text-left shadow-[0_18px_50px_rgba(15,23,42,0.16)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-accent/35 hover:shadow-[0_22px_58px_rgba(37,99,235,0.22)] md:bottom-6 md:right-6"
         aria-label="打开 MaxKB 智能问答"
         aria-expanded={open}
       >
