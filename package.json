@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node --check public/demos/incremental-enrich.js && node --check public/demos/cross-border/cross-border.js && node --check public/demos/ai-ecommerce/app.js && node --check public/demos/digitalhuman/app.js && node --check public/demos/rpa/app.js && tsc -b && vite build",
+    "build": "node --check public/demos/incremental-enrich.js && node --check public/demos/cross-border/cross-border.js && node --check public/demos/ai-ecommerce/app.js && node --check public/demos/digitalhuman/app.js && node --check public/demos/rpa/app.js && tsc -b && vite build && node scripts/patch-static-demos.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },
