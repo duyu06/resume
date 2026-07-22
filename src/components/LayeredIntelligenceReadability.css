@@ -56,8 +56,8 @@
 
 @media (max-width: 1023px) {
   .layered-intelligence__technology {
-    clip-path: inset(0 0 0 68% round 0 28px 28px 0);
-    opacity: 0.66;
+    clip-path: inset(0 0 0 64% round 0 28px 28px 0);
+    opacity: 0.7;
   }
 
   .layered-intelligence::after {
@@ -67,36 +67,71 @@
 
 @media (max-width: 767px) {
   .layered-intelligence {
-    --spot-radius: 150px;
+    --spot-radius: clamp(138px, 42vw, 178px);
+    opacity: 0.86;
   }
 
   .layered-intelligence__technology {
-    clip-path: inset(0 0 0 72% round 0 24px 24px 0);
-    opacity: 0.42;
+    clip-path: inset(0 0 0 54% round 0 24px 24px 0);
+    opacity: 0.62;
+    background:
+      radial-gradient(circle at var(--spot-x) var(--spot-y), rgba(56, 189, 248, 0.24), transparent 34%),
+      linear-gradient(135deg, rgba(10, 28, 50, 0.86), rgba(15, 23, 42, 0.82));
   }
 
   .layered-intelligence::after {
-    inset: 16% 4% 24%;
+    inset: 15% 3% 23%;
     background: radial-gradient(
       ellipse at center,
-      rgba(255, 255, 255, 0.94) 0%,
-      rgba(255, 255, 255, 0.72) 52%,
-      transparent 84%
+      rgba(255, 255, 255, 0.96) 0%,
+      rgba(255, 255, 255, 0.78) 48%,
+      rgba(255, 255, 255, 0.22) 70%,
+      transparent 87%
     );
+    filter: blur(15px);
   }
 
   .layered-intelligence__spot-ring {
-    display: none;
+    display: block;
+    width: calc(var(--spot-radius) * 1.05);
+    opacity: 0.18;
+    border-color: rgba(125, 211, 252, 0.26);
+    box-shadow:
+      0 0 32px rgba(14, 165, 233, 0.09),
+      inset 0 0 28px rgba(14, 165, 233, 0.05);
+  }
+
+  .layered-intelligence__delivery-node span {
+    background: rgba(8, 47, 73, 0.56);
+    border-color: rgba(125, 211, 252, 0.3);
+  }
+
+  .layered-intelligence__tech-grid > div,
+  .layered-intelligence__terminal {
+    background: rgba(2, 12, 27, 0.72);
+    border-color: rgba(125, 211, 252, 0.2);
   }
 
   .hero-role-safe {
     border-radius: 22px;
     padding: 0.55rem 0.85rem;
+    background: rgba(255, 255, 255, 0.88);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .layered-intelligence__technology {
     clip-path: inset(0 0 0 66% round 0 30px 30px 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 767px) {
+  .layered-intelligence__technology {
+    clip-path: inset(0 0 0 58% round 0 24px 24px 0);
+    opacity: 0.54;
+  }
+
+  .layered-intelligence__spot-ring {
+    display: none;
   }
 }

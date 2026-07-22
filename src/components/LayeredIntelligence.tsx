@@ -16,39 +16,63 @@ export default function LayeredIntelligence() {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 
     if (reducedMotion.matches) {
-      root.style.setProperty('--spot-x', '82%');
-      root.style.setProperty('--spot-y', '34%');
+      root.style.setProperty('--spot-x', '78%');
+      root.style.setProperty('--spot-y', '36%');
       return;
     }
 
-    let targetX = 0.82;
-    let targetY = 0.34;
+    let targetX = 0.78;
+    let targetY = 0.36;
     let currentX = targetX;
     let currentY = targetY;
     let rafId = 0;
     let visible = true;
+    let touchControlUntil = 0;
 
-    const onPointerMove = (event: PointerEvent) => {
+    const setPointerTarget = (clientX: number, clientY: number, isTouch = false) => {
       const rect = root.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
+      if (!rect.width || !rect.height) return false;
 
       const inside =
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom;
 
-      if (!inside) {
-        targetX = 0.82;
-        targetY = 0.34;
-        return;
+      if (!inside) return false;
+
+      const pointerX = (clientX - rect.left) / rect.width;
+      const pointerY = (clientY - rect.top) / rect.height;
+
+      if (isTouch) {
+        // Mobile keeps the reveal in the decorative right half while still
+        // responding clearly to horizontal and vertical finger movement.
+        targetX = Math.min(0.92, Math.max(0.56, pointerX));
+        targetY = Math.min(0.76, Math.max(0.16, pointerY));
+        touchControlUntil = performance.now() + 1800;
+      } else {
+        targetX = Math.min(0.94, Math.max(0.7, pointerX));
+        targetY = Math.min(0.72, Math.max(0.18, pointerY));
       }
 
-      const pointerX = (event.clientX - rect.left) / rect.width;
-      const pointerY = (event.clientY - rect.top) / rect.height;
+      return true;
+    };
 
-      targetX = Math.min(0.94, Math.max(0.7, pointerX));
-      targetY = Math.min(0.72, Math.max(0.18, pointerY));
+    const onPointerMove = (event: PointerEvent) => {
+      if (!setPointerTarget(event.clientX, event.clientY)) {
+        targetX = 0.82;
+        targetY = 0.34;
+      }
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!touch) return;
+      setPointerTarget(touch.clientX, touch.clientY, true);
+    };
+
+    const onTouchEnd = () => {
+      touchControlUntil = performance.now() + 900;
     };
 
     const observer = new IntersectionObserver(
@@ -62,17 +86,24 @@ export default function LayeredIntelligence() {
 
     if (finePointer.matches) {
       window.addEventListener('pointermove', onPointerMove, { passive: true });
+    } else {
+      window.addEventListener('touchstart', onTouchMove, { passive: true });
+      window.addEventListener('touchmove', onTouchMove, { passive: true });
+      window.addEventListener('touchend', onTouchEnd, { passive: true });
+      window.addEventListener('touchcancel', onTouchEnd, { passive: true });
     }
 
     const tick = (time: number) => {
       if (visible) {
-        if (!finePointer.matches) {
-          targetX = 0.82 + Math.sin(time / 2400) * 0.07;
-          targetY = 0.36 + Math.cos(time / 3000) * 0.1;
+        if (!finePointer.matches && time > touchControlUntil) {
+          // Roughly one horizontal scan every 7 seconds. The secondary
+          // vertical movement prevents the effect from feeling mechanical.
+          targetX = 0.73 + Math.sin(time / 1150) * 0.16;
+          targetY = 0.38 + Math.cos(time / 1800) * 0.11;
         }
 
-        currentX += (targetX - currentX) * 0.075;
-        currentY += (targetY - currentY) * 0.075;
+        currentX += (targetX - currentX) * 0.065;
+        currentY += (targetY - currentY) * 0.065;
         root.style.setProperty('--spot-x', `${currentX * 100}%`);
         root.style.setProperty('--spot-y', `${currentY * 100}%`);
       }
@@ -86,6 +117,10 @@ export default function LayeredIntelligence() {
       window.cancelAnimationFrame(rafId);
       observer.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('touchstart', onTouchMove);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
     };
   }, []);
 
