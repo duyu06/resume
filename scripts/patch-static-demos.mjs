@@ -66,10 +66,22 @@ await replaceRequired('dist/demos/cross-border/cross-border.js', [
 ]);
 
 const yolaMotionCssPath = 'dist/demos/cross-border/cross-border-motion.css';
-const yolaStickyRule = '\n@media (min-width:769px){.awards-pin{position:sticky;top:0}}\n';
+const yolaRuntimeRules = `
+@media (min-width:769px){.awards-pin{position:sticky;top:0}}
+body[data-demo-enrich='cross-border'] .yola-story-frame.motion-enrich-reveal{
+  opacity:0!important;
+  transform:translate3d(0,34px,0) rotateX(-7deg)!important;
+  filter:none!important;
+  translate:none!important;
+}
+body[data-demo-enrich='cross-border'] .yola-story-frame.motion-enrich-reveal.is-active{
+  opacity:1!important;
+  transform:translate3d(0,0,0) rotateX(0deg)!important;
+}
+`;
 let yolaMotionCss = await readFile(yolaMotionCssPath, 'utf8');
-if (!yolaMotionCss.includes('.awards-pin{position:sticky;top:0}')) {
-  yolaMotionCss += yolaStickyRule;
+if (!yolaMotionCss.includes(".yola-story-frame.motion-enrich-reveal.is-active")) {
+  yolaMotionCss += yolaRuntimeRules;
   await writeFile(yolaMotionCssPath, yolaMotionCss, 'utf8');
 }
 
