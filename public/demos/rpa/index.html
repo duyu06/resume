@@ -1,19 +1,92 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=2" />
-    <title>FlowRPA — 多账号运营 RPA 自动化系统</title>
-    <script type="module" crossorigin src="/resume/demos/rpa/assets/index-DAgWRyIF.js"></script>
-    <link rel="stylesheet" crossorigin href="/resume/demos/rpa/assets/index-DdJKvvK8.css">
-    <link rel="stylesheet" href="/resume/demos/mobile-overrides.css">
-    <link rel="stylesheet" href="/resume/demos/incremental-enrich.css">
-    <script defer src="/resume/demos/incremental-enrich.js"></script>
-  </head>
-  <body>
-    <div class="demo-context-bar"><a href="/resume/#projects">← 返回作品集</a><span>交互原型 · 关键提交节点保留人工确认</span></div>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f7fb" />
+  <meta name="description" content="WebRPA 兼容演示：可视化拖拽工作流、节点配置、断点、单步、人工审批、日志与 JSON 导入导出。" />
+  <title>WebRPA｜可视化网页机器人流程自动化</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./app.css" />
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a href="/resume/#projects">← 返回项目作品集</a>
+    <div class="top-actions">
+      <a href="https://github.com/pmh1314520/WebRPA" target="_blank" rel="noopener noreferrer">上游源码 · AGPL-3.0 ↗</a>
+      <button id="backend-toggle" type="button" aria-expanded="false">⚙ 执行器连接</button>
+      <span id="mode-badge">浏览器演示</span>
+    </div>
+  </header>
+
+  <section id="backend-panel" class="backend-panel" hidden>
+    <label>WebRPA 服务地址<input id="backend-url" type="url" placeholder="例如 http://127.0.0.1:5921" /></label>
+    <label class="mode-switch"><input id="real-mode" type="checkbox" /> 标记为本地执行器模式</label>
+    <button id="test-backend" type="button">测试地址</button>
+    <a id="open-backend" href="http://127.0.0.1:5921" target="_blank" rel="noopener noreferrer">打开本地 WebRPA ↗</a>
+    <p>Pages 页面只运行工作流编辑和模拟执行。真实网页、桌面与 Android 自动化需要 Windows 本地 WebRPA 服务。</p>
+  </section>
+
+  <section class="hero">
+    <span class="badge">WEBRPA COMPATIBLE WORKFLOW STUDIO</span>
+    <h1>网页机器人流程自动化</h1>
+    <p>拖拽模块构建任务，配置参数、断点与人工审批，并观察节点状态和运行日志。</p>
+    <div class="hero-metrics"><span><b>558</b> 上游功能模块</span><span><b>Visual</b> 拖拽工作流</span><span><b>Safe</b> 人工审批节点</span><span><b>JSON</b> 导入与导出</span></div>
+  </section>
+
+  <main class="studio">
+    <aside class="palette">
+      <div class="brand"><i>R</i><div><b>WebRPA Studio</b><small>Compatibility Demo</small></div></div>
+      <label class="search"><span>⌕</span><input id="module-search" placeholder="搜索模块" /></label>
+      <div class="category-tabs"><button class="active" data-category="all" type="button">全部</button><button data-category="web" type="button">网页</button><button data-category="data" type="button">数据</button><button data-category="control" type="button">控制</button><button data-category="human" type="button">人工</button></div>
+      <div id="module-list" class="module-list" aria-label="可拖拽模块"></div>
+      <div class="license-note">本页为独立实现的兼容演示，不复制 WebRPA AGPL 源码。商业使用请遵守上游授权。</div>
+    </aside>
+
+    <section class="workspace">
+      <div class="toolbar">
+        <div class="file-actions"><button id="new-workflow" type="button">新建</button><button id="save-local" type="button">保存</button><button id="export-json" type="button">导出 JSON</button><label class="import-button" for="import-json">导入 JSON</label><input id="import-json" type="file" accept="application/json" /></div>
+        <div class="run-actions"><button id="run" class="primary" type="button">▶ 运行</button><button id="pause" type="button" disabled>Ⅱ 暂停</button><button id="step" type="button">▷ 单步</button><button id="stop" class="danger" type="button" disabled>■ 停止</button></div>
+      </div>
+
+      <div class="workflow-tabs"><button class="active" type="button">内容发布自动化</button><button type="button">＋</button><span id="workflow-state">已保存</span></div>
+
+      <div class="canvas-shell">
+        <div id="canvas" class="canvas" tabindex="0" aria-label="工作流画布">
+          <svg id="edges" class="edges" aria-hidden="true"></svg>
+          <div class="canvas-hint">从左侧拖入模块，或点击模块快速添加</div>
+        </div>
+        <div class="zoom"><button id="zoom-out" type="button">−</button><span id="zoom-value">100%</span><button id="zoom-in" type="button">＋</button><button id="fit" type="button">适应</button></div>
+      </div>
+
+      <section class="bottom-panel">
+        <nav><button class="active" data-bottom="logs" type="button">运行日志</button><button data-bottom="variables" type="button">全局变量</button><button data-bottom="versions" type="button">版本历史</button></nav>
+        <div id="bottom-logs" class="bottom-view active"><div id="log-list" class="log-list" role="log" aria-live="polite"></div></div>
+        <div id="bottom-variables" class="bottom-view"><div class="variable"><code>task_id</code><input value="RPA-2026-001" /></div><div class="variable"><code>account_env</code><input value="env_01" /></div><div class="variable"><code>approval_required</code><input value="true" /></div></div>
+        <div id="bottom-versions" class="bottom-view"><ul id="version-list"><li><b>当前版本</b><span>自动保存</span></li><li><b>v1 初始流程</b><span>本地快照</span></li></ul></div>
+      </section>
+    </section>
+
+    <aside class="inspector">
+      <div class="inspector-head"><div><small>NODE INSPECTOR</small><h2 id="inspector-title">未选择节点</h2></div><button id="delete-node" type="button" disabled>删除</button></div>
+      <div id="empty-inspector" class="empty-inspector">选择画布中的节点以编辑参数。</div>
+      <form id="node-form" hidden>
+        <label>节点名称<input id="node-name" /></label>
+        <label>模块类型<input id="node-type" disabled /></label>
+        <label>参数 JSON<textarea id="node-params" rows="10"></textarea></label>
+        <label class="check"><input id="node-breakpoint" type="checkbox" /> 在此节点设置断点</label>
+        <label class="check"><input id="node-retry" type="checkbox" /> 失败后自动重试</label>
+        <button class="primary" type="submit">应用配置</button>
+      </form>
+      <section id="approval-card" class="approval-card" hidden>
+        <small>HUMAN IN THE LOOP</small><h3>等待人工审批</h3><p id="approval-message">关键提交节点已暂停。</p><div><button id="reject" type="button">驳回</button><button id="approve" class="primary" type="button">通过并继续</button></div>
+      </section>
+      <section class="execution-info"><h3>执行状态</h3><div><span>当前节点</span><b id="current-node">-</b></div><div><span>运行耗时</span><b id="run-time">00:00</b></div><div><span>成功节点</span><b id="success-count">0</b></div><div><span>失败节点</span><b id="failure-count">0</b></div></section>
+    </aside>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
 </html>

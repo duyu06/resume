@@ -1,22 +1,129 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=2" />
-    <title>电商主图生成器 — AI E-commerce Image Generator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/resume/demos/ai-ecommerce/assets/index-CZVcH8US.js"></script>
-    <link rel="stylesheet" crossorigin href="/resume/demos/ai-ecommerce/assets/index-BlOY9UZ8.css">
-    <link rel="stylesheet" href="/resume/demos/mobile-overrides.css">
-    <link rel="stylesheet" href="/resume/demos/incremental-enrich.css">
-    <script defer src="/resume/demos/incremental-enrich.js"></script>
-  </head>
-  <body>
-    <div class="demo-context-bar"><a href="/resume/#projects">← 返回作品集</a><span>交互原型 · 展示核心产品流程</span></div>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#fff8f3" />
+  <meta name="description" content="PrismPix AI 电商视觉生成引擎适配演示：产品分析、营销策略、14 条 Prompt 与电商图片生成。" />
+  <title>PrismPix｜AI 电商视觉生成引擎</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./app.css" />
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="/resume/#projects">← 返回项目作品集</a>
+    <div class="top-actions">
+      <a class="source" href="https://github.com/keirosang/PrismPix" target="_blank" rel="noopener noreferrer">上游源码 · PrismPix ↗</a>
+      <span id="mode-badge" class="mode-badge">演示模式</span>
+    </div>
+  </header>
+
+  <main class="shell">
+    <aside class="intro">
+      <div>
+        <span class="badge">PRISMPIX ADAPTER · GPL-3.0 UPSTREAM</span>
+        <h1><span>AI</span> 电商视觉生成引擎</h1>
+        <p class="subtitle">Product Intelligence → Campaign → 14 Prompts → 14 Images</p>
+        <p class="intro-copy">接入 PrismPix 的三阶段工作流。GitHub Pages 默认运行可交互演示；配置自行部署的 PrismPix 后端后，可调用原项目的 Flask API。</p>
+        <div class="feature-list">
+          <div class="feature"><i>01</i><div><b>产品视觉分析</b><small>材质、颜色、结构、不可修改项</small></div></div>
+          <div class="feature"><i>02</i><div><b>营销策略</b><small>卖点、痛点、场景与信任元素</small></div></div>
+          <div class="feature"><i>03</i><div><b>14 条生产 Prompt</b><small>H1-H5 主图、D1-D9 详情图</small></div></div>
+          <div class="feature"><i>04</i><div><b>图片生成与交付</b><small>任务状态、预览、Prompt JSON 导出</small></div></div>
+        </div>
+      </div>
+      <div class="license-note">兼容前端由本项目独立实现；未复制 PrismPix 源码。真实生成需要部署上游 Python 服务并自行配置 API Key。</div>
+    </aside>
+
+    <section class="workspace" aria-label="PrismPix AI 电商视觉工作台">
+      <div class="workspace-header">
+        <div>
+          <p>PRISMPIX COMPATIBLE CONSOLE</p>
+          <h2>AI 电商视觉生成</h2>
+        </div>
+        <button id="connection-toggle" class="connection-button" type="button" aria-expanded="false">⚙ 后端连接</button>
+      </div>
+
+      <section id="connection-panel" class="connection-panel" hidden>
+        <label>PrismPix 后端地址
+          <input id="backend-url" type="url" placeholder="例如 http://127.0.0.1:8000" autocomplete="url" />
+        </label>
+        <label class="mode-switch"><input id="real-mode" type="checkbox" /> 使用真实后端</label>
+        <button id="test-backend" type="button">测试连接</button>
+        <p>后端需允许当前站点跨域访问。API Key 只应保存在后端 `.env`，不要写入本页面。</p>
+      </section>
+
+      <div class="app-grid">
+        <aside class="sidebar">
+          <form id="product-form">
+            <section class="step">
+              <h3>产品输入</h3>
+              <div class="upload-card">
+                <img id="product-preview" src="https://raw.githubusercontent.com/keirosang/PrismPix/main/samples/DDLYQ005/product_ref.png" alt="PrismPix 示例产品参考图" />
+                <input id="image-file" name="image" type="file" accept="image/*" />
+                <label class="upload-button" for="image-file">上传产品图</label>
+                <button id="load-sample" type="button">恢复上游示例</button>
+                <small id="file-label">示例：DDLYQ005 产品身份证</small>
+              </div>
+            </section>
+
+            <section class="step form-grid">
+              <label>SKU<input id="sku" name="sku" value="DDLYQ005" /></label>
+              <label>类目<select id="category" name="category"><option>配饰/首饰</option><option>美妆/护肤</option><option>包袋/手袋</option><option>数码/小家电</option><option>家居/装饰</option></select></label>
+              <label>视觉风格<select id="style" name="style"><option value="高级 premium luxury">高级 / Premium</option><option value="简约 modern minimal">极简 / Minimal</option><option value="清新 fresh natural">自然 / Natural</option><option value="科技 tech">科技 / Tech</option></select></label>
+              <label>平台<select id="platform" name="platform"><option value="Amazon">Amazon</option><option value="Shopify">Shopify</option><option value="TikTok Shop">TikTok Shop</option><option value="TEMU">TEMU</option></select></label>
+              <label>语言<select id="language" name="language"><option value="zh">中文</option><option value="en">English</option></select></label>
+              <label>生成模式<select id="generation-mode" name="generation_mode"><option value="full">完整 14 图</option><option value="main">主图 H1-H5</option><option value="detail">详情图 D1-D9</option><option value="lookbook">Lookbook</option></select></label>
+            </section>
+
+            <section class="step">
+              <label>附加要求<textarea id="requirements" name="additional_requirements" rows="4">保持产品外观、颜色、结构与 Logo 完全一致；背景和场景可变化；为标题与 CTA 预留空间。</textarea></label>
+              <button id="analyze" class="primary" type="submit">① 分析产品</button>
+            </section>
+          </form>
+        </aside>
+
+        <div class="main">
+          <nav class="stage-tabs" aria-label="PrismPix 处理阶段">
+            <button class="active" type="button" data-stage="analysis"><span>01</span>产品与营销</button>
+            <button type="button" data-stage="prompts"><span>02</span>Prompt 清单</button>
+            <button type="button" data-stage="images"><span>03</span>图片结果</button>
+          </nav>
+
+          <section id="stage-analysis" class="stage active">
+            <div class="section-head"><div><small>STAGE 1 + 2</small><h3>产品分析与 Campaign Strategy</h3></div><span id="analysis-state">等待分析</span></div>
+            <div class="analysis-grid">
+              <article class="card"><h4>产品身份证</h4><dl id="product-facts"><div><dt>主体</dt><dd>黑色结构配饰</dd></div><div><dt>材质</dt><dd>哑光金属 / 织物</dd></div><div><dt>主色</dt><dd>#111111 / #D9D4CC</dd></div><div><dt>约束</dt><dd>结构、Logo、比例不可修改</dd></div></dl></article>
+              <article class="card"><h4>核心卖点</h4><ul id="selling-points"><li>结构辨识度与细节工艺</li><li>多场景搭配与高级视觉质感</li><li>统一 Campaign Style Lock</li></ul></article>
+              <article class="card"><h4>目标场景</h4><div id="scene-tags" class="tags"><span>纯净白底</span><span>材质微距</span><span>生活方式</span><span>信任背书</span></div></article>
+              <article class="card"><h4>营销信息</h4><p id="campaign-copy">以“结构与质感”为主叙事，兼顾平台主图转化和详情页信息承接。</p></article>
+            </div>
+            <button id="generate-prompts" class="primary next" type="button" disabled>② 确认并生成 14 条 Prompt</button>
+          </section>
+
+          <section id="stage-prompts" class="stage">
+            <div class="section-head"><div><small>STAGE 3</small><h3>14 条生产 Prompt</h3></div><div><button id="expand-prompts" type="button">全部展开</button><button id="download-prompts" type="button">导出 JSON</button></div></div>
+            <div id="prompt-list" class="prompt-list"></div>
+            <button id="generate-images" class="primary next" type="button" disabled>③ 生成图片</button>
+          </section>
+
+          <section id="stage-images" class="stage">
+            <div class="section-head"><div><small>OUTPUT</small><h3>电商图片结果</h3></div><div class="module-filter"><button class="active" data-prefix="all" type="button">全部</button><button data-prefix="H" type="button">H1-H5</button><button data-prefix="D" type="button">D1-D9</button></div></div>
+            <div id="image-grid" class="image-grid"></div>
+          </section>
+
+          <aside class="task-console">
+            <div class="task-head"><div><small>TASK STATUS</small><b id="task-status">Idle</b></div><span id="task-id">DEMO</span></div>
+            <div class="progress"><i id="task-progress"></i></div>
+            <ol id="task-log"><li class="done">控制台已就绪</li><li>等待上传产品图</li><li>等待分析</li><li>等待 Prompt</li><li>等待图片</li></ol>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
 </html>
