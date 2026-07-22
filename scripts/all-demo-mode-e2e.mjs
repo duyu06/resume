@@ -72,6 +72,13 @@ async function assertNoHorizontalOverflow(page, label) {
   assert(Math.max(dimensions.html, dimensions.body) <= dimensions.innerWidth + 2, `${label}: horizontal overflow`);
 }
 
+async function assertNoUpstreamSourceLinks(page, label) {
+  const links = await page.evaluate(() => [...document.querySelectorAll('a')]
+    .filter((anchor) => anchor.textContent?.includes('上游源码'))
+    .map((anchor) => ({ text: anchor.textContent?.trim(), href: anchor.getAttribute('href') })));
+  assert(links.length === 0, `${label}: visible upstream source links remain: ${JSON.stringify(links)}`);
+}
+
 async function waitForProgress(page, expected, timeout) {
   await page.waitForFunction(
     (value) => Number(document.querySelector('[data-demo-percent]')?.textContent?.replace('%', '')) === value,
@@ -85,6 +92,68 @@ async function waitForReload(page, action) {
   await action();
   await page.waitForFunction((origin) => performance.timeOrigin !== origin, before, { timeout: 15000 });
   await page.waitForSelector('.demo-mode-launcher', { timeout: 15000 });
+}
+
+async function sampleYolaHeroFrames(page) {
+  await page.waitForFunction(() => document.body.dataset.yolaKeyframeCount === '14', null, { timeout: 15000 });
+  const markerCount = await page.locator('[data-yola-marker]').count();
+  assert(markerCount === 14, `YOLA: expected 14 hero markers, found ${markerCount}`);
+
+  const observed = [];
+  for (const fraction of [0, 0.06, 0.13, 0.21, 0.29, 0.37, 0.45, 0.53, 0.61, 0.7, 0.79, 0.88, 0.96]) {
+    const stage = await page.evaluate(async (progress) => {
+      const section = document.querySelector('.hero-scroll');
+      const distance = Math.max(0, section.offsetHeight - innerHeight);
+      scrollTo(0, section.offsetTop + distance * progress);
+      await new Promise((resolve) => setTimeout(resolve, 110));
+      return document.body.dataset.yolaKeyframe || '';
+    }, fraction);
+    observed.push(stage);
+  }
+
+  const unique = [...new Set(observed.filter((stage) => /^\d{2}$/.test(stage)))];
+  assert(unique.length >= 10, `YOLA: hero keyframes too sparse (${unique.join(', ')})`);
+  return unique;
+}
+
+async function sampleYolaCollectionFrames(page, device) {
+  const observed = [];
+  if (device.isMobile) {
+    await page.locator('#collection').scrollIntoViewIfNeeded();
+    const grid = page.locator('.awards-grid');
+    for (const fraction of [0, 0.2, 0.4, 0.6, 0.8, 1]) {
+      const stage = await grid.evaluate(async (element, progress) => {
+        element.scrollLeft = (element.scrollWidth - element.clientWidth) * progress;
+        element.dispatchEvent(new Event('scroll'));
+        await new Promise((resolve) => setTimeout(resolve, 130));
+        return document.body.dataset.yolaKeyframe || '';
+      }, fraction);
+      observed.push(stage);
+    }
+  } else {
+    for (const fraction of [0.02, 0.16, 0.31, 0.46, 0.61, 0.77, 0.91, 0.98]) {
+      const stage = await page.evaluate(async (progress) => {
+        const section = document.querySelector('[data-yola-collection]');
+        const distance = Math.max(0, section.offsetHeight - innerHeight);
+        scrollTo(0, section.offsetTop + distance * progress);
+        await new Promise((resolve) => setTimeout(resolve, 130));
+        return document.body.dataset.yolaKeyframe || '';
+      }, fraction);
+      observed.push(stage);
+    }
+  }
+
+  const unique = [...new Set(observed.filter((stage) => /^C\d{2}$/.test(stage)))];
+  assert(unique.length >= (device.isMobile ? 5 : 6), `YOLA: collection keyframes too sparse (${unique.join(', ')})`);
+  return unique;
+}
+
+async function validateYolaMotionDensity(page, device) {
+  const heroFrames = await sampleYolaHeroFrames(page);
+  const collectionFrames = await sampleYolaCollectionFrames(page, device);
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.waitForTimeout(120);
+  return { heroFrames, collectionFrames };
 }
 
 async function testProject(browser, device, project) {
@@ -113,6 +182,10 @@ async function testProject(browser, device, project) {
     await page.goto(`${baseURL}/demos/${project.slug}/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForSelector('.demo-mode-launcher', { timeout: 20000 });
     await assertNoHorizontalOverflow(page, `${project.title} initial`);
+    await assertNoUpstreamSourceLinks(page, project.title);
+
+    let yolaMotion = null;
+    if (project.slug === 'cross-border') yolaMotion = await validateYolaMotionDensity(page, device);
 
     await page.locator('.demo-mode-launcher').click();
     const panel = page.locator('.demo-mode-panel');
@@ -171,6 +244,7 @@ async function testProject(browser, device, project) {
     }
 
     await assertNoHorizontalOverflow(page, `${project.title} after scenarios`);
+    await assertNoUpstreamSourceLinks(page, `${project.title} after scenarios`);
     await page.screenshot({ path: `${outputDir}/${targetName}-${device.name}-${project.slug}.png`, fullPage: true });
 
     await page.evaluate((reset) => {
@@ -206,10 +280,11 @@ async function testProject(browser, device, project) {
     await waitForProgress(page, 0, 10000);
     assert((await page.locator('[data-demo-status]').textContent()) === '等待开始', `${project.title}: reset did not restore initial state`);
     await assertNoHorizontalOverflow(page, `${project.title} after reset`);
+    await assertNoUpstreamSourceLinks(page, `${project.title} after reset`);
 
     assert(pageErrors.length === 0, `${project.title}: uncaught errors: ${pageErrors.join(' | ')}`);
     assert(sameOriginFailures.length === 0, `${project.title}: same-origin failures: ${sameOriginFailures.join(' | ')}`);
-    results.push({ device: device.name, project: project.slug, status: 'passed' });
+    results.push({ device: device.name, project: project.slug, status: 'passed', ...(yolaMotion ? { motion: yolaMotion } : {}) });
   } catch (error) {
     await page.screenshot({ path: `${outputDir}/${targetName}-${device.name}-${project.slug}-failed.png`, fullPage: true }).catch(() => {});
     results.push({ device: device.name, project: project.slug, status: 'failed', error: error instanceof Error ? error.message : String(error) });
