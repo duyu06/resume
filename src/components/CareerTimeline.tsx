@@ -50,7 +50,7 @@ export default function CareerTimeline() {
 
       <div className="relative mx-auto max-w-3xl">
         <div
-          className="absolute bottom-3 left-[11px] top-3 w-px bg-gradient-to-b from-white/20 via-white/12 to-white/5 md:left-[15px]"
+          className="absolute bottom-3 left-[11px] top-3 w-px bg-gradient-to-b from-accent/35 via-ink/12 to-ink/5 md:left-[15px]"
           aria-hidden
         />
 
@@ -59,42 +59,44 @@ export default function CareerTimeline() {
             <FadeIn key={item.title} delay={i * 0.1} y={30}>
               <div className="relative flex gap-5 md:gap-7">
                 <div className="relative z-10 flex-shrink-0 pt-1.5">
-                  <Circle
-                    className="h-2 w-2 text-ink/50 md:h-2.5 md:w-2.5"
-                    fill="currentColor"
-                    strokeWidth={0}
-                  />
+                  <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white shadow-[0_5px_18px_rgba(37,99,235,0.18)] ring-1 ring-accent/18 md:h-[30px] md:w-[30px]">
+                    <Circle
+                      className="h-2 w-2 text-accent md:h-2.5 md:w-2.5"
+                      fill="currentColor"
+                      strokeWidth={0}
+                    />
+                  </span>
                 </div>
 
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 rounded-[24px] border border-ink/8 bg-white p-5 shadow-[0_18px_55px_rgba(15,23,42,0.055)] sm:p-6">
                   <div className="mb-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="font-display text-[0.7rem] uppercase tracking-[0.15em] text-ink/50 md:text-xs">
+                    <span className="font-display text-[0.7rem] uppercase tracking-[0.15em] text-accent md:text-xs">
                       {item.date}
                     </span>
                     <span className="hidden text-[0.65rem] text-ink/15 sm:inline">|</span>
-                    <span className="hidden font-display text-[0.6rem] uppercase tracking-[0.12em] text-ink/35 sm:inline md:text-[0.65rem]">
+                    <span className="hidden font-display text-[0.6rem] uppercase tracking-[0.12em] text-ink/45 sm:inline md:text-[0.65rem]">
                       {item.role}
                     </span>
                   </div>
 
-                  <h3 className="mb-3 font-body text-lg font-semibold leading-snug tracking-tight text-ink/90 md:text-xl">
+                  <h3 className="mb-3 font-body text-lg font-semibold leading-snug tracking-tight text-ink md:text-xl">
                     {item.title}
                   </h3>
 
                   {item.note && (
-                    <p className="mb-4 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs leading-relaxed text-ink/55">
+                    <p className="mb-4 rounded-xl border border-accent/12 bg-accent-soft px-3 py-2 text-xs leading-relaxed text-ink-dim">
                       {item.note}
                     </p>
                   )}
 
                   <ul className="flex flex-col gap-2">
-                    {item.bullets.map((b) => (
+                    {item.bullets.map((bullet) => (
                       <li
-                        key={b}
-                        className="flex items-start gap-2.5 text-sm leading-relaxed text-ink/55 md:text-[0.9375rem]"
+                        key={bullet}
+                        className="flex items-start gap-2.5 text-sm leading-relaxed text-ink-dim md:text-[0.9375rem]"
                       >
-                        <span className="mt-[0.6em] h-1 w-1 flex-shrink-0 rounded-full bg-ink/25" />
-                        <span>{b}</span>
+                        <span className="mt-[0.6em] h-1 w-1 flex-shrink-0 rounded-full bg-accent/55" />
+                        <span>{bullet}</span>
                       </li>
                     ))}
                   </ul>
