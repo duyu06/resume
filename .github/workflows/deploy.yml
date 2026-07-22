@@ -29,6 +29,25 @@ jobs:
       - run: npm run build
         env:
           VITE_MAXKB_EMBED_URL: ${{ vars.MAXKB_EMBED_URL }}
+      - name: Install Chromium smoke-test runtime
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start preview server
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/resume-preview.log 2>&1 &
+          for attempt in {1..40}; do
+            if curl --fail --silent http://127.0.0.1:4173/resume/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/resume-preview.log
+          exit 1
+      - name: Test core demos on desktop and mobile
+        run: npm run test:demos
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
       - uses: actions/configure-pages@v4
         if: github.event_name != 'pull_request'
       - uses: actions/upload-pages-artifact@v3
