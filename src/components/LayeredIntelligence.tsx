@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import './LayeredIntelligence.css';
 
 const productSteps = ['业务问题', '用户任务', 'MVP', '产品价值'];
 const deliverySteps = ['PROMPT', 'API', 'QUEUE', 'WEBSOCKET', 'DELIVERY'];
@@ -29,13 +30,21 @@ export default function LayeredIntelligence() {
     const onPointerMove = (event: PointerEvent) => {
       const rect = root.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
+
+      const inside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (!inside) {
+        targetX = 0.68;
+        targetY = 0.42;
+        return;
+      }
+
       targetX = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
       targetY = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
-    };
-
-    const onPointerLeave = () => {
-      targetX = 0.68;
-      targetY = 0.42;
     };
 
     const observer = new IntersectionObserver(
@@ -48,8 +57,7 @@ export default function LayeredIntelligence() {
     observer.observe(root);
 
     if (finePointer.matches) {
-      root.addEventListener('pointermove', onPointerMove, { passive: true });
-      root.addEventListener('pointerleave', onPointerLeave, { passive: true });
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
     }
 
     const tick = (time: number) => {
@@ -73,8 +81,7 @@ export default function LayeredIntelligence() {
     return () => {
       window.cancelAnimationFrame(rafId);
       observer.disconnect();
-      root.removeEventListener('pointermove', onPointerMove);
-      root.removeEventListener('pointerleave', onPointerLeave);
+      window.removeEventListener('pointermove', onPointerMove);
     };
   }, []);
 
