@@ -52,6 +52,31 @@ jobs:
         env:
           TEST_BASE_URL: http://127.0.0.1:4173/resume
 
+      - name: Verify deployed integrated demos
+        if: github.event_name == 'pull_request'
+        run: |
+          ready=0
+          for attempt in {1..30}; do
+            prism=$(curl --fail --silent --location https://duyu06.github.io/resume/demos/ai-ecommerce/ || true)
+            digital=$(curl --fail --silent --location https://duyu06.github.io/resume/demos/digitalhuman/ || true)
+            rpa=$(curl --fail --silent --location https://duyu06.github.io/resume/demos/rpa/ || true)
+            if grep -q 'PRISMPIX ADAPTER' <<< "$prism" \
+              && grep -q 'TALK-TO-FENGGE-LIVE ADAPTER' <<< "$digital" \
+              && grep -q 'WEBRPA COMPATIBLE WORKFLOW STUDIO' <<< "$rpa"; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo 'Deployed pages did not expose the integrated demo markers in time.'
+            exit 1
+          fi
+          rm -rf test-results/upstream-demo-screenshots
+          node scripts/upstream-demo-smoke.mjs
+        env:
+          TEST_BASE_URL: https://duyu06.github.io/resume
+
       - name: Upload integrated demo screenshots
         if: always()
         uses: actions/upload-artifact@v4
