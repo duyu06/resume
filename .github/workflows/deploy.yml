@@ -48,6 +48,14 @@ jobs:
         run: npm run test:demos
         env:
           TEST_BASE_URL: http://127.0.0.1:4173/resume
+      - name: Upload dual-device visual checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-demo-dual-device-screenshots
+          path: test-results/demo-screenshots
+          if-no-files-found: warn
+          retention-days: 14
       - uses: actions/configure-pages@v4
         if: github.event_name != 'pull_request'
       - uses: actions/upload-pages-artifact@v3
