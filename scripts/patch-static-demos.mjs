@@ -71,9 +71,25 @@ const demoStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode.css" />'
 const demoFitStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode-fit.css" />';
 const demoScript = '<script defer src="/resume/demos/demo-mode.js"></script>';
 const demoFixScript = '<script defer src="/resume/demos/demo-mode-review-fixes.js"></script>';
+const upstreamSourceAnchorPattern = /<a\b[^>]*>\s*[^<]*上游源码[^<]*<\/a>/giu;
+const yolaMarkerTemplate = Array.from(
+  { length: 14 },
+  (_, index) => `<i data-yola-marker="${String(index + 1).padStart(2, '0')}"></i>`,
+).join('');
+const unresolvedYolaMarkerTemplate = '${Array.from({length:14},(_,index)=>`<i data-yola-marker="${String(index+1).padStart(2,\'0\')}"></i>`).join(\'\')}';
 
 for (const path of demoIndexes) {
   let content = await readFile(path, 'utf8');
+
+  // Public demo UI should focus on the product experience. Attribution and
+  // licensing remain documented in the repository, but source links are not
+  // rendered inside the portfolio demos.
+  content = content.replace(upstreamSourceAnchorPattern, '');
+
+  if (path.endsWith('/cross-border/index.html')) {
+    content = content.replace(unresolvedYolaMarkerTemplate, yolaMarkerTemplate);
+  }
+
   if (!content.includes('/resume/demos/demo-mode.css')) {
     if (!content.includes('</head>')) throw new Error(`${path}: missing </head>`);
     content = content.replace('</head>', `  ${demoStyle}\n</head>`);
@@ -90,10 +106,19 @@ for (const path of demoIndexes) {
     if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
     content = content.replace('</body>', `  ${demoFixScript}\n</body>`);
   }
+
+  if (/<a\b[^>]*>\s*[^<]*上游源码/iu.test(content)) {
+    throw new Error(`${path}: visible upstream source link survived sanitization`);
+  }
+  if (path.endsWith('/cross-border/index.html')) {
+    const markerCount = (content.match(/data-yola-marker=/g) || []).length;
+    if (markerCount !== 14) throw new Error(`${path}: expected 14 YOLA keyframe markers, found ${markerCount}`);
+  }
+
   await writeFile(path, content, 'utf8');
 }
 
 const deploymentRevision = process.env.GITHUB_SHA || 'local-build';
 await writeFile('dist/deploy-revision.txt', `${deploymentRevision}\n`, 'utf8');
 
-console.log(`Patched ${stylesheets.length} static demo stylesheets, 3 demo scripts, ${demoIndexes.length} demo pages, and revision ${deploymentRevision}.`);
+console.log(`Patched ${stylesheets.length} static demo stylesheets, 3 demo scripts, ${demoIndexes.length} clean demo pages, and revision ${deploymentRevision}.`);
