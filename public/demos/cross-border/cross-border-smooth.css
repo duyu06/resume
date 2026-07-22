@@ -1,0 +1,102 @@
+/* Performance layer for the YOLA scroll-driven experience.
+   Loaded after the base and shared demo styles by cross-border.js. */
+
+html,
+body {
+  -webkit-overflow-scrolling: touch;
+}
+
+.hero-scroll,
+.awards-section {
+  touch-action: pan-y;
+}
+
+.hero-sticky,
+.awards-pin,
+.awards-grid,
+.video-scaling-wrapper,
+.hero-video,
+.reveal-video {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.hero-sticky,
+.awards-pin {
+  contain: paint;
+}
+
+.hero-video {
+  transform: translate3d(0, 0, 0);
+  will-change: opacity;
+}
+
+.awards-grid {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.video-scaling-wrapper {
+  left: 0;
+  right: 0;
+  width: 100%;
+  transform: scaleX(0) translateZ(0);
+  transform-origin: center center;
+  will-change: transform;
+  contain: strict;
+}
+
+.reveal-video {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: translate3d(0, 0, 0);
+  will-change: opacity;
+}
+
+.product-image-wrap img {
+  transform: translateZ(0);
+}
+
+/* YOLA owns its scroll choreography. Disable the generic demo reveal layer,
+   which otherwise competes with GSAP and adds extra blur/compositing work. */
+body[data-demo-enrich='cross-border']::after {
+  display: none !important;
+}
+
+body[data-demo-enrich='cross-border'] .motion-enrich-reveal {
+  opacity: 1 !important;
+  translate: 0 0 !important;
+  filter: none !important;
+  transition-property: box-shadow, border-color !important;
+  transition-delay: 0ms !important;
+}
+
+body[data-demo-enrich='cross-border'] .motion-enrich-card:hover {
+  filter: none;
+}
+
+@media (max-width: 768px) {
+  .hero-video,
+  .reveal-video {
+    transition-duration: 220ms;
+  }
+
+  .product-card {
+    contain: layout paint style;
+  }
+
+  .video-scaling-wrapper {
+    contain: paint;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-video,
+  .reveal-video,
+  .awards-grid,
+  .video-scaling-wrapper {
+    will-change: auto;
+  }
+}
