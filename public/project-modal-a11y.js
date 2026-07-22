@@ -3,7 +3,7 @@
 
   const normalize = (root = document) => {
     root.querySelectorAll?.('button[aria-label="关闭项目详情"].absolute.inset-0').forEach((button) => {
-      button.setAttribute('aria-label', '点击遮罩关闭项目详情');
+      button.setAttribute('aria-label', '点击遮罩退出弹窗');
     });
   };
 
