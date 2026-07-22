@@ -28,7 +28,7 @@ export default function DockNav() {
 
   return (
     <nav
-      className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-3 right-3 z-[900] flex justify-between gap-0.5 rounded-full border border-ink/10 bg-white/88 px-1.5 py-1.5 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl md:hidden"
+      className="mobile-dock-nav fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-3 right-3 z-[900] flex justify-between gap-0.5 rounded-full border border-ink/10 bg-white/88 px-1.5 py-1.5 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-[opacity,visibility,transform] duration-300 md:hidden"
       aria-label="页面导航"
     >
       {links.map((link) => {

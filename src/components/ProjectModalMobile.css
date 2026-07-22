@@ -1,0 +1,49 @@
+body.project-modal-open .mobile-dock-nav {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(calc(100% + 2rem));
+}
+
+.project-modal-shell {
+  overscroll-behavior: contain;
+}
+
+.project-modal-scroll {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.project-modal-scroll::after {
+  content: '';
+  display: block;
+  height: 0.25rem;
+}
+
+@media (max-width: 639px) {
+  .project-modal-shell {
+    width: 100%;
+    height: min(94dvh, 900px);
+    max-height: 94dvh;
+    border-radius: 28px 28px 0 0;
+  }
+
+  .project-modal-scroll {
+    padding-bottom: 1rem;
+  }
+}
+
+@media (max-height: 620px) and (orientation: landscape) {
+  .project-modal-shell {
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.project-modal-open .mobile-dock-nav {
+    transition-duration: 0.01ms;
+  }
+}
