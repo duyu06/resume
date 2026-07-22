@@ -1,22 +1,126 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=2" />
-    <title>电商主图生成器 — AI E-commerce Image Generator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/resume/demos/ai-ecommerce/assets/index-CZVcH8US.js"></script>
-    <link rel="stylesheet" crossorigin href="/resume/demos/ai-ecommerce/assets/index-BlOY9UZ8.css">
-    <link rel="stylesheet" href="/resume/demos/mobile-overrides.css">
-    <link rel="stylesheet" href="/resume/demos/incremental-enrich.css">
-    <script defer src="/resume/demos/incremental-enrich.js"></script>
-  </head>
-  <body>
-    <div class="demo-context-bar"><a href="/resume/#projects">← 返回作品集</a><span>交互原型 · 展示核心产品流程</span></div>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#fff7f2" />
+  <meta name="description" content="AI 电商主图生成器交互原型：商品上传、主体锁定、风格生成、对比、质量评估和导出。" />
+  <title>AI 电商主图生成器｜交互原型</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./app.css" />
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="/resume/#projects">← 返回项目作品集</a>
+    <span class="prototype">交互原型 · 不调用真实生成服务</span>
+  </header>
+
+  <main class="shell">
+    <aside class="intro">
+      <div>
+        <span class="badge">✦ AI-Powered Visual Creation</span>
+        <h1><span>AI</span> 电商主图生成器</h1>
+        <p class="subtitle">AI E-commerce<br />Main Image Generator</p>
+        <p class="intro-copy">从商品上传、主体约束和风格配置，到批量生成、人工审核、质量评分与多平台导出，形成可追踪的商品视觉生产闭环。</p>
+        <div class="feature-list">
+          <div class="feature"><i>◎</i><div><b>主体识别与锁定</b><small>材质、颜色、视角、Logo 与包装文字</small></div></div>
+          <div class="feature"><i>✦</i><div><b>风格与场景模板</b><small>极简、自然、轻奢与科技场景</small></div></div>
+          <div class="feature"><i>↔</i><div><b>批量生成与对比</b><small>版本记录、人工筛选与失败重试</small></div></div>
+          <div class="feature"><i>⇩</i><div><b>质量评估与导出</b><small>多平台尺寸与高清格式</small></div></div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="workspace" aria-label="AI 电商主图生成工作台">
+      <div class="workspace-header">
+        <h2>AI 电商主图生成器</h2>
+        <div class="credits"><span>Credits</span><strong>1,280</strong><span>产品原型</span></div>
+      </div>
+
+      <div class="app-grid">
+        <aside class="sidebar">
+          <section class="step">
+            <h3>1. 上传产品图</h3>
+            <div class="upload-card">
+              <div class="bottle" aria-label="示例精华液商品"></div>
+              <button id="upload-demo" type="button">载入示例商品</button>
+              <small id="file-label">等待载入 · 建议 1200 × 1200</small>
+            </div>
+          </section>
+
+          <section class="step">
+            <h3>2. 主体识别与锁定</h3>
+            <div class="lock-row"><span>保持主体、包装与文字一致</span><button id="subject-lock" class="switch" type="button" aria-pressed="true" aria-label="切换主体锁定"></button></div>
+          </section>
+
+          <section class="step">
+            <h3>3. 风格与场景</h3>
+            <div class="chips" aria-label="风格选择">
+              <button class="chip active" type="button" aria-pressed="true">自然</button>
+              <button class="chip" type="button" aria-pressed="false">极简</button>
+              <button class="chip" type="button" aria-pressed="false">轻奢</button>
+              <button class="chip" type="button" aria-pressed="false">科技</button>
+            </div>
+          </section>
+
+          <section class="step">
+            <h3>4. 平台与尺寸</h3>
+            <div class="chips" aria-label="尺寸选择">
+              <button class="chip active" type="button" aria-pressed="true">1:1 电商</button>
+              <button class="chip" type="button" aria-pressed="false">4:5 社媒</button>
+              <button class="chip" type="button" aria-pressed="false">3:4 详情</button>
+            </div>
+            <button id="generate" class="generate" type="button">开始生成</button>
+            <div id="generate-progress" class="progress" aria-label="生成进度"><i></i></div>
+          </section>
+        </aside>
+
+        <div class="main">
+          <div class="section-head"><h3>5. 生成结果（8）</h3><span>点击选择版本 · 键盘方向键切换</span></div>
+          <div class="results">
+            <button class="result scene-warm active" data-scene="scene-warm" data-index="01" data-score="94"><span class="bottle"></span></button>
+            <button class="result scene-green" data-scene="scene-green" data-index="02" data-score="92"><span class="bottle"></span></button>
+            <button class="result scene-water" data-scene="scene-water" data-index="03" data-score="89"><span class="bottle"></span></button>
+            <button class="result scene-pink" data-scene="scene-pink" data-index="04" data-score="91"><span class="bottle"></span></button>
+            <button class="result scene-mono" data-scene="scene-mono" data-index="05" data-score="90"><span class="bottle"></span></button>
+            <button class="result scene-gold" data-scene="scene-gold" data-index="06" data-score="95"><span class="bottle"></span></button>
+            <button class="result scene-leaf" data-scene="scene-leaf" data-index="07" data-score="93"><span class="bottle"></span></button>
+            <button class="result scene-dark" data-scene="scene-dark" data-index="08" data-score="88"><span class="bottle"></span></button>
+          </div>
+
+          <div class="lower">
+            <section class="compare">
+              <div class="section-head"><h3>6. 原图 / 生成图对比</h3><span>拖动滑杆检查主体一致性</span></div>
+              <div class="compare-stage">
+                <div class="compare-side original"><span class="bottle"></span></div>
+                <div class="compare-side generated"><span class="bottle"></span></div>
+              </div>
+              <input id="compare-range" class="compare-range" type="range" min="0" max="100" value="50" aria-label="对比滑杆" />
+            </section>
+
+            <section class="quality">
+              <div class="section-head"><h3>7. 质量评估</h3><span>人工验收前置</span></div>
+              <div class="score" style="--score:94"><strong id="score">94</strong></div>
+              <div class="metrics">
+                <div class="metric"><span>主体一致性</span><span class="bar"><i style="width:96%"></i></span><b>96</b></div>
+                <div class="metric"><span>清晰度</span><span class="bar"><i style="width:93%"></i></span><b>93</b></div>
+                <div class="metric"><span>构图美感</span><span class="bar"><i style="width:91%"></i></span><b>91</b></div>
+                <div class="metric"><span>商用适配</span><span class="bar"><i style="width:94%"></i></span><b>94</b></div>
+              </div>
+              <div class="export" aria-label="导出格式">
+                <button class="active" type="button">PNG</button><button type="button">JPG</button><button type="button">WEBP</button>
+              </div>
+              <button id="download-one" class="download" type="button">导出当前高清图</button>
+              <button id="download-batch" class="secondary" type="button" style="width:100%;margin-top:8px">批量导出</button>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
 </html>

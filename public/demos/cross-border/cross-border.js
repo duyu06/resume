@@ -4,446 +4,173 @@
   const gsap = window.gsap;
   const ScrollTrigger = window.ScrollTrigger;
   if (!gsap || !ScrollTrigger) return;
-
   gsap.registerPlugin(ScrollTrigger);
-  ScrollTrigger.config({
-    ignoreMobileResize: true,
-    limitCallbacks: true,
-  });
+  ScrollTrigger.config({ ignoreMobileResize: true, limitCallbacks: true });
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const activeScrubbers = [];
-  let rebuildTimer = 0;
-  let lastWidth = window.innerWidth;
-  let footerObserver = null;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const scrim = $('#scrim');
+  const menu = $('#menu-panel');
+  const bag = $('#bag-drawer');
+  const quickView = $('#quick-view');
+  const bagItems = $('#bag-items');
+  const bagCount = $('#bag-count');
+  const bagTotal = $('#bag-total');
+  const toast = $('#toast');
+  let activeProduct = null;
+  let selectedSize = '7';
+  let cart = [];
+  let toastTimer = 0;
+  let lastFocus = null;
 
-  const isMobileViewport = () => window.matchMedia('(max-width: 768px)').matches;
+  const productData = {
+    obsidian: { name: 'Obsidian Crest', price: 198, image: 'https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp' },
+    lava: { name: 'Lava Echo', price: 178, image: 'https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min.webp' },
+    crimson: { name: 'Crimson Vein', price: 198, image: 'https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144747_f21bc119-e460-45be-a071-851291bd71c5_min.webp' },
+    noir: { name: 'Noir Signet', price: 168, image: 'https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_215521_100b78bd-d24a-4225-b2e8-5bb30d44af73_min.webp' },
+    shadow: { name: 'Shadowline Band', price: 148, image: 'https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp' },
+  };
 
-  function loadSmoothStyles() {
-    const existing = document.querySelector('link[data-yola-smooth]');
-    if (existing) return Promise.resolve();
-
-    return new Promise((resolve) => {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = './cross-border-smooth.css';
-      link.dataset.yolaSmooth = 'true';
-      link.addEventListener('load', resolve, { once: true });
-      link.addEventListener('error', resolve, { once: true });
-      document.head.appendChild(link);
-    });
+  function notify(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
   }
 
-  function splitCharacters(element, className) {
-    if (!element || element.dataset.split === 'true') return;
-    const text = element.textContent || '';
-    element.textContent = '';
-    [...text].forEach((character) => {
-      const span = document.createElement('span');
-      span.className = className;
-      span.textContent = character === ' ' ? '\u00a0' : character;
-      element.appendChild(span);
-    });
-    element.dataset.split = 'true';
+  function lockPage(lock) {
+    document.documentElement.style.overflow = lock ? 'hidden' : '';
   }
 
-  function splitWords(element) {
-    if (!element || element.dataset.split === 'true') return;
-    const words = (element.textContent || '').trim().split(/\s+/);
-    element.textContent = '';
-    words.forEach((word, index) => {
-      const span = document.createElement('span');
-      span.className = 'detail-word';
-      span.textContent = word;
-      element.appendChild(span);
-      if (index < words.length - 1) element.appendChild(document.createTextNode(' '));
-    });
-    element.dataset.split = 'true';
+  function openLayer(layer, trigger) {
+    closeLayers(false);
+    lastFocus = trigger || document.activeElement;
+    layer.classList.add('open');
+    scrim.classList.add('open');
+    lockPage(true);
+    layer.querySelector('button,a,input')?.focus();
   }
 
-  function createVideoScrubber(video, options = {}) {
-    const mobile = isMobileViewport();
-    const state = {
-      duration: 0,
-      targetTime: 0,
-      currentTime: 0,
-      lastSeekAt: 0,
-      active: false,
-      ready: false,
-      destroyed: false,
-      raf: 0,
-    };
-
-    const lerp = options.lerp ?? 0.08;
-    const minimumDelta = options.minimumDelta ?? 0.01;
-    const minimumInterval = options.minimumInterval ?? (mobile ? 42 : 28);
-
-    video.muted = true;
-    video.playsInline = true;
-    video.disablePictureInPicture = true;
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
-    video.preload = 'auto';
-    video.pause();
-
-    const markReady = () => {
-      const duration = Number.isFinite(video.duration) ? video.duration : 0;
-      if (duration <= 0) return;
-
-      state.duration = duration;
-      if (!state.ready) {
-        state.ready = true;
-        state.currentTime = video.currentTime || 0;
-        if (!video.seeking && video.currentTime === 0 && duration > 0.05) {
-          try {
-            video.currentTime = 0.01;
-          } catch {
-            // Keep the poster until the first frame can be decoded.
-          }
-        }
-      }
-      video.classList.add('is-ready');
-      video.classList.remove('is-error');
-    };
-
-    const markError = () => {
-      video.classList.remove('is-ready');
-      video.classList.add('is-error');
-    };
-
-    video.addEventListener('loadedmetadata', markReady, { passive: true });
-    video.addEventListener('loadeddata', markReady, { passive: true });
-    video.addEventListener('canplay', markReady, { passive: true });
-    video.addEventListener('error', markError, { passive: true });
-
-    if (video.readyState >= HTMLMediaElement.HAVE_METADATA) markReady();
-    else if (video.networkState === HTMLMediaElement.NETWORK_EMPTY) video.load();
-
-    function tick(now) {
-      if (state.destroyed) return;
-
-      if (
-        state.active &&
-        !document.hidden &&
-        state.ready &&
-        state.duration > 0 &&
-        video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
-      ) {
-        state.currentTime += (state.targetTime - state.currentTime) * (reducedMotion ? 1 : lerp);
-
-        if (
-          !video.seeking &&
-          Math.abs(video.currentTime - state.currentTime) > minimumDelta &&
-          now - state.lastSeekAt >= minimumInterval
-        ) {
-          state.lastSeekAt = now;
-          try {
-            video.currentTime = Math.max(0, Math.min(state.duration - 0.01, state.currentTime));
-          } catch {
-            // A rejected seek should keep the most recently decoded frame.
-          }
-        }
-      }
-
-      state.raf = requestAnimationFrame(tick);
-    }
-
-    state.raf = requestAnimationFrame(tick);
-
-    const controller = {
-      setProgress(progress) {
-        const safeProgress = Math.max(0, Math.min(1, progress));
-        state.targetTime = safeProgress * Math.max(0, state.duration - 0.03);
-      },
-      setActive(active) {
-        state.active = Boolean(active);
-      },
-      destroy() {
-        state.destroyed = true;
-        cancelAnimationFrame(state.raf);
-        video.removeEventListener('loadedmetadata', markReady);
-        video.removeEventListener('loadeddata', markReady);
-        video.removeEventListener('canplay', markReady);
-        video.removeEventListener('error', markError);
-      },
-    };
-
-    activeScrubbers.push(controller);
-    return controller;
+  function closeLayers(restore = true) {
+    [menu, bag, quickView].forEach((layer) => layer?.classList.remove('open'));
+    scrim.classList.remove('open');
+    lockPage(false);
+    if (restore && lastFocus instanceof HTMLElement) lastFocus.focus();
   }
 
-  function destroyAnimations() {
-    ScrollTrigger.getAll().forEach((trigger) => trigger.kill(true));
-    while (activeScrubbers.length) activeScrubbers.pop()?.destroy();
-    gsap.killTweensOf('.awards-grid,.video-scaling-wrapper,[data-fade-slide-in],.stat-char,.detail-word,.card-subtext');
-  }
+  $('#menu-open')?.addEventListener('click', (event) => openLayer(menu, event.currentTarget));
+  $('#bag-open')?.addEventListener('click', (event) => openLayer(bag, event.currentTarget));
+  scrim?.addEventListener('click', () => closeLayers());
+  $$('.close-layer').forEach((button) => button.addEventListener('click', () => closeLayers()));
+  $$('#menu-panel a').forEach((link) => link.addEventListener('click', () => closeLayers(false)));
 
-  function setupMenu() {
-    const button = document.querySelector('.menu-button');
-    const panel = document.querySelector('.menu-panel');
-    if (!button || !panel) return;
-
-    const close = () => {
-      panel.classList.remove('is-open');
-      button.setAttribute('aria-expanded', 'false');
-    };
-
-    button.addEventListener('click', () => {
-      const open = !panel.classList.contains('is-open');
-      panel.classList.toggle('is-open', open);
-      button.setAttribute('aria-expanded', String(open));
-    });
-
-    panel.querySelectorAll('a,button').forEach((item) => item.addEventListener('click', close));
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') close();
-    });
-  }
-
-  function setupHeroAnimation() {
-    const hero = document.querySelector('.hero-scroll');
-    const video = document.querySelector('.hero-video');
-    const button = document.querySelector('.hero-content .capsule-button');
-    const chars = [...document.querySelectorAll('.hero-char')];
-    if (!hero || !video) return;
-
-    chars.forEach((character) => {
-      character.style.opacity = '1';
-      character.style.filter = 'blur(0px)';
-      character.style.transform = 'translate3d(0,0,0)';
-    });
-    if (button) {
-      button.style.opacity = '1';
-      button.style.transform = 'translate3d(0,0,0)';
-    }
-
-    const scrubber = createVideoScrubber(video);
-
-    ScrollTrigger.create({
-      trigger: hero,
-      start: 'top top',
-      end: 'bottom bottom',
-      invalidateOnRefresh: true,
-      onEnter: () => scrubber.setActive(true),
-      onEnterBack: () => scrubber.setActive(true),
-      onLeave: () => scrubber.setActive(false),
-      onLeaveBack: () => scrubber.setActive(false),
-      onUpdate(self) {
-        scrubber.setActive(self.isActive);
-        scrubber.setProgress(self.progress);
-
-        const exitProgress = Math.max(0, Math.min(1, (self.progress - 0.8) / 0.2));
-        const eased = 1 - Math.pow(1 - exitProgress, 3);
-
-        chars.forEach((character, index) => {
-          const stagger = (index / Math.max(1, chars.length)) * 0.28;
-          const local = Math.max(0, Math.min(1, (eased - stagger) / 0.72));
-          character.style.opacity = String(1 - local);
-          character.style.filter = `blur(${local * 10}px)`;
-          character.style.transform = `translate3d(0,${-local * 28}px,0)`;
-        });
-
-        if (button) {
-          const buttonExit = Math.pow(exitProgress, 4);
-          button.style.opacity = String(1 - buttonExit);
-          button.style.transform = `translate3d(0,${-buttonExit * 24}px,0)`;
-        }
-      },
-    });
-  }
-
-  function setupAwardsAnimation() {
-    const section = document.querySelector('.awards-section');
-    const grid = document.querySelector('.awards-grid');
-    const reveal = document.querySelector('.video-scaling-wrapper');
-    const revealVideo = document.querySelector('.reveal-video');
-    if (!section || !grid || !reveal || !revealVideo) return;
-
-    gsap.set(grid, { x: 0, force3D: true });
-    gsap.set(reveal, { scaleX: 0, transformOrigin: '50% 50%', force3D: true });
-
-    const scrubber = createVideoScrubber(revealVideo, {
-      minimumInterval: isMobileViewport() ? 46 : 30,
-    });
-
-    const getDistance = () => Math.max(0, grid.scrollWidth - window.innerWidth);
-    const getEnd = () => `+=${Math.max(window.innerHeight * 2.35, getDistance() + window.innerHeight * 1.35)}`;
-
-    const timeline = gsap.timeline({
-      defaults: { ease: 'none' },
-      scrollTrigger: {
-        trigger: section,
-        start: 'top top',
-        end: getEnd,
-        pin: true,
-        pinSpacing: true,
-        scrub: reducedMotion ? false : isMobileViewport() ? 0.7 : 0.45,
-        anticipatePin: 1,
-        fastScrollEnd: true,
-        invalidateOnRefresh: true,
-        onUpdate(self) {
-          const videoProgress = Math.max(0, Math.min(1, (self.progress - 0.72) / 0.28));
-          scrubber.setActive(self.isActive && videoProgress > 0.001);
-          scrubber.setProgress(videoProgress);
-          reveal.style.pointerEvents = videoProgress > 0.02 ? 'auto' : 'none';
-        },
-        onLeave: () => scrubber.setActive(false),
-        onLeaveBack: () => scrubber.setActive(false),
-      },
-    });
-
-    timeline.to(grid, {
-      x: () => -getDistance(),
-      duration: 0.72,
-      force3D: true,
-    });
-
-    timeline.to(reveal, {
-      scaleX: 1,
-      duration: 0.28,
-      force3D: true,
-    });
-  }
-
-  function setupStatsAnimations() {
-    const targets = [...document.querySelectorAll('[data-fade-slide-in]')];
-
-    if (reducedMotion) {
-      gsap.set(targets, { autoAlpha: 1, y: 0 });
-      gsap.set('.stat-char,.detail-word,.card-subtext', { opacity: 1, y: 0, yPercent: 0 });
-      return;
-    }
-
-    if (targets.length) {
-      gsap.set(targets, { autoAlpha: 0, y: 20 });
-      gsap.to(targets, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: '.stats-left',
-          start: 'top 72%',
-          once: true,
-        },
-      });
-    }
-
-    document.querySelectorAll('.stat-card').forEach((card) => {
-      const chars = card.querySelectorAll('.stat-char');
-      const words = card.querySelectorAll('.detail-word');
-      const subtext = card.querySelector('.card-subtext');
-
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: card,
-          start: 'top 72%',
-          once: true,
-        },
-      });
-
-      timeline.fromTo(
-        chars,
-        { yPercent: 105, opacity: 0 },
-        { yPercent: 0, opacity: 1, duration: 0.55, stagger: 0.025, ease: 'power3.out' },
-      );
-
-      timeline.fromTo(
-        words,
-        { y: 12, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.45, stagger: 0.018, ease: 'power2.out' },
-        '-=0.2',
-      );
-
-      if (subtext) timeline.fromTo(subtext, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 }, '-=0.2');
-    });
-  }
-
-  function setupFooter() {
-    const footer = document.querySelector('.site-footer');
-    const spacer = document.querySelector('.footer-spacer');
-    if (!footer || !spacer) return;
-
-    const sync = () => {
-      spacer.style.height = `${footer.offsetHeight}px`;
-    };
-
-    sync();
-    footerObserver?.disconnect();
-    if ('ResizeObserver' in window) {
-      footerObserver = new ResizeObserver(sync);
-      footerObserver.observe(footer);
-    }
-    window.addEventListener('resize', sync, { passive: true });
-  }
-
-  function setupButtons() {
-    document.querySelectorAll('[data-scroll-target]').forEach((button) => {
+  function renderCart() {
+    bagCount.textContent = String(cart.length);
+    bagItems.innerHTML = cart.length
+      ? cart.map((item, index) => `<article class="bag-item"><img src="${item.image}" alt="${item.name}"><div><b>${item.name}</b><small>Size ${item.size}</small></div><button type="button" data-remove="${index}" aria-label="移除 ${item.name}">×</button></article>`).join('')
+      : '<p style="color:#766f68">购物袋为空。选择一枚戒指开始体验。</p>';
+    bagTotal.textContent = `$${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}`;
+    $$('[data-remove]', bagItems).forEach((button) => {
       button.addEventListener('click', () => {
-        document.querySelector(button.dataset.scrollTarget)?.scrollIntoView({
-          behavior: reducedMotion ? 'auto' : 'smooth',
-        });
+        cart.splice(Number(button.dataset.remove), 1);
+        renderCart();
       });
     });
+  }
 
-    document.querySelector('.newsletter-form')?.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const input = event.currentTarget.querySelector('input');
-      if (!input?.value.trim()) return;
-      alert("You're on the list. Welcome.");
-      event.currentTarget.reset();
+  function openProduct(key, trigger) {
+    activeProduct = productData[key];
+    selectedSize = '7';
+    $('#quick-image').src = activeProduct.image;
+    $('#quick-name').textContent = activeProduct.name;
+    $('#quick-price').textContent = `$${activeProduct.price.toFixed(2)}`;
+    $$('.size').forEach((button) => button.classList.toggle('active', button.dataset.size === selectedSize));
+    openLayer(quickView, trigger);
+  }
+
+  $$('.product').forEach((button) => button.addEventListener('click', () => openProduct(button.dataset.product, button)));
+  $$('.size').forEach((button) => button.addEventListener('click', () => {
+    selectedSize = button.dataset.size;
+    $$('.size').forEach((item) => item.classList.toggle('active', item === button));
+  }));
+  $('#add-to-bag')?.addEventListener('click', () => {
+    if (!activeProduct) return;
+    cart.push({ ...activeProduct, size: selectedSize });
+    renderCart();
+    closeLayers(false);
+    notify(`${activeProduct.name} · Size ${selectedSize} 已加入购物袋`);
+  });
+  $('#checkout')?.addEventListener('click', () => notify('交互原型：结算前将重新校验价格、规格与库存'));
+
+  $('#newsletter')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const input = $('input', event.currentTarget);
+    if (!input.value.trim()) return;
+    notify('订阅成功：原型不会发送真实邮件');
+    event.currentTarget.reset();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeLayers();
+  });
+
+  if (!reducedMotion) {
+    const media = $('.hero-media');
+    const titleLines = $$('.hero-copy h1 i');
+    const heroCopy = $('.hero-copy p');
+    const heroCta = $('.hero-copy .cta');
+
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: '.hero-scroll',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.8,
+        invalidateOnRefresh: true,
+      },
+    })
+      .to(media, { scale: 1.22, xPercent: -4, filter: 'brightness(.68)', ease: 'none' }, 0)
+      .to(titleLines, { yPercent: -120, opacity: 0, filter: 'blur(10px)', stagger: .06, ease: 'none' }, .55)
+      .to([heroCopy, heroCta], { y: -25, opacity: 0, ease: 'none' }, .68);
+
+    gsap.from('.device-stage', {
+      y: 80,
+      opacity: 0,
+      scale: .96,
+      duration: 1.1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '.device-stage', start: 'top 80%', once: true },
+    });
+
+    gsap.utils.toArray('.craft-stat').forEach((card) => {
+      gsap.from(card, { y: 35, opacity: 0, duration: .8, ease: 'power2.out', scrollTrigger: { trigger: card, start: 'top 82%', once: true } });
+    });
+
+    ScrollTrigger.matchMedia({
+      '(min-width: 901px)': () => {
+        const rail = $('.product-rail');
+        const wrap = $('.rail-wrap');
+        const distance = () => Math.max(0, rail.scrollWidth - innerWidth);
+        const tween = gsap.to(rail, {
+          x: () => -distance(),
+          ease: 'none',
+          force3D: true,
+          scrollTrigger: {
+            trigger: wrap,
+            start: 'top top',
+            end: () => `+=${distance() + innerHeight * .8}`,
+            pin: true,
+            scrub: .7,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+        return () => tween.kill();
+      },
     });
   }
 
-  function prepareText() {
-    document.querySelectorAll('.hero-title-line-inner').forEach((element) => splitCharacters(element, 'hero-char'));
-    document.querySelectorAll('.heading-style-h1:last-child').forEach((element) => splitCharacters(element, 'stat-char'));
-    document.querySelectorAll('.detail-paragraph').forEach(splitWords);
-  }
-
-  function buildAnimations() {
-    setupHeroAnimation();
-    setupAwardsAnimation();
-    setupStatsAnimations();
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-  }
-
-  function initialize() {
-    prepareText();
-    setupMenu();
-    setupFooter();
-    setupButtons();
-    buildAnimations();
-  }
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) document.querySelectorAll('video').forEach((video) => video.pause());
-  });
-
-  window.addEventListener(
-    'resize',
-    () => {
-      clearTimeout(rebuildTimer);
-      rebuildTimer = window.setTimeout(() => {
-        if (window.innerWidth === lastWidth) return;
-        lastWidth = window.innerWidth;
-        destroyAnimations();
-        requestAnimationFrame(buildAnimations);
-      }, 200);
-    },
-    { passive: true },
-  );
-
-  window.addEventListener(
-    'pagehide',
-    () => {
-      destroyAnimations();
-      footerObserver?.disconnect();
-    },
-    { once: true },
-  );
-
-  const fontsReady = document.fonts?.ready ?? Promise.resolve();
-  Promise.all([fontsReady, loadSmoothStyles()]).then(initialize);
+  renderCart();
+  addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
 })();
