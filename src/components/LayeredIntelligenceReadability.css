@@ -123,15 +123,15 @@
   .layered-intelligence__technology {
     clip-path: inset(0 0 0 66% round 0 30px 30px 0);
   }
+}
 
-  @media (max-width: 767px) {
-    .layered-intelligence__technology {
-      clip-path: inset(0 0 0 58% round 0 24px 24px 0);
-      opacity: 0.54;
-    }
+@media (prefers-reduced-motion: reduce) and (max-width: 767px) {
+  .layered-intelligence__technology {
+    clip-path: inset(0 0 0 58% round 0 24px 24px 0);
+    opacity: 0.54;
+  }
 
-    .layered-intelligence__spot-ring {
-      display: none;
-    }
+  .layered-intelligence__spot-ring {
+    display: none;
   }
 }
