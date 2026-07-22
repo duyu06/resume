@@ -1,6 +1,8 @@
+import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
 const baseURL = process.env.TEST_BASE_URL || 'http://127.0.0.1:4173/resume';
+const outputDir = 'test-results/demo-screenshots';
 const devices = [
   { name: 'desktop-1440', viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false },
   { name: 'mobile-390', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },
@@ -69,10 +71,14 @@ async function testAiEcommerce(page) {
   await page.waitForFunction(() => document.querySelector('#generate')?.textContent === '重新生成', null, { timeout: 5000 });
   await page.locator('.result').nth(1).click();
   assert((await page.locator('#score').textContent()) === '92', 'AI ecommerce: result selection failed');
-  await page.locator('#compare-range').fill('70');
+  await page.locator('#compare-range').evaluate((element) => {
+    element.value = '70';
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+  });
   await page.locator('#download-one').click();
 }
 
+await mkdir(outputDir, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 try {
   for (const device of devices) {
@@ -80,17 +86,20 @@ try {
     const page = await context.newPage();
     page.on('pageerror', (error) => results.push({ device: device.name, pageError: error.message }));
     const tests = [
-      ['YOLA', testYola],
-      ['Digital human', testDigitalHuman],
-      ['RPA', testRpa],
-      ['AI ecommerce', testAiEcommerce],
+      ['yola', 'YOLA', testYola],
+      ['digitalhuman', 'Digital human', testDigitalHuman],
+      ['rpa', 'RPA', testRpa],
+      ['ai-ecommerce', 'AI ecommerce', testAiEcommerce],
     ];
-    for (const [name, test] of tests) {
+    for (const [slug, name, test] of tests) {
       const started = Date.now();
       try {
         await test(page);
+        await page.waitForTimeout(120);
+        await page.screenshot({ path: `${outputDir}/${device.name}-${slug}.png`, fullPage: true });
         results.push({ device: device.name, demo: name, status: 'passed', ms: Date.now() - started });
       } catch (error) {
+        await page.screenshot({ path: `${outputDir}/${device.name}-${slug}-failed.png`, fullPage: true }).catch(() => {});
         results.push({ device: device.name, demo: name, status: 'failed', error: error.message });
         throw error;
       }
