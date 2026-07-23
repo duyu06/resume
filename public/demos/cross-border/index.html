@@ -3,170 +3,163 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="description" content="prmpt archive collection — a scroll-driven fashion and product motion experience." />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="YOLA — handcrafted rings, forged in Berlin since 2019." />
   <link rel="icon" type="image/svg+xml" href="/resume/favicon.svg?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./cross-border.css" />
   <link rel="stylesheet" href="/resume/demos/incremental-enrich.css" />
-  <title>prmpt® — Archive Collection</title>
+  <title>YOLA — Measured Purity</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script defer src="/resume/demos/incremental-enrich.js"></script>
   <script defer src="./cross-border.js"></script>
 </head>
-<body data-prmpt-phase="hero" data-yola-keyframe="01" data-yola-keyframe-count="14" data-yola-section="hero">
-  <main id="scroll-spacer" class="scroll-spacer" aria-label="prmpt archive collection experience">
-    <div class="custom-cursor" aria-hidden="true">
-      <svg viewBox="0 0 48 48" role="presentation">
-        <circle cx="24" cy="24" r="22.75" fill="none" stroke="currentColor" stroke-width="2.5" />
-        <path d="M17.2 17.5h13.6M17.2 24h13.6M20.5 30.5h7M24 17.5v13" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" />
+<body data-yola-keyframe="01" data-yola-keyframe-count="14" data-yola-section="hero">
+  <header class="site-header" aria-label="Primary navigation">
+    <a class="yola-logo" href="#hero" aria-label="YOLA home">
+      <svg viewBox="0 0 112 60" role="img" aria-label="YOLA">
+        <ellipse cx="15" cy="30" rx="12" ry="17"></ellipse>
+        <ellipse cx="15" cy="30" rx="7" ry="11"></ellipse>
+        <text x="31" y="38">YLA</text>
       </svg>
-    </div>
-
-    <a class="prmpt-logo" href="#hero" aria-label="prmpt home">
-      <span class="prmpt-wordmark">prmpt</span><sup>®</sup>
     </a>
-
-    <p class="hero-caption" id="about">
-      When switching between videos near the center, the current frame remains stable. Move beyond the center threshold to scrub either side of the collection film.
-    </p>
-
-    <header class="site-header" aria-label="Primary navigation">
-      <a class="about-link" href="#about">ABOUT</a>
+    <nav class="header-nav">
+      <a href="#about">ABOUT</a>
       <div class="header-actions">
-        <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false">
-          <span></span><span></span>
-        </button>
-        <button class="header-action" type="button" data-scroll-target="#collection">[ CART 0 ]</button>
+        <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
+        <button class="bag-button header-action" type="button" data-scroll-target="#collection">[ BAG 0 ]</button>
       </div>
-    </header>
+    </nav>
+  </header>
 
-    <aside class="menu-panel" aria-label="Quick navigation">
-      <a href="#hero">Archive</a>
-      <a href="#collection">Collection</a>
-      <a href="#outro">View</a>
-      <a href="/resume/#projects">Portfolio</a>
-    </aside>
+  <aside class="menu-panel" aria-label="Quick navigation">
+    <a href="#hero">Measured Purity</a>
+    <a href="#collection">Collection</a>
+    <a href="#about">Craft</a>
+    <a href="#footer">Studio</a>
+    <a href="/resume/#projects">Portfolio</a>
+  </aside>
 
-    <section id="hero" class="hero-content" aria-label="Archive hero">
-      <button class="capsule-button" type="button" data-scroll-target="#collection">
-        <span>Enter archive</span><span aria-hidden="true">↘</span>
-      </button>
-    </section>
-
-    <section id="outro-info" class="outro-info" aria-label="Featured collection">
-      <div class="outro-label">
-        <span class="circle-icon" aria-hidden="true"><span id="circle-symbol">8</span></span>
-        <p>ARCHIVE COLLECTION<br />“PROMPT”</p>
+  <main>
+    <section id="hero" class="hero-scroll" aria-label="Measured purity film">
+      <div class="hero-sticky">
+        <video id="hero-video" muted playsinline preload="auto" aria-label="YOLA ring film">
+          <source src="./assets/videos/hero-measured-purity.mp4" type="video/mp4" />
+        </video>
+        <div class="hero-content">
+          <h1 aria-label="Measured Purity">
+            <span class="hero-title-line"><span class="hero-title-line-inner">MEASURED</span></span>
+            <span class="hero-title-line"><span class="hero-title-line-inner">PURITY</span></span>
+          </h1>
+          <button class="capsule-button discover-button" type="button" data-scroll-target="#footer">
+            <span>DISCOVER</span><i aria-hidden="true"></i>
+          </button>
+        </div>
+        <p class="hero-index">BERLIN · 2019 — 2026</p>
       </div>
-      <strong>$97,33</strong>
     </section>
 
-    <div id="outro-buy" class="outro-buy" aria-hidden="true"><span>view</span></div>
-
-    <section id="main-canvas" class="main-canvas" aria-label="Interactive collection films">
-      <video id="video-left" muted playsinline preload="auto" aria-label="Left archive film">
-        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260625_154433_532a85d3-dabf-4265-b8bd-19ac6af31842.mp4" type="video/mp4" />
-      </video>
-      <video id="video-right" muted playsinline preload="auto" aria-label="Right archive film">
-        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260625_154401_a664f076-b971-4557-8728-40ef9ea4c49b.mp4" type="video/mp4" />
-      </video>
-    </section>
-
-    <div id="outro-overlay" class="outro-overlay" aria-hidden="true"></div>
-
-    <footer id="outro-footer" class="outro-footer">
-      <span>PRMPT® 2026</span>
-      <a href="#outro">PRIVACY POLICY</a>
-    </footer>
-
-    <section id="collection" class="black-panel" aria-label="Archive gallery">
-      <div class="gallery-wrap">
-        <div class="gallery-grid" id="gallery-grid">
-          <article class="product-card bp-card" data-product-index="01" data-name="Prompt 01" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_104530_521b2f85-c0f3-4d0e-9704-b578315b4cb9.png&w=1920&q=85" alt="Archive collection look 01" />
-            <h2 class="product-name sr-only">Prompt 01</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>01 / PROMPT</span>
+    <section id="collection" class="awards-section" data-yola-collection aria-label="YOLA ring collection">
+      <div class="awards-stage">
+        <div class="awards-grid">
+          <article class="product-card" data-name="Obsidian Coil" data-price="$480">
+            <img src="./assets/products/obsidian-coil.webp" alt="Obsidian Coil handcrafted ring" />
+            <div><h2 class="product-name">Obsidian Coil</h2><p class="product-price">$480</p></div>
           </article>
-          <article class="product-card bp-card" data-product-index="02" data-name="Prompt 02" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_103711_76ccdb8b-5043-4f47-9c54-4379713393ea.png&w=1920&q=85" alt="Archive collection look 02" />
-            <h2 class="product-name sr-only">Prompt 02</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>02 / PROMPT</span>
+          <article class="product-card" data-name="Void Arc" data-price="$560">
+            <img src="./assets/products/void-arc.webp" alt="Void Arc handcrafted ring" />
+            <div><h2 class="product-name">Void Arc</h2><p class="product-price">$560</p></div>
           </article>
-          <article class="product-card bp-card" data-product-index="03" data-name="Prompt 03" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_103728_394f6a1b-85e2-4386-a4f6-408472a0a5b7.png&w=1920&q=85" alt="Archive collection look 03" />
-            <h2 class="product-name sr-only">Prompt 03</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>03 / PROMPT</span>
+          <article class="product-card" data-name="Onyx Hex" data-price="$620">
+            <img src="./assets/products/onyx-hex.webp" alt="Onyx Hex handcrafted ring" />
+            <div><h2 class="product-name">Onyx Hex</h2><p class="product-price">$620</p></div>
           </article>
-          <article class="product-card bp-card" data-product-index="04" data-name="Prompt 04" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_103739_86743e0e-16a7-4bee-bf38-dd67985344dc.png&w=1920&q=85" alt="Archive collection look 04" />
-            <h2 class="product-name sr-only">Prompt 04</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>04 / PROMPT</span>
+          <article class="product-card" data-name="Shadow Sigil" data-price="$740">
+            <img src="./assets/products/shadow-sigil.webp" alt="Shadow Sigil handcrafted ring" />
+            <div><h2 class="product-name">Shadow Sigil</h2><p class="product-price">$740</p></div>
           </article>
-          <article class="product-card bp-card" data-product-index="05" data-name="Prompt 05" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_103748_b2215dc8-a3a7-470d-b19a-5b87fa7d0c37.png&w=1920&q=85" alt="Archive collection look 05" />
-            <h2 class="product-name sr-only">Prompt 05</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>05 / PROMPT</span>
+          <article class="product-card" data-name="Eclipse Band" data-price="$820">
+            <img src="./assets/products/obsidian-coil.webp" alt="Eclipse Band handcrafted ring" />
+            <div><h2 class="product-name">Eclipse Band</h2><p class="product-price">$820</p></div>
           </article>
-          <article class="product-card bp-card" data-product-index="06" data-name="Prompt 06" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_103758_e919ce72-5c9d-4b87-9be6-d7647b34825c.png&w=1920&q=85" alt="Archive collection look 06" />
-            <h2 class="product-name sr-only">Prompt 06</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>06 / PROMPT</span>
+          <article class="product-card" data-name="Matte Skull" data-price="$950">
+            <img src="./assets/products/void-arc.webp" alt="Matte Skull handcrafted ring" />
+            <div><h2 class="product-name">Matte Skull</h2><p class="product-price">$950</p></div>
           </article>
-          <article class="product-card bp-card" data-product-index="07" data-name="Prompt 07" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_103808_013583d0-3386-4547-9832-37c7d8edb3ac.png&w=1920&q=85" alt="Archive collection look 07" />
-            <h2 class="product-name sr-only">Prompt 07</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>07 / PROMPT</span>
-          </article>
-          <article class="product-card bp-card" data-product-index="08" data-name="Prompt 08" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_103937_a0c49d0a-33eb-4ead-aea6-c1baf241acbc.png&w=1920&q=85" alt="Archive collection look 08" />
-            <h2 class="product-name sr-only">Prompt 08</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>08 / PROMPT</span>
-          </article>
-          <article class="product-card bp-card" data-product-index="09" data-name="Prompt 09" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_103956_d18ed8fd-7b6f-4b86-91f9-20010fe38670.png&w=1920&q=85" alt="Archive collection look 09" />
-            <h2 class="product-name sr-only">Prompt 09</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>09 / PROMPT</span>
-          </article>
-          <article class="product-card bp-card" data-product-index="10" data-name="Prompt 10" data-price="$97.33">
-            <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260629_104034_ba5a9963-87ff-4008-a545-6bd686c088b5.png&w=1920&q=85" alt="Archive collection look 10" />
-            <h2 class="product-name sr-only">Prompt 10</h2>
-            <p class="product-price sr-only">$97.33</p>
-            <span>10 / PROMPT</span>
-          </article>
+        </div>
+        <div class="video-scaling-wrapper" aria-hidden="true">
+          <video id="collection-video" muted playsinline preload="auto">
+            <source src="./assets/videos/collection-reveal.mp4" type="video/mp4" />
+          </video>
         </div>
       </div>
     </section>
 
-    <span id="outro" class="outro-anchor" aria-hidden="true"></span>
-    <div class="legacy-motion-probes" aria-hidden="true">
-      <div class="hero-scroll legacy-hero-probe"></div>
-      <div class="legacy-collection-probe" data-yola-collection></div>
-      <div class="legacy-yola-markers">
-        <i data-yola-marker="01"></i><i data-yola-marker="02"></i><i data-yola-marker="03"></i><i data-yola-marker="04"></i>
-        <i data-yola-marker="05"></i><i data-yola-marker="06"></i><i data-yola-marker="07"></i><i data-yola-marker="08"></i>
-        <i data-yola-marker="09"></i><i data-yola-marker="10"></i><i data-yola-marker="11"></i><i data-yola-marker="12"></i>
-        <i data-yola-marker="13"></i><i data-yola-marker="14"></i>
+    <section id="about" class="craft-section" aria-label="Made without compromise">
+      <div class="craft-copy">
+        <h2 data-fade-slide-in>Made Without Compromise</h2>
+        <div class="craft-paragraphs">
+          <p data-fade-slide-in>Each ring is forged by a single pair of hands — no factory floor, no assembly line. The material is chosen first; the form follows its nature.</p>
+          <p data-fade-slide-in>We work in oxidized silver, blackened bronze, and raw brass. Weights are deliberate. Edges are left where they fall. Nothing is smoothed for comfort.</p>
+          <p data-fade-slide-in>YOLA exists for those who wear jewelry that means something. Not decoration — declaration. One piece at a time, made to last a lifetime.</p>
+        </div>
+        <button class="capsule-button" type="button" data-scroll-target="#collection" data-fade-slide-in><span>VIEW COLLECTION</span><i aria-hidden="true"></i></button>
       </div>
-      <div class="awards-grid legacy-snap-rail">
-        <article class="product-card legacy-snap-card"><h2 class="product-name sr-only">Archive 01</h2></article>
-        <article class="product-card legacy-snap-card"><h2 class="product-name sr-only">Archive 02</h2></article>
-        <article class="product-card legacy-snap-card"><h2 class="product-name sr-only">Archive 03</h2></article>
-        <article class="product-card legacy-snap-card"><h2 class="product-name sr-only">Archive 04</h2></article>
-        <article class="product-card legacy-snap-card"><h2 class="product-name sr-only">Archive 05</h2></article>
-        <article class="product-card legacy-snap-card"><h2 class="product-name sr-only">Archive 06</h2></article>
+
+      <div class="stats-column">
+        <article class="stat-card">
+          <div class="stomp-wrapper"><div class="stomp-stack stack-a"><h3>100%</h3><h3 class="heading-style-h1">100%</h3></div><div class="stomp-stack stack-b"><h3>Handmade</h3><h3 class="heading-style-h1">Handmade</h3></div></div>
+          <p class="detail-paragraph">Every ring crafted by a single artisan, start to finish</p>
+        </article>
+        <article class="stat-card">
+          <div class="stomp-wrapper"><div class="stomp-stack stack-a"><h3>14-92g</h3><h3 class="heading-style-h1">14-92g</h3></div><div class="stomp-stack stack-b"><h3>Per piece</h3><h3 class="heading-style-h1">Per piece</h3></div></div>
+          <p class="detail-paragraph">Deliberate weight — each ring is a physical presence you feel</p>
+        </article>
+        <article class="stat-card">
+          <div class="stomp-wrapper"><div class="stomp-stack stack-a"><h3>Sterling</h3><h3 class="heading-style-h1">Sterling</h3></div><div class="stomp-stack stack-b"><h3>&amp; Silver</h3><h3 class="heading-style-h1">&amp; Silver</h3></div></div>
+          <p class="detail-paragraph">Oxidized metals only — no plating, no compromise</p>
+        </article>
+        <article class="stat-card">
+          <div class="stomp-wrapper"><div class="stomp-stack stack-a"><h3>Lifetime</h3><h3 class="heading-style-h1">Lifetime</h3></div><div class="stomp-stack stack-b"><h3>Guarantee</h3><h3 class="heading-style-h1">Guarantee</h3></div></div>
+          <p class="detail-paragraph">We stand behind every piece we make, forever</p>
+          <p class="card-subtext">Est. YOLA Studio, 2019.</p>
+        </article>
       </div>
-    </div>
+    </section>
+
+    <div class="footer-spacer" aria-hidden="true"></div>
   </main>
+
+  <footer id="footer" class="site-footer">
+    <section>
+      <a href="#">Sign in</a>
+      <p>Handcrafted in small batches<br />YOLA Studio<br /><br />Based in Berlin<br />(c) YOLA 2026<br />All pieces are original designs.</p>
+    </section>
+    <section>
+      <a href="#">Instagram</a>
+      <nav><a href="#">Refund Policy</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></nav>
+    </section>
+    <section>
+      <h3>Newsletter</h3>
+      <p>Join our list. Be first to know new drops. 10% off your first order.</p>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Email" aria-label="Email address" required />
+        <button class="capsule-button" type="submit"><span>SUBSCRIBE</span><i aria-hidden="true"></i></button>
+      </form>
+    </section>
+  </footer>
+
+  <div class="legacy-motion-probes" aria-hidden="true">
+    <div class="legacy-collection-probe" data-yola-collection></div>
+    <div class="legacy-yola-markers">
+      <i data-yola-marker="01"></i><i data-yola-marker="02"></i><i data-yola-marker="03"></i><i data-yola-marker="04"></i>
+      <i data-yola-marker="05"></i><i data-yola-marker="06"></i><i data-yola-marker="07"></i><i data-yola-marker="08"></i>
+      <i data-yola-marker="09"></i><i data-yola-marker="10"></i><i data-yola-marker="11"></i><i data-yola-marker="12"></i>
+      <i data-yola-marker="13"></i><i data-yola-marker="14"></i>
+    </div>
+  </div>
 </body>
 </html>
