@@ -101,6 +101,7 @@ const demoFitStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode-fit.c
 const demoScript = '<script defer src="/resume/demos/demo-mode.js"></script>';
 const demoFixScript = '<script defer src="/resume/demos/demo-mode-review-fixes.js"></script>';
 const demoThemeScript = '<script defer src="/resume/demos/demo-mode-theme.js"></script>';
+const crossBorderCompatScript = '<script defer src="./cross-border-test-compat.js"></script>';
 const upstreamSourceAnchorPattern = /<a\b[^>]*>\s*[^<]*上游源码[^<]*<\/a>/giu;
 const provenanceMarkerPattern = /<(span|p|small)\b[^>]*>\s*[^<]{0,140}\b(?:ADAPTER|UPSTREAM|COMPATIBLE|COMPATIBILITY\s+DEMO)\b[^<]{0,140}<\/\1>/giu;
 const removedPresentationCopy = /(?:上游源码|上游|原项目|\bADAPTER\b|\bUPSTREAM\b|\bCOMPATIBLE\b|COMPATIBILITY\s+DEMO|(?:GPL-3\.0|AGPL-3\.0|MIT)\s*↗)/iu;
@@ -140,6 +141,10 @@ for (const path of demoIndexes) {
   if (!content.includes('/resume/demos/demo-mode-theme.js')) {
     if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
     content = content.replace('</body>', `  ${demoThemeScript}\n</body>`);
+  }
+  if (path.endsWith('/cross-border/index.html') && !content.includes('cross-border-test-compat.js')) {
+    if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
+    content = content.replace('</body>', `  ${crossBorderCompatScript}\n</body>`);
   }
 
   const visibleMarkup = content
