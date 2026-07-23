@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#070b18" />
+  <meta name="theme-color" content="#02090a" />
   <meta name="description" content="AI 客服数字人 Agent 演示：智能问答、订单查询、物流跟踪、库存检查、退款、情绪分析、人工转接与会话记忆。" />
-  <title>AI 客服数字人 · 智能服务工作台</title>
+  <title>AI 客服数字人 Agent · 智能服务工作台</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./app.css" />
+  <link rel="stylesheet" href="./reference-redesign.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script defer src="./storage-migration.js"></script>
@@ -23,7 +24,7 @@
   <header class="topbar" data-motion="topbar">
     <a class="brand" href="#workspace" aria-label="返回 AI 客服数字人工作台顶部">
       <span class="brand-orb" aria-hidden="true"><i></i></span>
-      <span><b>AI 客服数字人</b><small>智能服务 · 高效响应</small></span>
+      <span><b>AI CS AGENT</b><small>智能服务 · 高效连接</small></span>
     </a>
     <div class="topbar-center">
       <span id="connection-badge" class="connection-badge">演示模式</span>
@@ -31,7 +32,7 @@
     </div>
     <div class="top-actions">
       <a class="portfolio-link" href="/resume/#projects">作品集</a>
-      <button id="settings-toggle" type="button" aria-expanded="false">Agent 配置</button>
+      <button id="settings-toggle" type="button" aria-expanded="false">系统状态 · 运行中</button>
     </div>
   </header>
 
@@ -64,9 +65,14 @@
   </aside>
 
   <main class="experience-shell">
+    <header class="reference-hero" data-motion="hero-title">
+      <h1>AI 客服数字人 <span>Agent</span></h1>
+      <p>全渠道智能服务　·　订单查询　·　退货退款　·　情绪识别　·　人工转接</p>
+    </header>
+
     <section id="workspace" class="hero-board" aria-label="AI 客服数字人工作台">
       <article class="avatar-deck glass-panel" data-motion="avatar">
-        <div class="deck-kicker"><span>LIVE DIGITAL HUMAN</span><b>在线</b></div>
+        <div class="deck-kicker"><span>DIGITAL HUMAN</span><b>在线</b></div>
         <div class="avatar-frame">
           <div class="avatar-depth avatar-depth-one" aria-hidden="true"></div>
           <div class="avatar-depth avatar-depth-two" aria-hidden="true"></div>
@@ -75,12 +81,12 @@
         </div>
         <div class="listening-card">
           <div class="voice-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div><b>正在监听客户意图</b><span>语音、文本与业务状态同步分析</span></div>
+          <div><b>林晓雨 · Gold</b><span>CUST-001 · Web · 中文</span></div>
         </div>
         <div class="avatar-caption">
           <span>AI CUSTOMER SERVICE</span>
-          <h1>让数字人<br />真正解决问题</h1>
-          <p>在一个界面中完成咨询应答、订单查询、物流跟踪、库存核验、退款闭环和人工接管。</p>
+          <h1>林晓雨</h1>
+          <p>订单查询 · 退货退款 · 库存核验 · 人工转接</p>
         </div>
       </article>
 
@@ -88,7 +94,7 @@
         <header class="console-head">
           <div>
             <small>LIVE SUPPORT WORKSPACE</small>
-            <h2>实时对话工作台</h2>
+            <h2>实时会话工作台</h2>
           </div>
           <div class="conversation-meta">
             <span>会话 ID</span>
@@ -103,25 +109,25 @@
         <section id="order-center" class="metrics" aria-label="客服指标">
           <article data-metric-card><span>当前客户</span><b id="metric-customer">CUST-001</b><small>会员等级 · Gold</small></article>
           <article data-metric-card><span>情绪状态</span><b id="metric-sentiment">中性</b><small>实时风险识别</small></article>
-          <article data-metric-card><span>工具调用</span><b id="metric-tools">0</b><small>业务系统调用轨迹</small></article>
-          <article data-metric-card><span>本轮消息</span><b id="metric-messages">0</b><small>当前会话上下文</small></article>
+          <article data-metric-card><span>工具调用</span><b id="metric-tools">04</b><small>业务系统调用轨迹</small></article>
+          <article data-metric-card><span>未读消息</span><b id="metric-messages">08</b><small>当前会话上下文</small></article>
         </section>
 
         <section class="chat-panel glass-panel">
           <div class="chat-head">
             <div class="agent-id"><span class="mini-avatar">AI</span><span><b>AI 客服数字人</b><small>订单、库存、退款与售后</small></span></div>
-            <span id="agent-state">等待客户消息</span>
+            <span id="agent-state">会话进行中</span>
           </div>
           <div id="chat-thread" class="chat-thread" role="log" aria-live="polite"></div>
           <form id="chat-form" class="composer">
-            <textarea id="message-input" rows="2" placeholder="输入客户问题，例如：帮我查询订单 ORD-12345" required></textarea>
+            <textarea id="message-input" rows="2" placeholder="输入您的问题，例如：帮我查询订单 ORD-12345" required></textarea>
             <button id="send-message" type="submit"><span>发送</span><b>↗</b></button>
           </form>
           <section class="quick-actions" aria-label="快捷客服场景">
-            <button type="button" data-quick="order"><span>01</span><b>查询订单</b><small>获取状态与物流</small></button>
-            <button type="button" data-quick="inventory"><span>02</span><b>物流 / 库存</b><small>查看可售与配送</small></button>
-            <button type="button" data-quick="refund"><span>03</span><b>申请退款</b><small>进入确认闭环</small></button>
-            <button type="button" data-quick="angry"><span>04</span><b>转人工服务</b><small>处理负面情绪</small></button>
+            <button type="button" data-quick="order"><span>01</span><b>订单查询</b><small>获取状态与物流</small></button>
+            <button type="button" data-quick="inventory"><span>02</span><b>库存核验</b><small>查看可售与配送</small></button>
+            <button type="button" data-quick="refund"><span>03</span><b>退款提交</b><small>进入确认闭环</small></button>
+            <button type="button" data-quick="angry"><span>04</span><b>人工转接</b><small>处理负面情绪</small></button>
           </section>
         </section>
       </section>
@@ -150,20 +156,20 @@
           </div>
           <div class="service-chart" aria-label="24 小时服务趋势图">
             <svg viewBox="0 0 320 110" role="img" aria-label="服务质量趋势">
-              <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8b5cff" stop-opacity=".42"/><stop offset="1" stop-color="#8b5cff" stop-opacity="0"/></linearGradient></defs>
+              <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5fe6a0" stop-opacity=".42"/><stop offset="1" stop-color="#5fe6a0" stop-opacity="0"/></linearGradient></defs>
               <path d="M0 88 C28 76 42 36 66 54 S105 87 128 62 S171 42 194 65 S233 31 256 51 S292 65 320 42 L320 110 L0 110Z" fill="url(#chartFill)"/>
-              <path d="M0 88 C28 76 42 36 66 54 S105 87 128 62 S171 42 194 65 S233 31 256 51 S292 65 320 42" fill="none" stroke="#a57bff" stroke-width="3" stroke-linecap="round"/>
+              <path d="M0 88 C28 76 42 36 66 54 S105 87 128 62 S171 42 194 65 S233 31 256 51 S292 65 320 42" fill="none" stroke="#5fe6a0" stroke-width="3" stroke-linecap="round"/>
             </svg>
           </div>
         </section>
 
         <section class="tool-panel">
           <section class="glass-panel">
-            <div class="panel-head"><small>TOOL TRACE</small><b>工具调用轨迹</b></div>
+            <div class="panel-head"><small>TOOL TRACE</small><b>Agent 工具调用</b></div>
             <div id="tool-log" class="tool-log"><p>等待 Agent 选择工具。</p></div>
           </section>
           <section class="glass-panel sentiment-panel">
-            <div class="panel-head"><small>SENTIMENT</small><b>情绪与风险</b></div>
+            <div class="panel-head"><small>SENTIMENT</small><b>情绪识别 · 中性</b></div>
             <div class="sentiment-meter"><i id="sentiment-fill"></i></div>
             <strong id="sentiment-value">neutral · 0.00</strong>
             <p id="handoff-note">当前无需人工接管。</p>
@@ -180,7 +186,7 @@
       <header class="story-head">
         <span>AGENT WORKFLOW</span>
         <h2>从客户意图到业务结果，<br />每一步都可追踪。</h2>
-        <p>采用 MotionSites 的分层叙事和交互发现方式，把隐藏在对话背后的判断、工具调用与人工边界公开展示。</p>
+        <p>采用分层叙事和交互发现方式，把隐藏在对话背后的判断、工具调用与人工边界公开展示。</p>
       </header>
       <div class="story-layout">
         <div class="workflow-stage glass-panel" aria-hidden="true">
