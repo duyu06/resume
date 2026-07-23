@@ -7,6 +7,7 @@ on:
       - 'public/demos/cross-border/**'
       - 'scripts/cross-border-visual-compare.mjs'
       - 'scripts/yola-review-e2e.mjs'
+      - 'scripts/patch-static-demos.mjs'
       - '.github/workflows/cross-border-visual-compare.yml'
   workflow_dispatch:
 
