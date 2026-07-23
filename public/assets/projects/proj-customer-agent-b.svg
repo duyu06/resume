@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1414" height="1000" viewBox="0 0 1414 1000" role="img" aria-labelledby="title desc">
+  <title id="title">AI 客服 Agent 业务流程</title>
+  <desc id="desc">展示客户消息、情绪识别、工具路由、订单库存退款工具、人工转接和服务质量指标的流程图。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07120f"/><stop offset="1" stop-color="#132920"/></linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#142c24"/><stop offset="1" stop-color="#091713"/></linearGradient>
+    <radialGradient id="halo"><stop stop-color="#5fe6a0" stop-opacity=".28"/><stop offset="1" stop-color="#5fe6a0" stop-opacity="0"/></radialGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#000" flood-opacity=".35"/></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6 0 12Z" fill="#5fe6a0"/></marker>
+  </defs>
+  <rect width="1414" height="1000" fill="url(#bg)"/>
+  <circle cx="707" cy="500" r="510" fill="url(#halo)" opacity=".48"/>
+  <g font-family="Arial,sans-serif">
+    <text x="70" y="82" fill="#5fe6a0" font-size="18" letter-spacing="5">CUSTOMER SERVICE AGENT · SYSTEM FLOW</text>
+    <text x="70" y="142" fill="#f2fff9" font-size="52" font-weight="700">从客户问题到可追踪的业务结果</text>
+    <text x="70" y="184" fill="#8ea79d" font-size="20">意图识别 · Tool Calling · 会话记忆 · 风险降级 · 人工接管</text>
+  </g>
+
+  <g transform="translate(72 248)" font-family="Arial,sans-serif" filter="url(#shadow)">
+    <rect width="245" height="250" rx="28" fill="url(#card)" stroke="#2b5748"/>
+    <circle cx="122" cy="80" r="48" fill="#5fe6a0" fill-opacity=".13" stroke="#5fe6a0" stroke-opacity=".42"/>
+    <path d="M101 78c0-14 9-25 21-25s21 11 21 25-9 25-21 25-21-11-21-25Zm-28 88c8-34 32-50 49-50s41 16 49 50" fill="none" stroke="#5fe6a0" stroke-width="7" stroke-linecap="round"/>
+    <text x="28" y="196" fill="#5fe6a0" font-size="12" letter-spacing="2">01 · CUSTOMER</text>
+    <text x="28" y="226" fill="#f2fff9" font-size="22" font-weight="700">客户问题</text>
+  </g>
+
+  <path d="M327 373H435" fill="none" stroke="#5fe6a0" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <g transform="translate(451 248)" font-family="Arial,sans-serif" filter="url(#shadow)">
+    <rect width="300" height="250" rx="28" fill="url(#card)" stroke="#2b5748"/>
+    <g transform="translate(38 38)">
+      <circle cx="112" cy="66" r="60" fill="#5fe6a0" fill-opacity=".1" stroke="#5fe6a0" stroke-opacity=".3"/>
+      <path d="M72 66h80M112 26v80M84 38l56 56M140 38 84 94" stroke="#5fe6a0" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="112" cy="66" r="18" fill="#07120f" stroke="#5fe6a0" stroke-width="4"/>
+    </g>
+    <text x="30" y="196" fill="#5fe6a0" font-size="12" letter-spacing="2">02 · AGENT BRAIN</text>
+    <text x="30" y="226" fill="#f2fff9" font-size="22" font-weight="700">意图、情绪与记忆</text>
+  </g>
+
+  <path d="M761 373H869" fill="none" stroke="#5fe6a0" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <g transform="translate(885 248)" font-family="Arial,sans-serif" filter="url(#shadow)">
+    <rect width="457" height="250" rx="28" fill="url(#card)" stroke="#2b5748"/>
+    <text x="30" y="42" fill="#5fe6a0" font-size="12" letter-spacing="2">03 · TOOL ROUTER</text>
+    <g transform="translate(30 66)">
+      <rect width="188" height="62" rx="15" fill="#07120f" stroke="#2b5748"/><text x="18" y="26" fill="#5fe6a0" font-size="12">lookup_order</text><text x="18" y="47" fill="#8ea79d" font-size="12">订单与物流</text>
+      <rect x="208" width="188" height="62" rx="15" fill="#07120f" stroke="#2b5748"/><text x="226" y="26" fill="#5fe6a0" font-size="12">check_inventory</text><text x="226" y="47" fill="#8ea79d" font-size="12">库存与可售</text>
+      <rect y="78" width="188" height="62" rx="15" fill="#07120f" stroke="#2b5748"/><text x="18" y="104" fill="#5fe6a0" font-size="12">process_refund</text><text x="18" y="125" fill="#8ea79d" font-size="12">退款状态机</text>
+      <rect x="208" y="78" width="188" height="62" rx="15" fill="#07120f" stroke="#2b5748"/><text x="226" y="104" fill="#ff8c96" font-size="12">escalate_to_human</text><text x="226" y="125" fill="#8ea79d" font-size="12">人工接管</text>
+    </g>
+  </g>
+
+  <path d="M602 510V595" fill="none" stroke="#5fe6a0" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M1114 510V595" fill="none" stroke="#5fe6a0" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <g transform="translate(330 620)" font-family="Arial,sans-serif" filter="url(#shadow)">
+    <rect width="545" height="278" rx="30" fill="url(#card)" stroke="#2b5748"/>
+    <text x="30" y="44" fill="#5fe6a0" font-size="12" letter-spacing="2">04 · CUSTOMER RESPONSE</text>
+    <g transform="translate(30 72)">
+      <rect x="106" width="365" height="66" rx="18" fill="#5fe6a0"/><text x="128" y="28" fill="#062117" font-size="14">订单 ORD-12345 一直没收到，</text><text x="128" y="50" fill="#062117" font-size="14">我很生气，请转人工。</text>
+      <rect y="88" width="470" height="88" rx="18" fill="#081612" stroke="#2b5748"/><text x="20" y="120" fill="#f2fff9" font-size="14">已保留订单与会话信息，并标记 P1 优先级。</text><text x="20" y="148" fill="#f2fff9" font-size="14">人工坐席接入后无需重复描述。</text><text x="20" y="169" fill="#8ea79d" font-size="10">escalate_to_human · negative sentiment</text>
+    </g>
+  </g>
+
+  <g transform="translate(910 620)" font-family="Arial,sans-serif" filter="url(#shadow)">
+    <rect width="432" height="278" rx="30" fill="url(#card)" stroke="#2b5748"/>
+    <text x="28" y="44" fill="#5fe6a0" font-size="12" letter-spacing="2">05 · SERVICE QUALITY</text>
+    <g transform="translate(28 74)">
+      <text x="0" y="22" fill="#8ea79d" font-size="13">工具调用准确率</text><text x="328" y="22" fill="#f2fff9" font-size="15" font-weight="700">96%</text><rect y="36" width="376" height="8" rx="4" fill="#07120f"/><rect y="36" width="361" height="8" rx="4" fill="#5fe6a0"/>
+      <text x="0" y="84" fill="#8ea79d" font-size="13">自动解决率</text><text x="328" y="84" fill="#f2fff9" font-size="15" font-weight="700">82%</text><rect y="98" width="376" height="8" rx="4" fill="#07120f"/><rect y="98" width="308" height="8" rx="4" fill="#5fe6a0"/>
+      <text x="0" y="146" fill="#8ea79d" font-size="13">人工转接命中率</text><text x="328" y="146" fill="#f2fff9" font-size="15" font-weight="700">100%</text><rect y="160" width="376" height="8" rx="4" fill="#07120f"/><rect y="160" width="376" height="8" rx="4" fill="#ff8c96"/>
+    </g>
+  </g>
+</svg>

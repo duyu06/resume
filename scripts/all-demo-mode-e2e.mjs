@@ -25,13 +25,18 @@ const projects = [
   },
   {
     slug: 'digitalhuman',
-    title: 'talk-to-fengge-live 数字人',
+    title: 'AI 客服数字人 Agent',
     timeout: 50000,
     reset: {
-      expectedLocal: { fengge_backend: 'http://127.0.0.1:8791', fengge_region: 'cn', fengge_real: '0' },
-      absentLocal: ['fengge_demo_characters', 'fengge_demo_personas'],
-      expectedSession: { fengge_api_key: '' },
-      absentSession: [],
+      expectedLocal: {
+        customer_agent_backend: 'http://127.0.0.1:8000',
+        customer_agent_real: '0',
+        customer_agent_customer_id: 'CUST-001',
+        customer_agent_conversation_id: 'CONV-DEMO-001',
+      },
+      absentLocal: ['fengge_backend', 'fengge_region', 'fengge_real', 'fengge_demo_characters', 'fengge_demo_personas'],
+      expectedSession: { customer_agent_token: '' },
+      absentSession: ['fengge_api_key'],
       modeSelector: '#connection-badge',
       modeText: '演示模式',
     },

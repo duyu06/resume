@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node --check public/demos/incremental-enrich.js && node --check public/demos/demo-mode.js && node --check public/demos/demo-mode-review-fixes.js && node --check public/demos/cross-border/cross-border.js && node --check public/demos/ai-ecommerce/app.js && node --check public/demos/digitalhuman/app.js && node --check public/demos/rpa/app.js && node --check public/demos/guoyang/app.js && node --check public/demos/guoyang/demo-override.js && tsc -b && vite build && node scripts/patch-static-demos.mjs",
+    "build": "node --check public/demos/incremental-enrich.js && node --check public/demos/demo-mode.js && node --check public/demos/demo-mode-review-fixes.js && node --check public/demos/cross-border/cross-border.js && node --check public/demos/ai-ecommerce/app.js && node --check public/demos/digitalhuman/storage-migration.js && node --check public/demos/digitalhuman/app.js && node --check public/demos/rpa/app.js && node --check public/demos/guoyang/app.js && node --check public/demos/guoyang/demo-override.js && tsc -b && vite build && node scripts/patch-static-demos.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },

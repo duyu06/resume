@@ -1,92 +1,358 @@
 (() => {
   'use strict';
-  const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-  const defaultPersonas = [
-    { id: 'fengge', name: '峰哥表达风格', persona: '你是一位表达直接、观点鲜明但保持诚实边界的数字人。使用口语化短句，先回应问题核心，再给出判断依据。' },
-    { id: 'product', name: 'AI 产品顾问', persona: '你是一名技术型 AI 产品顾问。先拆解业务目标，再说明模型边界、系统依赖、成本风险和可交付方案。' },
-    { id: 'companion', name: '共情陪伴', persona: '你是一位耐心、克制、善于倾听的数字伙伴。先确认情绪与事实，再给出温和且可执行的建议。' },
-  ];
-  const defaultCharacters = [
-    { id: 'fengge-demo', name: '峰哥数字人', image_uri: '', voice: 'Raymond', call_mode: 'video', persona: defaultPersonas[0].persona },
-    { id: 'product-demo', name: 'AI 产品顾问', image_uri: '', voice: 'Ethan', call_mode: 'video', persona: defaultPersonas[1].persona },
-    { id: 'companion-demo', name: '数字陪伴者', image_uri: '', voice: 'Tina', call_mode: 'audio', persona: defaultPersonas[2].persona },
-  ];
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const defaults = {
+    backend: 'http://127.0.0.1:8000',
+    customerId: 'CUST-001',
+    conversationId: 'CONV-DEMO-001',
+  };
 
   const state = {
-    backend: localStorage.getItem('fengge_backend') || 'http://127.0.0.1:8791',
-    region: localStorage.getItem('fengge_region') || 'cn',
-    real: localStorage.getItem('fengge_real') === '1',
-    apiKey: sessionStorage.getItem('fengge_api_key') || '',
-    characters: [],
-    personas: [],
-    editingId: null,
-    selected: null,
-    avatarData: '',
-    audioData: '',
-    live: null,
-    rtc: null,
-    callStartedAt: 0,
-    callTimer: 0,
-    mediaStream: null,
+    backend: localStorage.getItem('customer_agent_backend') || defaults.backend,
+    real: localStorage.getItem('customer_agent_real') === '1',
+    token: sessionStorage.getItem('customer_agent_token') || '',
+    customerId: localStorage.getItem('customer_agent_customer_id') || defaults.customerId,
+    conversationId: localStorage.getItem('customer_agent_conversation_id') || defaults.conversationId,
+    conversationVersion: 0,
+    pendingRefund: null,
+    backendToolCallsTotal: 0,
+    messages: 0,
+    toolCalls: 0,
+    busy: false,
+    sentiment: { label: 'neutral', score: 0 },
   };
 
   const toast = $('#toast');
   let toastTimer = 0;
+
   function notify(message) {
     toast.textContent = message;
     toast.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2700);
-  }
-
-  function log(message, level = 'INFO') {
-    const row = document.createElement('div');
-    row.className = `log-row${level === 'ERROR' ? ' error' : ''}`;
-    row.innerHTML = `<time>${new Date().toLocaleTimeString('zh-CN', { hour12: false })}</time><span>${escapeHtml(message)}</span><em>${level}</em>`;
-    $('#log').prepend(row);
+    toastTimer = window.setTimeout(() => toast.classList.remove('show'), 2600);
   }
 
   function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+    return String(value ?? '').replace(/[&<>'"]/g, (char) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
+    }[char]));
   }
 
   function normalizeBase(value) {
     return value.trim().replace(/\/+$/, '');
   }
 
+  function headers() {
+    const result = { 'Content-Type': 'application/json' };
+    if (state.token) {
+      result.Authorization = `Bearer ${state.token}`;
+      result['X-API-Key'] = state.token;
+    }
+    return result;
+  }
+
+  async function requestJson(path, options = {}) {
+    const base = normalizeBase(state.backend);
+    if (!base) throw new Error('请先填写客服 Agent API 地址');
+    const response = await fetch(`${base}${path}`, {
+      ...options,
+      headers: { ...headers(), ...(options.headers || {}) },
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+    return payload;
+  }
+
   function saveSettings() {
-    state.backend = normalizeBase($('#backend-url').value) || 'http://127.0.0.1:8791';
-    state.region = $('#region').value;
+    state.backend = normalizeBase($('#backend-url').value) || defaults.backend;
     state.real = $('#real-mode').checked;
-    state.apiKey = $('#api-key').value.trim();
-    localStorage.setItem('fengge_backend', state.backend);
-    localStorage.setItem('fengge_region', state.region);
-    localStorage.setItem('fengge_real', state.real ? '1' : '0');
-    sessionStorage.setItem('fengge_api_key', state.apiKey);
-    $('#open-native').href = state.backend;
-    $('#open-native-call').dataset.href = state.backend;
-    $('#connection-badge').textContent = state.real ? '真实后端' : '演示模式';
+    state.token = $('#agent-token').value.trim();
+    state.customerId = $('#customer-id').value.trim() || defaults.customerId;
+
+    localStorage.setItem('customer_agent_backend', state.backend);
+    localStorage.setItem('customer_agent_real', state.real ? '1' : '0');
+    localStorage.setItem('customer_agent_customer_id', state.customerId);
+    localStorage.setItem('customer_agent_conversation_id', state.conversationId);
+    sessionStorage.setItem('customer_agent_token', state.token);
+
+    $('#connection-badge').textContent = state.real ? '真实 Agent 后端' : '演示模式';
     $('#connection-badge').classList.toggle('real', state.real);
+    $('#metric-customer').textContent = state.customerId;
+  }
+
+  function setBusy(busy, label = '') {
+    state.busy = busy;
+    const selectors = [
+      '#send-message',
+      '#message-input',
+      '#new-conversation',
+      '#load-performance',
+      '#settings-toggle',
+      '#customer-id',
+      '#test-backend',
+      '#backend-url',
+      '#agent-token',
+      '#real-mode',
+    ];
+    selectors.forEach((selector) => {
+      const element = $(selector);
+      if (element) element.disabled = busy;
+    });
+    $$('.quick-actions button').forEach((button) => { button.disabled = busy; });
+    $('.agent-console')?.setAttribute('aria-busy', String(busy));
+    $('#agent-state').textContent = label || (busy ? '正在处理客户问题' : '等待客户消息');
+  }
+
+  function setSentiment(label, score) {
+    const safeScore = Math.max(-1, Math.min(1, Number(score) || 0));
+    state.sentiment = { label, score: safeScore };
+    const display = label === 'negative' ? '负面' : label === 'positive' ? '正面' : '中性';
+    $('#metric-sentiment').textContent = display;
+    $('#sentiment-value').textContent = `${label} · ${safeScore.toFixed(2)}`;
+    const percent = Math.max(6, Math.min(100, (safeScore + 1) * 50));
+    $('#sentiment-fill').style.width = `${percent}%`;
+    $('#sentiment-fill').style.background = safeScore < -0.25 ? 'var(--red)' : safeScore > 0.25 ? 'var(--green)' : 'var(--amber)';
+    $('#handoff-note').textContent = safeScore < -0.45 ? '建议转人工坐席，优先安抚并确认补偿方案。' : '当前无需人工接管。';
+  }
+
+  function addMessage(role, content, meta = '') {
+    const item = document.createElement('article');
+    item.className = `message ${role}`;
+    item.innerHTML = `${escapeHtml(content)}${meta ? `<small>${escapeHtml(meta)}</small>` : ''}`;
+    $('#chat-thread').append(item);
+    $('#chat-thread').scrollTop = $('#chat-thread').scrollHeight;
+    if (role !== 'typing') {
+      state.messages += 1;
+      $('#metric-messages').textContent = String(state.messages);
+    }
+    return item;
+  }
+
+  function addTool(name, detail, status = 'success', countDelta = 1) {
+    const empty = $('#tool-log > p');
+    empty?.remove();
+    const item = document.createElement('article');
+    item.className = `tool-event ${status}`;
+    item.innerHTML = `<b>${escapeHtml(name)}</b><span>${escapeHtml(detail)}</span>`;
+    $('#tool-log').prepend(item);
+    const safeDelta = Number.isFinite(Number(countDelta)) ? Math.max(0, Number(countDelta)) : 0;
+    state.toolCalls += safeDelta;
+    $('#metric-tools').textContent = String(state.toolCalls);
+  }
+
+  function detectSentiment(message) {
+    const text = message.toLowerCase();
+    const negativeWords = ['生气', '投诉', '太差', '没收到', '退款', '失望', '骗子', '很久'];
+    const positiveWords = ['谢谢', '满意', '很好', '喜欢', '不错'];
+    const negative = negativeWords.filter((word) => text.includes(word)).length;
+    const positive = positiveWords.filter((word) => text.includes(word)).length;
+    const score = Math.max(-1, Math.min(1, (positive - negative) * 0.28));
+    return { label: score < -0.18 ? 'negative' : score > 0.18 ? 'positive' : 'neutral', score };
+  }
+
+  function extractOrder(message) {
+    return message.match(/ORD-[A-Z0-9-]+/i)?.[0]?.toUpperCase() || '';
+  }
+
+  function requestsHuman(message) {
+    return /(转人工|人工客服|人工坐席|客服经理|人工处理|请人工|投诉)/.test(message);
+  }
+
+  function confirmsRefund(message) {
+    return /(确认|同意|提交|未拆封|配件完整|可以退款|继续退款)/.test(message);
+  }
+
+  function cancelsRefund(message) {
+    return /(取消|暂不|先不|不退|不用退款|放弃退款)/.test(message);
+  }
+
+  async function demoReply(message) {
+    const sentiment = detectSentiment(message);
+    setSentiment(sentiment.label, sentiment.score);
+    const order = extractOrder(message);
+
+    await sleep(320);
+
+    if (requestsHuman(message) || sentiment.score < -0.45) {
+      addTool('escalate_to_human', `优先级 P1 · ${order ? `关联订单 ${order} · ` : ''}原因：负面情绪或明确要求人工`);
+      return '很抱歉给你带来不便。我已经保留当前会话、客户信息和相关订单，并将问题标记为优先处理，人工坐席接入后无需你重复描述。';
+    }
+
+    if (state.pendingRefund) {
+      const pendingOrder = state.pendingRefund.orderId;
+      if (cancelsRefund(message)) {
+        state.pendingRefund = null;
+        addTool('cancel_refund', `${pendingOrder} · 退款预申请已取消`);
+        return `已取消订单 ${pendingOrder} 的退款预申请，订单状态保持不变。后续仍可重新发起退款。`;
+      }
+      if (confirmsRefund(message)) {
+        state.pendingRefund = null;
+        addTool('confirm_refund', `${pendingOrder} · 已正式提交 · 原路退回 1–3 个工作日`);
+        return `订单 ${pendingOrder} 的退款申请已正式提交。审核通过后将原路退回，预计 1–3 个工作日到账。我会保留本次退款记录。`;
+      }
+    }
+
+    if (order && /(订单|物流|到哪|状态|查询)/.test(message)) {
+      addTool('lookup_order', `${order} · 已发货 · 顺丰 SF13800138000`);
+      return `已查到订单 ${order}：商品已从长沙仓发出，当前运输至广州分拨中心，预计明天下午送达。物流单号为 SF13800138000。需要我继续帮你催促配送吗？`;
+    }
+
+    if (/(退款|退货|不要了)/.test(message)) {
+      if (!order) {
+        addTool('request_order_number', '退款流程缺少订单号', 'waiting');
+        return '可以协助处理退款。请先提供订单号，例如 ORD-12345，我会核验订单状态和退款资格。';
+      }
+      state.pendingRefund = { orderId: order, status: 'awaiting_confirmation' };
+      addTool('process_refund', `${order} · 符合七天无理由条件 · 等待客户确认`);
+      return `订单 ${order} 当前符合退款条件。我已生成退款预申请，预计原路退回需要 1–3 个工作日。正式提交前，请确认商品未拆封且配件完整。`;
+    }
+
+    if (/(库存|有货|耳机|商品)/.test(message)) {
+      addTool('check_inventory', 'SKU-HEADPHONE-BLK · 可售 18 件 · 长沙仓');
+      return '黑色耳机目前有货，长沙仓可售 18 件。今天 18:00 前下单可在当日出库，我也可以继续帮你查看其他颜色。';
+    }
+
+    if (state.pendingRefund) {
+      return `订单 ${state.pendingRefund.orderId} 的退款预申请仍在等待确认。请回复“确认提交退款”或“取消退款”。`;
+    }
+
+    addTool('knowledge_search', '检索售后政策与常见问题知识库');
+    return '我可以协助查询订单、库存、退款和售后政策。你可以直接提供订单号，或描述遇到的问题。';
+  }
+
+  async function realReply(message, conversationId) {
+    const payload = await requestJson('/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        message,
+        customer_id: state.customerId,
+        conversation_id: conversationId,
+      }),
+    });
+    const metadata = payload.metadata || {};
+    const score = metadata.sentiment_score ?? metadata.last_sentiment ?? 0;
+    setSentiment(score < -0.18 ? 'negative' : score > 0.18 ? 'positive' : 'neutral', score);
+
+    const reportedTotal = Number(metadata.total_tool_calls);
+    let currentTotal = state.backendToolCallsTotal;
+    let delta = 0;
+    if (Number.isFinite(reportedTotal) && reportedTotal >= 0) {
+      currentTotal = reportedTotal;
+      delta = reportedTotal >= state.backendToolCallsTotal ? reportedTotal - state.backendToolCallsTotal : reportedTotal;
+      state.backendToolCallsTotal = reportedTotal;
+    }
+
+    const traceName = delta > 0 ? 'backend_tool_calls' : 'agent_response';
+    const traceDetail = delta > 0
+      ? `会话 ${payload.conversation_id || conversationId} · 本轮执行 ${delta} 次工具调用 · 服务端累计 ${currentTotal} 次`
+      : `会话 ${payload.conversation_id || conversationId} · 服务端本轮未执行工具`;
+    addTool(traceName, traceDetail, 'success', delta);
+
+    return payload.response || '客服 Agent 已处理请求，但未返回文本内容。';
+  }
+
+  async function sendMessage(message) {
+    const text = String(message || '').trim();
+    if (!text || state.busy) return;
+
+    saveSettings();
+    const requestVersion = state.conversationVersion;
+    const requestConversationId = state.conversationId;
+    addMessage('user', text, `${state.customerId} · ${new Date().toLocaleTimeString('zh-CN', { hour12: false })}`);
+    $('#message-input').value = '';
+    setBusy(true, state.real ? '正在请求客服 Agent 后端' : '正在分析意图并选择工具');
+    const typing = addMessage('typing', '数字人正在思考…');
+
+    try {
+      const response = state.real ? await realReply(text, requestConversationId) : await demoReply(text);
+      typing.remove();
+      if (requestVersion !== state.conversationVersion) return;
+      addMessage('agent', response, state.real ? 'AI Customer Service Agent API' : '本地演示 Agent');
+      $('#agent-state').textContent = '问题已处理';
+    } catch (error) {
+      typing.remove();
+      if (requestVersion !== state.conversationVersion) return;
+      addMessage('agent', '当前无法完成请求，已保留会话内容。请检查 Agent 服务后重试。', '系统降级响应');
+      addTool('fallback', error instanceof Error ? error.message : String(error), 'error');
+      notify(error instanceof Error ? error.message : String(error));
+      $('#agent-state').textContent = '请求失败，已降级';
+    } finally {
+      if (requestVersion === state.conversationVersion) setBusy(false);
+    }
+  }
+
+  function createConversationId() {
+    return `CONV-${Date.now().toString(36).toUpperCase()}`;
+  }
+
+  async function resetConversation() {
+    if (state.busy) return;
+
+    const previousConversationId = state.conversationId;
+    state.conversationVersion += 1;
+    setBusy(true, state.real ? '正在结束旧会话' : '正在建立新会话');
+
+    try {
+      if (state.real) {
+        try {
+          await requestJson(`/conversation/${encodeURIComponent(previousConversationId)}`, { method: 'DELETE' });
+        } catch (error) {
+          notify(`服务端会话未清除：${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+
+      state.conversationId = createConversationId();
+      state.pendingRefund = null;
+      state.backendToolCallsTotal = 0;
+      state.messages = 0;
+      state.toolCalls = 0;
+      localStorage.setItem('customer_agent_conversation_id', state.conversationId);
+      $('#conversation-id').textContent = state.conversationId;
+      $('#metric-messages').textContent = '0';
+      $('#metric-tools').textContent = '0';
+      $('#tool-log').innerHTML = '<p>等待 Agent 选择工具。</p>';
+      $('#chat-thread').innerHTML = '';
+      $('#performance-report').textContent = '完成一次会话后查看性能报告。';
+      setSentiment('neutral', 0);
+      addMessage('agent', '新的客服会话已建立。请告诉我需要查询订单、库存、退款，还是转接人工。', 'AI 客服数字人');
+      notify('新会话已建立');
+    } finally {
+      setBusy(false, '新会话已建立');
+    }
+  }
+
+  async function loadPerformance() {
+    if (state.busy) return;
+    try {
+      if (state.real) {
+        const payload = await requestJson('/performance');
+        $('#performance-report').textContent = typeof payload.report === 'string' ? payload.report : JSON.stringify(payload, null, 2);
+      } else {
+        $('#performance-report').textContent = [
+          `会话消息：${state.messages}`,
+          `工具调用：${state.toolCalls}`,
+          `当前情绪：${state.sentiment.label} (${state.sentiment.score.toFixed(2)})`,
+          `待确认退款：${state.pendingRefund?.orderId || '无'}`,
+          '演示响应成功率：100%',
+          '人工转接策略：负面情绪 < -0.45 或客户明确要求人工',
+        ].join('\n');
+      }
+      notify('性能报告已更新');
+    } catch (error) {
+      notify(error instanceof Error ? error.message : String(error));
+    }
   }
 
   $('#backend-url').value = state.backend;
-  $('#region').value = state.region;
+  $('#agent-token').value = state.token;
   $('#real-mode').checked = state.real;
-  $('#api-key').value = state.apiKey;
+  $('#customer-id').value = state.customerId;
+  $('#conversation-id').textContent = state.conversationId;
   saveSettings();
-
-  async function requestJson(path, options = {}) {
-    const headers = new Headers(options.headers || {});
-    if (options.body && !(options.body instanceof FormData)) headers.set('Content-Type', 'application/json');
-    if (state.apiKey) headers.set('X-Vidu-Api-Key', state.apiKey);
-    headers.set('X-Vidu-Region', state.region);
-    const response = await fetch(`${state.backend}${path}`, { ...options, headers });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
-    return payload;
-  }
 
   $('#settings-toggle').addEventListener('click', (event) => {
     const panel = $('#settings-panel');
@@ -94,319 +360,53 @@
     panel.hidden = !open;
     event.currentTarget.setAttribute('aria-expanded', String(open));
   });
-  ['backend-url', 'region', 'real-mode', 'api-key'].forEach((id) => $(`#${id}`).addEventListener('change', saveSettings));
 
-  function setView(name) {
-    $$('.view-tabs button').forEach((button) => button.classList.toggle('active', button.dataset.view === name));
-    $$('.view').forEach((view) => view.classList.toggle('active', view.id === `view-${name}`));
-  }
-  $$('.view-tabs button').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
+  ['backend-url', 'agent-token', 'real-mode', 'customer-id'].forEach((id) => {
+    $(`#${id}`).addEventListener('change', saveSettings);
+  });
 
-  async function connectBackend() {
+  $('#test-backend').addEventListener('click', async () => {
+    if (state.busy) return;
     saveSettings();
-    if (!state.real) {
-      state.characters = loadLocal('fengge_demo_characters', defaultCharacters);
-      state.personas = loadLocal('fengge_demo_personas', defaultPersonas);
-      renderAll();
-      notify('演示模式已就绪');
-      log('演示数据已载入');
-      return;
-    }
     try {
-      const [config, chars, personas] = await Promise.all([
-        requestJson('/api/config'),
-        requestJson('/api/characters'),
-        requestJson('/api/personas'),
-      ]);
-      state.characters = chars.characters || [];
-      state.personas = personas.personas || [];
-      if (!state.characters.length && config.avatar) {
-        state.characters = [{ id: 'server-default', name: config.avatar.name || '数字人', image_uri: config.avatar.image_uri || '', voice: config.default_voice || 'Tina', call_mode: config.call_mode || 'video', persona: config.avatar.persona || '你是一个友好的助手。' }];
-      }
-      renderAll();
-      $('#connection-badge').textContent = config.has_key || state.apiKey ? '后端已连接' : '后端已连接 · 缺少 Key';
-      log(`后端连接成功：${state.backend}`);
-      notify('角色库与人格库同步完成');
+      const payload = await requestJson('/health');
+      notify(`客服 Agent 连接成功：${payload.status || 'healthy'}`);
+      $('#connection-badge').textContent = 'Agent 已连接';
+      $('#connection-badge').classList.add('real');
     } catch (error) {
-      log(error.message, 'ERROR');
-      notify(`连接失败：${error.message}`);
+      notify(`连接失败：${error instanceof Error ? error.message : String(error)}`);
     }
-  }
-  $('#connect-backend').addEventListener('click', connectBackend);
-
-  function loadLocal(key, fallback) {
-    try { return JSON.parse(localStorage.getItem(key) || 'null') || structuredClone(fallback); } catch { return structuredClone(fallback); }
-  }
-  function saveLocal() {
-    localStorage.setItem('fengge_demo_characters', JSON.stringify(state.characters));
-    localStorage.setItem('fengge_demo_personas', JSON.stringify(state.personas));
-  }
-
-  function renderAll() {
-    renderCharacters();
-    renderPersonas();
-    populatePersonaSelect();
-  }
-
-  function avatarStyle(uri) {
-    return uri ? ` style="background-image:url('${escapeHtml(uri)}')"` : '';
-  }
-
-  function renderCharacters() {
-    const grid = $('#character-grid');
-    grid.innerHTML = state.characters.map((character) => `<article class="character-card" data-id="${escapeHtml(character.id)}"><div class="character-visual"><div class="character-avatar${character.image_uri ? ' has-image' : ''}"${avatarStyle(character.image_uri)}></div></div><div class="character-info"><h3>${escapeHtml(character.name)}</h3><p>${escapeHtml((character.persona || '').slice(0, 92))}${(character.persona || '').length > 92 ? '…' : ''}</p><div class="character-meta"><span>${escapeHtml(character.voice || 'Tina')}</span><span>${escapeHtml(character.call_mode || 'video')}</span></div><div class="character-actions"><button class="edit" type="button">编辑</button><button class="call" type="button">开始通话</button></div></div></article>`).join('') || '<p>角色库为空，请新建角色。</p>';
-    $$('.character-card').forEach((card) => {
-      const character = state.characters.find((item) => String(item.id) === card.dataset.id);
-      $('.edit', card).addEventListener('click', () => openEditor(character));
-      $('.call', card).addEventListener('click', () => startCall(character));
-    });
-  }
-
-  function renderPersonas() {
-    $('#persona-count').textContent = `${state.personas.length} 个`;
-    $('#persona-list').innerHTML = state.personas.map((persona) => `<button class="persona-chip" type="button" data-id="${escapeHtml(persona.id)}">${escapeHtml(persona.name)}</button>`).join('') || '<span>暂无人格</span>';
-    $$('.persona-chip').forEach((button) => button.addEventListener('click', () => {
-      const persona = state.personas.find((item) => String(item.id) === button.dataset.id);
-      openEditor(null, persona);
-    }));
-  }
-
-  function populatePersonaSelect() {
-    $('#persona-preset').innerHTML = '<option value="">不套用</option>' + state.personas.map((persona) => `<option value="${escapeHtml(persona.id)}">${escapeHtml(persona.name)}</option>`).join('');
-  }
-
-  function resetEditor() {
-    state.editingId = null;
-    state.avatarData = '';
-    $('#editor-title').textContent = '新建角色';
-    $('#character-name').value = '峰哥数字人';
-    $('#avatar-url').value = '';
-    $('#avatar-file').value = '';
-    $('#avatar-preview').style.backgroundImage = '';
-    $('#avatar-preview').innerHTML = '<span>上传形象</span>';
-    $('#voice').value = 'Raymond';
-    $('#custom-voice-row').hidden = true;
-    $('#call-mode').value = 'video';
-    $('#persona-preset').value = '';
-    $('#persona').value = defaultPersonas[0].persona;
-  }
-
-  function openEditor(character = null, personaPreset = null) {
-    resetEditor();
-    if (character) {
-      state.editingId = character.id;
-      $('#editor-title').textContent = `编辑角色 · ${character.name}`;
-      $('#character-name').value = character.name || '';
-      $('#avatar-url').value = character.image_uri || '';
-      setAvatar(character.image_uri || '');
-      const option = [...$('#voice').options].find((item) => item.value === character.voice);
-      if (option) $('#voice').value = character.voice;
-      else { $('#voice').value = '__custom__'; $('#custom-voice-row').hidden = false; $('#custom-voice').value = character.voice || ''; }
-      $('#call-mode').value = character.call_mode || 'video';
-      $('#persona').value = character.persona || '';
-    }
-    if (personaPreset) {
-      $('#persona-preset').value = personaPreset.id;
-      $('#persona').value = personaPreset.persona;
-    }
-    setView('editor');
-  }
-
-  $('#new-character').addEventListener('click', () => openEditor());
-  $('#back-library').addEventListener('click', () => setView('library'));
-  $('#voice').addEventListener('change', () => { $('#custom-voice-row').hidden = $('#voice').value !== '__custom__'; });
-  $('#persona-preset').addEventListener('change', () => {
-    const persona = state.personas.find((item) => String(item.id) === $('#persona-preset').value);
-    if (persona) $('#persona').value = persona.persona;
   });
 
-  function setAvatar(uri) {
-    state.avatarData = uri;
-    const preview = $('#avatar-preview');
-    preview.innerHTML = uri ? '' : '<span>上传形象</span>';
-    preview.style.backgroundImage = uri ? `url("${uri.replaceAll('"', '%22')}")` : '';
-  }
-  $('#avatar-url').addEventListener('input', () => setAvatar($('#avatar-url').value.trim()));
-  $('#avatar-file').addEventListener('change', async () => {
-    const file = $('#avatar-file').files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) return notify('图片需小于 10MB');
-    setAvatar(await readAsDataURL(file));
-  });
-  $('#audio-file').addEventListener('change', async () => {
-    const file = $('#audio-file').files?.[0];
-    if (!file) return;
-    if (file.size > 19 * 1024 * 1024) return notify('参考音频需小于 19MB');
-    state.audioData = await readAsDataURL(file);
-    $('#clone-status').textContent = `已选择：${file.name}`;
-  });
-  function readAsDataURL(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(reader.error); reader.readAsDataURL(file); }); }
-
-  function editorPayload() {
-    const voice = $('#voice').value === '__custom__' ? $('#custom-voice').value.trim() : $('#voice').value;
-    return {
-      id: state.editingId || `char_${Date.now()}`,
-      name: $('#character-name').value.trim(),
-      image_uri: state.avatarData || $('#avatar-url').value.trim(),
-      voice: voice || 'Tina',
-      call_mode: $('#call-mode').value,
-      persona: $('#persona').value.trim(),
-    };
-  }
-
-  async function saveCharacter() {
-    const character = editorPayload();
-    if (!character.name) throw new Error('请填写角色名称');
-    if (state.real) {
-      const result = await requestJson('/api/characters', { method: 'POST', body: JSON.stringify(character) });
-      character.id = result.character?.id || character.id;
-    }
-    const index = state.characters.findIndex((item) => String(item.id) === String(state.editingId));
-    if (index >= 0) state.characters[index] = character; else state.characters.push(character);
-    state.editingId = character.id;
-    if (!state.real) saveLocal();
-    renderAll();
-    notify('角色已保存');
-    log(`角色已保存：${character.name}`);
-    return character;
-  }
-
-  $('#character-form').addEventListener('submit', async (event) => {
+  $('#chat-form').addEventListener('submit', (event) => {
     event.preventDefault();
-    try { await saveCharacter(); setView('library'); } catch (error) { notify(error.message); }
-  });
-  $('#save-call').addEventListener('click', async () => {
-    try { const character = await saveCharacter(); await startCall(character); } catch (error) { notify(error.message); }
+    sendMessage($('#message-input').value);
   });
 
-  $('#clone-voice').addEventListener('click', async () => {
-    const audio = $('#audio-url').value.trim() || state.audioData;
-    const voice = $('#clone-name').value.trim();
-    if (!audio || !voice) return notify('请选择参考音频并填写音色名称');
-    if (!/^[A-Za-z0-9_]{1,16}$/.test(voice)) return notify('音色名称只能包含字母、数字、下划线，最长 16 位');
-    $('#clone-status').textContent = '克隆中…请确保音频已获得授权';
-    try {
-      if (state.real) await requestJson('/api/voice/clone', { method: 'POST', body: JSON.stringify({ audio_url: audio, voice, language: 'zh' }) });
-      else await delay(900);
-      let option = [...$('#voice').options].find((item) => item.value === voice);
-      if (!option) { option = document.createElement('option'); option.value = voice; option.textContent = `${voice} · 我的克隆音色`; $('#voice').append(option); }
-      $('#voice').value = voice;
-      $('#custom-voice-row').hidden = true;
-      $('#clone-status').textContent = `已克隆并选用：${voice}`;
-      log(`音色克隆完成：${voice}`);
-    } catch (error) { $('#clone-status').textContent = `克隆失败：${error.message}`; log(error.message, 'ERROR'); }
+  const quickMessages = {
+    order: '帮我查询订单 ORD-12345 现在到哪里了？',
+    inventory: '黑色耳机还有库存吗？',
+    refund: '我要为 ORD-12345 申请退款',
+    angry: '等了很久还没收到，我很生气，请尽快处理',
+  };
+
+  $$('.quick-actions [data-quick]').forEach((button) => {
+    button.addEventListener('click', () => sendMessage(quickMessages[button.dataset.quick]));
   });
 
-  function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+  $('#new-conversation').addEventListener('click', resetConversation);
+  $('#load-performance').addEventListener('click', loadPerformance);
 
-  async function markStep(name, detail = '', done = true) {
-    const item = $(`#stepper [data-step="${name}"]`);
-    if (!item) return;
-    item.classList.add('active');
-    $('small', item).textContent = detail;
-    await delay(260);
-    if (done) item.classList.add('done');
-  }
+  addMessage('agent', '你好，我是 AI 客服数字人。可以帮你查询订单、库存、退款状态，也可以在复杂问题时转接人工。', '客服会话已建立');
+  setSentiment('neutral', 0);
 
-  function resetStepper() {
-    $$('#stepper li').forEach((item) => { item.classList.remove('active', 'done'); $('small', item).textContent = ''; });
-  }
-
-  function displayActiveAvatar(character) {
-    const avatar = $('#active-avatar');
-    avatar.className = `active-avatar${character.image_uri ? ' has-image' : ''}`;
-    avatar.style.backgroundImage = character.image_uri ? `url("${character.image_uri.replaceAll('"', '%22')}")` : '';
-  }
-
-  async function startCall(character) {
-    state.selected = character;
-    resetStepper();
-    displayActiveAvatar(character);
-    setView('call');
-    $('#stage-message').textContent = `正在连接 ${character.name}…`;
-    try {
-      await markStep('create', '提交角色、音色与人设', false);
-      let payload;
-      if (state.real) {
-        payload = await requestJson('/api/live', { method: 'POST', body: JSON.stringify({ avatar_name: character.name, avatar_image_uri: character.image_uri, avatar_persona: character.persona, voice: character.voice, call_mode: character.call_mode }) });
-      } else {
-        await delay(620);
-        payload = { live: { id: `live_demo_${Date.now().toString(36)}`, status: 'created' }, rtc: { channel_name: `demo_${Math.random().toString(36).slice(2, 8)}`, user_id: 'portfolio_user' }, ws: { url: 'demo://control-channel' } };
-      }
-      state.live = payload.live || {};
-      state.rtc = payload.rtc || {};
-      $('#stepper [data-step="create"]').classList.add('done');
-      $('#live-id').textContent = state.live.id || state.live.live_id || '-';
-      $('#live-status').textContent = state.live.status || 'created';
-      await markStep('rtc', state.rtc.channel_name || state.rtc.channel || 'RTC 参数已返回');
-      $('#rtc-channel').textContent = state.rtc.channel_name || state.rtc.channel || '-';
-      $('#rtc-user').textContent = state.rtc.user_id || state.rtc.userId || '-';
-      await markStep('ws', state.real ? '请在原生控制台完成 WS / RTC' : '演示控制通道已连接');
-      await markStep('init', 'conn_init 已准备');
-      await markStep('ready', state.real ? '会话已创建，可打开原生控制台' : '演示会话就绪');
-      $('#stage-message').textContent = state.real ? `${character.name} 会话已创建，点击右侧进入原生 RTC 控制台` : `${character.name} 正在演示实时回应`;
-      $('#hangup').disabled = false;
-      $('#query-live').disabled = false;
-      $('#mic-toggle').disabled = false;
-      $('#cam-toggle').disabled = character.call_mode === 'audio';
-      startTimer();
-      log(`会话已创建：${$('#live-id').textContent}`);
-    } catch (error) {
-      $('#live-status').textContent = 'failed';
-      $('#stage-message').textContent = `连接失败：${error.message}`;
-      log(error.message, 'ERROR');
-      notify(error.message);
-    }
-  }
-
-  function startTimer() {
-    state.callStartedAt = Date.now();
-    clearInterval(state.callTimer);
-    state.callTimer = setInterval(() => {
-      const seconds = Math.floor((Date.now() - state.callStartedAt) / 1000);
-      $('#call-timer').textContent = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-    }, 1000);
-  }
-
-  $('#query-live').addEventListener('click', async () => {
-    const id = state.live?.id || state.live?.live_id;
-    if (!id) return;
-    try {
-      const payload = state.real ? await requestJson(`/api/live?live_id=${encodeURIComponent(id)}`) : { live: { id, status: 'active' } };
-      const status = payload.live?.status || payload.status || 'active';
-      $('#live-status').textContent = status;
-      notify(`会话状态：${status}`);
-      log(`查询会话状态：${status}`);
-    } catch (error) { notify(error.message); }
-  });
-
-  $('#hangup').addEventListener('click', () => {
-    clearInterval(state.callTimer);
-    $('#live-status').textContent = 'ended';
-    $('#stage-message').textContent = '会话已结束';
-    $('#hangup').disabled = true;
-    $('#query-live').disabled = true;
-    $('#mic-toggle').disabled = true;
-    $('#cam-toggle').disabled = true;
-    log('用户结束会话');
-  });
-  $('#mic-toggle').addEventListener('click', (event) => { event.currentTarget.classList.toggle('active'); event.currentTarget.textContent = event.currentTarget.classList.contains('active') ? '🔇 麦克风已关闭' : '🎙 麦克风'; });
-  $('#cam-toggle').addEventListener('click', (event) => { event.currentTarget.classList.toggle('active'); event.currentTarget.textContent = event.currentTarget.classList.contains('active') ? '🚫 摄像头已关闭' : '📷 摄像头'; });
-  $('#open-native-call').addEventListener('click', () => window.open(state.backend, '_blank', 'noopener'));
-
-  $('#device-check').addEventListener('click', async () => {
-    try {
-      state.mediaStream?.getTracks().forEach((track) => track.stop());
-      state.mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      $('#local-preview').srcObject = state.mediaStream;
-      const video = state.mediaStream.getVideoTracks()[0]?.label || '摄像头可用';
-      const audio = state.mediaStream.getAudioTracks()[0]?.label || '麦克风可用';
-      $('#device-result').textContent = `${video} · ${audio}`;
-      log('设备检测通过');
-      notify('摄像头与麦克风可用');
-    } catch (error) { $('#device-result').textContent = `设备检测失败：${error.message}`; log(error.message, 'ERROR'); }
-  });
-  $('#clear-log').addEventListener('click', () => { $('#log').innerHTML = ''; });
-
-  connectBackend();
+  window.__customerServiceAgentDemo = {
+    send: sendMessage,
+    reset: resetConversation,
+    getState: () => ({
+      ...state,
+      pendingRefund: state.pendingRefund ? { ...state.pendingRefund } : null,
+      sentiment: { ...state.sentiment },
+    }),
+  };
 })();
