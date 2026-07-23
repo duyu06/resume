@@ -44,3 +44,4 @@
 - GSAP 不阻塞原有状态机。
 - prefers-reduced-motion 下页面可完整操作。
 - Chromium 自动验证 GSAP/ScrollTrigger 加载、四阶段滚动激活和新 SVG 数字人资产。
+- 共享演示面板在 390px 手机可视视口内完整显示，不制造横向滚动。
