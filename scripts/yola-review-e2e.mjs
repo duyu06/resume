@@ -10,10 +10,13 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-async function waitForYola(page) {
+async function waitForYola(page, { requireEnrichment = true } = {}) {
   await page.goto(`${baseURL}/demos/cross-border/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForFunction(() => document.body.dataset.yolaKeyframeCount === '14', null, { timeout: 15000 });
-  await page.waitForFunction(() => document.querySelectorAll('.product-card.motion-enrich-reveal').length === 6, null, { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelectorAll('.product-card').length === 6, null, { timeout: 10000 });
+  if (requireEnrichment) {
+    await page.waitForFunction(() => document.querySelectorAll('.product-card.motion-enrich-reveal').length === 6, null, { timeout: 10000 });
+  }
 }
 
 async function scrollSection(page, selector, progress) {
@@ -72,7 +75,7 @@ async function testReducedMotion(browser) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const page = await context.newPage();
   try {
-    await waitForYola(page);
+    await waitForYola(page, { requireEnrichment: false });
     await page.locator('.craft-reveal').scrollIntoViewIfNeeded();
     await page.waitForTimeout(100);
     const state = await page.locator('.craft-reveal').evaluate((element) => {
