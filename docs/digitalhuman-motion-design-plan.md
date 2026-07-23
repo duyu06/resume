@@ -43,3 +43,4 @@
 - 消息、工具调用、退款确认和人工转接均可运行。
 - GSAP 不阻塞原有状态机。
 - prefers-reduced-motion 下页面可完整操作。
+- Chromium 自动验证 GSAP/ScrollTrigger 加载、四阶段滚动激活和新 SVG 数字人资产。
