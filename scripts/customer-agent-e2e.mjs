@@ -32,6 +32,11 @@ async function waitForTool(page, name) {
   );
 }
 
+async function sendText(page, message) {
+  await page.locator('#message-input').fill(message);
+  await page.locator('#send-message').click();
+}
+
 async function runDevice(browser, device) {
   const context = await browser.newContext({
     viewport: device.viewport,
@@ -48,6 +53,7 @@ async function runDevice(browser, device) {
     await page.waitForSelector('#chat-thread', { timeout: 15000 });
     assert((await page.title()).includes('AI 客服数字人 Agent'), 'Customer agent: page title is stale');
     assert((await page.locator('h1').textContent())?.includes('处理客服问题'), 'Customer agent: hero copy missing');
+    assert(await page.getByRole('textbox', { name: '客户 ID', exact: true }).isVisible(), 'Customer agent: customer ID input has no accessible name');
     await assertNoOverflow(page, `Customer agent ${device.name} initial`);
 
     const initialAgentMessages = await page.locator('.message.agent').count();
@@ -67,7 +73,21 @@ async function runDevice(browser, device) {
 
     await page.locator('[data-quick="refund"]').click();
     await waitForTool(page, 'process_refund');
-    assert((await page.locator('.message.agent').last().textContent())?.includes('1–3 个工作日'), 'Customer agent: refund response missing processing time');
+    assert((await page.locator('.message.agent').last().textContent())?.includes('退款预申请'), 'Customer agent: refund pre-application was not created');
+    assert((await page.evaluate(() => window.__customerServiceAgentDemo.getState().pendingRefund?.orderId)) === 'ORD-12345', 'Customer agent: pending refund state was not retained');
+
+    await sendText(page, '确认商品未拆封且配件完整，请正式提交退款');
+    await waitForTool(page, 'confirm_refund');
+    assert((await page.locator('.message.agent').last().textContent())?.includes('已正式提交'), 'Customer agent: refund confirmation did not complete the workflow');
+    assert((await page.evaluate(() => window.__customerServiceAgentDemo.getState().pendingRefund)) === null, 'Customer agent: pending refund was not cleared after confirmation');
+
+    await sendText(page, '请转人工帮我查询订单 ORD-12345');
+    await page.waitForFunction(
+      () => document.querySelector('#tool-log .tool-event:first-child b')?.textContent === 'escalate_to_human',
+      null,
+      { timeout: 12000 },
+    );
+    assert((await page.locator('.message.agent').last().textContent())?.includes('人工坐席'), 'Customer agent: explicit human handoff lost priority to order lookup');
 
     await page.locator('[data-quick="angry"]').click();
     await page.waitForFunction(() => document.querySelector('#metric-sentiment')?.textContent === '负面', null, { timeout: 12000 });
@@ -76,7 +96,7 @@ async function runDevice(browser, device) {
 
     await page.locator('#load-performance').click();
     assert((await page.locator('#performance-report').textContent())?.includes('工具调用'), 'Customer agent: performance report missing tool count');
-    assert(Number(await page.locator('#metric-tools').textContent()) >= 3, 'Customer agent: tool counter did not advance');
+    assert(Number(await page.locator('#metric-tools').textContent()) >= 5, 'Customer agent: tool counter did not advance through the complete workflow');
 
     const conversationBefore = await page.locator('#conversation-id').textContent();
     await page.locator('#new-conversation').click();
@@ -103,6 +123,7 @@ async function runDevice(browser, device) {
           });
         }
         if (url.pathname.startsWith('/conversation/')) {
+          await new Promise((resolve) => setTimeout(resolve, 650));
           return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'reset' }) });
         }
         if (url.pathname === '/performance') {
@@ -117,17 +138,26 @@ async function runDevice(browser, device) {
       await page.waitForFunction(() => document.querySelector('#toast')?.textContent?.includes('连接成功'), null, { timeout: 10000 });
       await page.locator('#settings-toggle').click();
 
-      await page.locator('#message-input').fill('测试真实客服 Agent');
-      await page.locator('#send-message').click();
+      await sendText(page, '测试真实客服 Agent');
       await page.waitForFunction(() => document.querySelector('.message.agent:last-of-type')?.textContent?.includes('服务端已处理'), null, { timeout: 10000 });
       assert((await page.locator('#connection-badge').textContent())?.includes('Agent'), 'Customer agent: real backend badge did not update');
+
+      const realConversationBefore = await page.locator('#conversation-id').textContent();
+      await page.locator('#new-conversation').click();
+      assert(await page.locator('#new-conversation').isDisabled(), 'Customer agent: new conversation action stayed enabled during server deletion');
+      assert(await page.locator('#send-message').isDisabled(), 'Customer agent: send action stayed enabled during server deletion');
+      assert(await page.locator('[data-quick="order"]').isDisabled(), 'Customer agent: quick action stayed enabled during server deletion');
+      await page.waitForFunction(() => !document.querySelector('#new-conversation')?.disabled, null, { timeout: 10000 });
+      const realConversationAfter = await page.locator('#conversation-id').textContent();
+      assert(realConversationBefore !== realConversationAfter, 'Customer agent: slow server deletion did not finish conversation rotation');
     }
 
     await page.locator('.demo-mode-launcher').click();
     await page.locator('.demo-mode-panel').waitFor({ state: 'visible' });
     await page.locator('[data-demo-action="run"]').click();
     await page.waitForFunction(() => document.querySelector('[data-demo-status]')?.textContent === '演示完成', null, { timeout: 30000 });
-    assert((await page.locator('.demo-mode-log li.success').count()) >= 3, 'Customer agent: shared demo control did not complete the workflow');
+    assert((await page.locator('.demo-mode-log li.success').count()) >= 4, 'Customer agent: shared demo control did not complete the refund confirmation workflow');
+    assert((await page.locator('#tool-log').textContent())?.includes('confirm_refund'), 'Customer agent: guided demo did not formally submit the refund');
 
     await assertNoOverflow(page, `Customer agent ${device.name} final`);
     assert(pageErrors.length === 0, `Customer agent: uncaught errors ${pageErrors.join('; ')}`);
