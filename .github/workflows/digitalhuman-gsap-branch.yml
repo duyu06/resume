@@ -1,9 +1,11 @@
-name: Digital Human GSAP Branch Acceptance
+name: Digital Human GSAP Acceptance
 
 on:
   push:
     branches:
+      - main
       - feature/digitalhuman-gsap-redesign-v2
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -43,25 +45,25 @@ jobs:
         run: node scripts/customer-agent-e2e.mjs
         env:
           TEST_BASE_URL: http://127.0.0.1:4173/resume
-          TEST_TARGET: branch-preview
-          TEST_OUTPUT_DIR: test-results/customer-agent-branch
+          TEST_TARGET: main-preview
+          TEST_OUTPUT_DIR: test-results/customer-agent-main
       - name: Run all-project demo mode acceptance
         run: node scripts/all-demo-mode-e2e.mjs
         env:
           TEST_BASE_URL: http://127.0.0.1:4173/resume
-          TEST_TARGET: branch-preview
-          TEST_OUTPUT_DIR: test-results/all-demo-mode-branch
+          TEST_TARGET: main-preview
+          TEST_OUTPUT_DIR: test-results/all-demo-mode-main
       - name: Upload acceptance evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: digitalhuman-gsap-branch-evidence
+          name: digitalhuman-gsap-main-evidence
           path: |
-            test-results/customer-agent-branch
-            test-results/all-demo-mode-branch
+            test-results/customer-agent-main
+            test-results/all-demo-mode-main
           if-no-files-found: ignore
           retention-days: 14
-      - name: Publish branch acceptance status
+      - name: Publish acceptance status
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
@@ -72,7 +74,7 @@ jobs:
             description='Digital human GSAP build and dual-device acceptance passed'
           else
             state=failure
-            description='Digital human GSAP branch acceptance failed'
+            description='Digital human GSAP acceptance failed'
           fi
           payload=$(printf '{"state":"%s","context":"digitalhuman-gsap/branch-e2e","description":"%s","target_url":"%s"}' "$state" "$description" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
           curl --fail --silent --show-error \
