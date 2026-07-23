@@ -31,14 +31,6 @@ await replaceRequired('dist/demos/ai-ecommerce/app.js', [
   ],
 ]);
 
-await replaceRequired('dist/demos/digitalhuman/app.js', [
-  [
-    "renderAll();\n      $('#connection-badge').textContent = config.has_key || state.apiKey ? '后端已连接' : '后端已连接 · 缺少 Key';",
-    "renderAll();\n      setView('library');\n      $('#connection-badge').textContent = config.has_key || state.apiKey ? '后端已连接' : '后端已连接 · 缺少 Key';",
-    'show synchronized character library after backend connection',
-  ],
-]);
-
 await replaceRequired('dist/demos/rpa/app.js', [
   [
     'async function executeNode(node, index) {',
