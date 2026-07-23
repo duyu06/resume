@@ -41,7 +41,7 @@ const projects: Project[] = [
     ],
     result: '完成产品需求、核心流程、Prompt 模板、质量验收标准和商业化方案，形成可演示的 AI 电商素材生产闭环。',
     link: `${import.meta.env.BASE_URL}demos/ai-ecommerce/`,
-    imgs: ['proj-02-a.png', 'proj-02-b.png'],
+    imgs: ['project-ai-ecommerce-page-a.jpg', 'project-ai-ecommerce-page-b.jpg'],
   },
   {
     n: '02',
@@ -66,7 +66,7 @@ const projects: Project[] = [
     ],
     link: `${import.meta.env.BASE_URL}demos/digitalhuman/`,
     cta: '打开完整数字人工作台',
-    imgs: ['proj-customer-agent-a.svg', 'proj-customer-agent-b.svg'],
+    imgs: ['project-digitalhuman-page-a.jpg', 'project-digitalhuman-page-b.jpg'],
   },
   {
     n: '03',
@@ -84,7 +84,7 @@ const projects: Project[] = [
     ],
     result: '完成多账号环境启动、自定义任务执行和结果回写原型，沉淀流程模板、异常处理和审计日志规范。',
     link: `${import.meta.env.BASE_URL}demos/rpa/`,
-    imgs: ['proj-07-a.png', 'proj-07-b.png'],
+    imgs: ['project-rpa-page-a.jpg', 'project-rpa-page-b.jpg'],
   },
   {
     n: '04',
@@ -102,7 +102,7 @@ const projects: Project[] = [
     ],
     result: '完成独立站 MVP、后台功能清单、交易规则、行为埋点和版本规划，并形成 AI 素材与商品后台联动方案。',
     link: `${import.meta.env.BASE_URL}demos/cross-border/`,
-    imgs: ['proj-03-a.png', 'proj-03-b.png'],
+    imgs: ['project-yola-page-a.jpg', 'project-yola-page-b.jpg'],
   },
   {
     n: '05',
@@ -120,7 +120,7 @@ const projects: Project[] = [
     ],
     result: '在典型测试环境中推理吞吐稳定在 50+ token/s、显存利用率控制在 85% 以下，形成可复用的部署、监控和故障排查方案。',
     link: `${import.meta.env.BASE_URL}demos/webui/`,
-    imgs: ['proj-05-a.png', 'proj-05-b.png'],
+    imgs: ['project-webui-page-a.jpg', 'project-webui-page-b.jpg'],
   },
   {
     n: '06',
@@ -138,7 +138,7 @@ const projects: Project[] = [
     ],
     result: '完成可交互的多 Agent 产品原型，验证多角色协作与分支叙事的技术可行性，并沉淀 Prompt 与状态管理范式。',
     link: `${import.meta.env.BASE_URL}demos/soulcaller/`,
-    imgs: ['proj-06-a.png', 'proj-06-b.png'],
+    imgs: ['project-soulcaller-page-a.jpg', 'project-soulcaller-page-b.jpg'],
   },
 ];
 
