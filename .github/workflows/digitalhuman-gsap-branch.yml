@@ -1,0 +1,84 @@
+name: Digital Human GSAP Branch Acceptance
+
+on:
+  push:
+    branches:
+      - feature/digitalhuman-gsap-redesign-v2
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: digitalhuman-gsap-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start production preview
+        run: |
+          npm run preview -- --host 127.0.0.1 > /tmp/digitalhuman-gsap-preview.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/resume/demos/digitalhuman/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/digitalhuman-gsap-preview.log
+          exit 1
+      - name: Run customer agent desktop and mobile acceptance
+        run: node scripts/customer-agent-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: branch-preview
+          TEST_OUTPUT_DIR: test-results/customer-agent-branch
+      - name: Run all-project demo mode acceptance
+        run: node scripts/all-demo-mode-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: branch-preview
+          TEST_OUTPUT_DIR: test-results/all-demo-mode-branch
+      - name: Upload acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: digitalhuman-gsap-branch-evidence
+          path: |
+            test-results/customer-agent-branch
+            test-results/all-demo-mode-branch
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Publish branch acceptance status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [[ "$JOB_STATUS" == "success" ]]; then
+            state=success
+            description='Digital human GSAP build and dual-device acceptance passed'
+          else
+            state=failure
+            description='Digital human GSAP branch acceptance failed'
+          fi
+          payload=$(printf '{"state":"%s","context":"digitalhuman-gsap/branch-e2e","description":"%s","target_url":"%s"}' "$state" "$description" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            -d "$payload"
