@@ -235,18 +235,30 @@
   }
 
   function patchSharedPrototypeCopy() {
-    const apply = () => {
-      const drawerTitle = $('.motion-enrich-drawer h2');
-      if (drawerTitle) drawerTitle.textContent = 'prmpt Archive Collection';
-      const status = $('.motion-enrich-status span');
-      if (status && /YOLA/i.test(status.textContent || '')) status.textContent = 'PRMPT ARCHIVE · PROTOTYPE';
-      const productLabel = $('.motion-product-dialog__content small');
-      if (productLabel) productLabel.textContent = 'PRMPT · ARCHIVE PROTOTYPE';
-      const productCopy = $('.motion-product-dialog__copy');
-      if (productCopy) productCopy.textContent = 'Quick view demonstrates archive item inspection and cart feedback. Price, availability and checkout are presentation data only.';
+    const setText = (element, value) => {
+      if (element && element.textContent !== value) element.textContent = value;
     };
+    const apply = () => {
+      setText($('.motion-enrich-drawer h2'), 'prmpt Archive Collection');
+      const status = $('.motion-enrich-status span');
+      if (status && /YOLA/i.test(status.textContent || '')) setText(status, 'PRMPT ARCHIVE · PROTOTYPE');
+      setText($('.motion-product-dialog__content small'), 'PRMPT · ARCHIVE PROTOTYPE');
+      setText(
+        $('.motion-product-dialog__copy'),
+        'Quick view demonstrates archive item inspection and cart feedback. Price, availability and checkout are presentation data only.',
+      );
+    };
+    let scheduled = false;
+    const observer = new MutationObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        apply();
+      });
+    });
     apply();
-    new MutationObserver(apply).observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
   function setupLegacySnapRail() {
