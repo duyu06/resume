@@ -84,8 +84,18 @@
       session: [],
     },
     digitalhuman: {
-      local: ['customer_agent_backend', 'customer_agent_real', 'customer_agent_customer_id', 'customer_agent_conversation_id'],
-      session: ['customer_agent_token'],
+      local: [
+        'customer_agent_backend',
+        'customer_agent_real',
+        'customer_agent_customer_id',
+        'customer_agent_conversation_id',
+        'fengge_backend',
+        'fengge_region',
+        'fengge_real',
+        'fengge_demo_characters',
+        'fengge_demo_personas',
+      ],
+      session: ['customer_agent_token', 'fengge_api_key'],
     },
     rpa: {
       local: ['webrpa_backend', 'webrpa_real', 'webrpa_demo_workflow'],
@@ -141,22 +151,27 @@
         $('#new-conversation')?.click();
         await waitFor(() => $$('.message.agent').length >= 1, 5000);
 
-        setProgress(28, '查询客户订单');
+        setProgress(26, '查询客户订单');
         $('[data-quick="order"]')?.click();
         await waitFor(() => $$('.message.agent').length >= 2 && $('#tool-log')?.textContent?.includes('lookup_order'), 12000);
         addLog('订单查询工具已返回物流状态', 'success');
 
-        setProgress(58, '处理退款预申请');
+        setProgress(50, '处理退款预申请');
         $('[data-quick="refund"]')?.click();
         await waitFor(() => $$('.message.agent').length >= 3 && $('#tool-log')?.textContent?.includes('process_refund'), 12000);
         addLog('退款资格已核验并生成预申请', 'success');
 
-        setProgress(82, '汇总服务质量');
+        setProgress(70, '确认并提交退款');
+        await window.__customerServiceAgentDemo?.send('确认商品未拆封且配件完整，请正式提交退款');
+        await waitFor(() => $('#tool-log')?.textContent?.includes('confirm_refund'), 12000);
+        addLog('客户确认已记录，退款申请正式提交', 'success');
+
+        setProgress(88, '汇总服务质量');
         $('#load-performance')?.click();
         await waitFor(() => $('#performance-report')?.textContent?.includes('工具调用'), 5000);
 
         setProgress(100, '演示完成');
-        addLog('客服会话、工具调用、情绪分析与性能报告均已完成', 'success');
+        addLog('客服会话、订单查询、退款闭环、情绪分析与性能报告均已完成', 'success');
         showToast('AI 客服数字人演示完成');
       } catch (error) {
         document.body.classList.add('demo-mode-error');
