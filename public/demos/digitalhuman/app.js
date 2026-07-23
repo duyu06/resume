@@ -19,6 +19,7 @@
     conversationId: localStorage.getItem('customer_agent_conversation_id') || defaults.conversationId,
     conversationVersion: 0,
     pendingRefund: null,
+    backendToolCallsTotal: 0,
     messages: 0,
     toolCalls: 0,
     busy: false,
@@ -131,14 +132,15 @@
     return item;
   }
 
-  function addTool(name, detail, status = 'success') {
+  function addTool(name, detail, status = 'success', countDelta = 1) {
     const empty = $('#tool-log > p');
     empty?.remove();
     const item = document.createElement('article');
     item.className = `tool-event ${status}`;
     item.innerHTML = `<b>${escapeHtml(name)}</b><span>${escapeHtml(detail)}</span>`;
     $('#tool-log').prepend(item);
-    state.toolCalls += 1;
+    const safeDelta = Number.isFinite(Number(countDelta)) ? Math.max(0, Number(countDelta)) : 0;
+    state.toolCalls += safeDelta;
     $('#metric-tools').textContent = String(state.toolCalls);
   }
 
@@ -234,7 +236,22 @@
     const metadata = payload.metadata || {};
     const score = metadata.sentiment_score ?? metadata.last_sentiment ?? 0;
     setSentiment(score < -0.18 ? 'negative' : score > 0.18 ? 'positive' : 'neutral', score);
-    addTool('agent_backend', `会话 ${payload.conversation_id || conversationId} · 服务端 Agent 已响应`);
+
+    const reportedTotal = Number(metadata.total_tool_calls);
+    let currentTotal = state.backendToolCallsTotal;
+    let delta = 0;
+    if (Number.isFinite(reportedTotal) && reportedTotal >= 0) {
+      currentTotal = reportedTotal;
+      delta = reportedTotal >= state.backendToolCallsTotal ? reportedTotal - state.backendToolCallsTotal : reportedTotal;
+      state.backendToolCallsTotal = reportedTotal;
+    }
+
+    const traceName = delta > 0 ? 'backend_tool_calls' : 'agent_response';
+    const traceDetail = delta > 0
+      ? `会话 ${payload.conversation_id || conversationId} · 本轮执行 ${delta} 次工具调用 · 服务端累计 ${currentTotal} 次`
+      : `会话 ${payload.conversation_id || conversationId} · 服务端本轮未执行工具`;
+    addTool(traceName, traceDetail, 'success', delta);
+
     return payload.response || '客服 Agent 已处理请求，但未返回文本内容。';
   }
 
@@ -290,6 +307,7 @@
 
       state.conversationId = createConversationId();
       state.pendingRefund = null;
+      state.backendToolCallsTotal = 0;
       state.messages = 0;
       state.toolCalls = 0;
       localStorage.setItem('customer_agent_conversation_id', state.conversationId);
