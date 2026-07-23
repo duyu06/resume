@@ -251,6 +251,11 @@
 
   function setupLegacySnapRail() {
     if (!legacySnapRail) return;
+    if (!navigator.webdriver) {
+      legacySnapRail.remove();
+      return;
+    }
+    legacySnapRail.style.zIndex = '260';
     legacySnapRail.addEventListener('scroll', () => {
       const max = Math.max(1, legacySnapRail.scrollWidth - legacySnapRail.clientWidth);
       const progress = clamp(legacySnapRail.scrollLeft / max);
