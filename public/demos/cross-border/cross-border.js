@@ -1,6 +1,12 @@
 (() => {
   'use strict';
 
+  const layoutStylesheet = document.createElement('link');
+  layoutStylesheet.rel = 'stylesheet';
+  layoutStylesheet.href = './yola-scroll-layout.css';
+  layoutStylesheet.dataset.yolaScrollLayout = 'true';
+  document.head.appendChild(layoutStylesheet);
+
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
@@ -19,6 +25,7 @@
   let resizeTimer = 0;
   let lastWidth = window.innerWidth;
   let rafId = 0;
+  let collectionScrollBound = false;
 
   const splitChars = (element, className) => {
     if (!element || element.dataset.split === 'true') return [];
@@ -101,9 +108,29 @@
     footerSpacer.style.height = `${Math.ceil(footer.getBoundingClientRect().height)}px`;
   };
 
-  const updateKeyframe = (progress) => {
+  const updateHeroKeyframe = (progress) => {
     const frame = Math.min(14, Math.max(1, Math.floor(progress * 14) + 1));
     document.body.dataset.yolaKeyframe = String(frame).padStart(2, '0');
+  };
+
+  const updateCollectionKeyframe = (progress) => {
+    const safe = clamp(progress);
+    const frame = Math.min(8, Math.max(1, Math.floor(safe * 8) + 1));
+    document.body.dataset.yolaKeyframe = `C${String(frame).padStart(2, '0')}`;
+    document.body.dataset.yolaSection = safe < 0.66 ? 'collection' : 'collection-film';
+    if (collectionScrubber) collectionScrubber.target = clamp((safe - 0.64) / 0.36);
+  };
+
+  const bindNativeCollectionScroll = () => {
+    if (!awardsGrid || collectionScrollBound) return;
+    collectionScrollBound = true;
+    awardsGrid.addEventListener('scroll', () => {
+      const distance = Math.max(1, awardsGrid.scrollWidth - awardsGrid.clientWidth);
+      const progress = clamp(awardsGrid.scrollLeft / distance);
+      updateCollectionKeyframe(progress);
+      const reveal = clamp((progress - 0.82) / 0.18);
+      videoWrapper.style.width = `${reveal * 100}%`;
+    }, { passive: true });
   };
 
   const initScrollMotion = () => {
@@ -118,29 +145,29 @@
       onUpdate: ({ progress }) => {
         if (heroScrubber) heroScrubber.target = progress;
         animateHeroExit(progress);
-        updateKeyframe(progress);
+        updateHeroKeyframe(progress);
       },
     });
 
-    const overflow = () => Math.max(0, awardsGrid.scrollWidth - window.innerWidth);
-    const carousel = gsap.timeline({
-      defaults: { ease: 'none' },
-      scrollTrigger: {
-        trigger: awardsSection,
-        start: 'top top',
-        end: () => `+=${Math.max(window.innerHeight * 1.5, overflow() + window.innerHeight * 1.1)}`,
-        pin: true,
-        scrub: 1,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: ({ progress }) => {
-          if (collectionScrubber) collectionScrubber.target = clamp((progress - 0.645) / 0.355);
-          document.body.dataset.yolaSection = progress < 0.645 ? 'collection' : 'collection-film';
+    if (window.innerWidth <= 768) {
+      bindNativeCollectionScroll();
+      updateCollectionKeyframe(0);
+    } else {
+      const overflow = () => Math.max(0, awardsGrid.scrollWidth - window.innerWidth);
+      const carousel = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: awardsSection,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1,
+          invalidateOnRefresh: true,
+          onUpdate: ({ progress }) => updateCollectionKeyframe(progress),
         },
-      },
-    });
-    carousel.to(awardsGrid, { x: () => -overflow(), duration: 1 });
-    carousel.to(videoWrapper, { width: '100%', duration: 0.55 });
+      });
+      carousel.to(awardsGrid, { x: () => -overflow(), duration: 1 });
+      carousel.to(videoWrapper, { width: '100%', duration: 0.55 });
+    }
 
     gsap.utils.toArray('[data-fade-slide-in]').forEach((element, index) => {
       gsap.fromTo(element,
