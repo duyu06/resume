@@ -57,7 +57,7 @@ const projects: Project[] = [
     ],
     result: '完成桌面与手机端 AI 客服工作台，形成订单查询、退款预申请、库存核验、情绪分析、人工转接和性能评估的可交互演示闭环。',
     link: `${import.meta.env.BASE_URL}demos/digitalhuman/`,
-    imgs: ['proj-04-a.png', 'proj-04-b.png'],
+    imgs: ['proj-customer-agent-a.svg', 'proj-customer-agent-b.svg'],
   },
   {
     n: '03',
