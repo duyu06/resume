@@ -16,7 +16,9 @@ type Project = {
   desc: string;
   bullets: string[];
   result: string;
+  proof?: string[];
   link: string;
+  cta?: string;
   imgs: string[];
 };
 
@@ -44,19 +46,26 @@ const projects: Project[] = [
   {
     n: '02',
     group: '核心案例',
-    cat: 'AI 客服 Agent',
-    nature: '开源项目适配 · 交互原型',
-    name: 'AI 客服数字人 Agent',
-    role: '产品设计 / AI Agent 集成 · 2026.07',
-    tags: ['Customer Service Agent', 'FastAPI', 'Tool Calling', '情绪分析', '人工转接'],
-    desc: '将数字人视觉形象与客服 Agent 业务能力结合，面向售前与售后场景处理咨询应答、订单查询、库存核验、退款申请、情绪识别和人工坐席转接。',
+    cat: 'AI 客服数字人',
+    nature: '完整产品 Demo · 双端适配',
+    name: 'AI 客服数字人工作台',
+    role: '产品设计 / AI Agent 集成 / 前端体验重构 · 2026.07',
+    tags: ['FastAPI', 'Tool Calling', 'GSAP / ScrollTrigger', '情绪与风险识别', '人工安全接管'],
+    desc: '将数字人舞台、实时对话、客户洞察、业务工具调用和服务指标整合为一套分层 AI 客服工作台，覆盖售前咨询、订单与物流、库存、退款及人工转接。',
     bullets: [
-      '设计「客户提问—意图识别—工具选择—业务结果—自然语言回复—会话记忆」闭环，覆盖订单、库存、退款和知识库检索',
-      '接入客服 Agent 的 health、chat、conversation 和 performance 接口，并提供无密钥演示模式与真实后端模式切换',
-      '建立负面情绪阈值、人工接管策略、工具调用轨迹和服务质量报告，确保复杂或高风险问题可降级处理',
+      '重构左侧客服导航、AI 数字人舞台、实时会话、客户洞察、服务指标与工具调用轨迹，形成可持续操作的客服工作台信息架构',
+      '设计「意图与情绪识别—选择业务工具—验证业务结果—人工安全接管」四阶段 Agent 工作流，覆盖订单、库存、退款预申请、正式退款与人工转接',
+      '使用 GSAP 与 ScrollTrigger 完成分阶段入场、数字人呼吸与浮动、智能光环、语音波形、光晕跟随、轻量视差、消息与工具卡动效，并提供 prefers-reduced-motion 降级',
+      '保留原有订单、退款、情绪识别和人工转接业务状态机，支持本地无密钥演示模式、FastAPI 真实后端模式及 sessionStorage 令牌隔离',
     ],
-    result: '完成桌面与手机端 AI 客服工作台，形成订单查询、退款预申请、库存核验、情绪分析、人工转接和性能评估的可交互演示闭环。',
+    result: '完成桌面端与移动端 AI 客服数字人工作台，形成从客户问题、Agent 决策、业务工具执行到服务质量反馈的完整可交互闭环。',
+    proof: [
+      'npm ci、生产构建、GSAP 脚本语法检查与 Chromium 生产预览通过',
+      '桌面端、移动端、全项目演示模式及横向溢出专项回归通过',
+      '订单、退款、人工转接和真实后端模拟链路通过，动画未改写业务状态机',
+    ],
     link: `${import.meta.env.BASE_URL}demos/digitalhuman/`,
+    cta: '打开完整数字人工作台',
     imgs: ['proj-customer-agent-a.svg', 'proj-customer-agent-b.svg'],
   },
   {
@@ -313,6 +322,20 @@ function ProjectDetailModal({ project, onClose }: { project: Project; onClose: (
             <p className="text-sm leading-relaxed text-ink-dim/90">{project.result}</p>
           </div>
 
+          {project.proof && (
+            <div className="mb-6 rounded-xl border border-ink/10 bg-white/45 p-4 sm:p-5">
+              <h4 className="mb-3 text-xs uppercase tracking-widest text-ink-dim/50">交付与验证</h4>
+              <ul className="space-y-2.5">
+                {project.proof.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-ink-dim/80">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                    <span className="min-w-0 break-words">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2">
             {project.tags.map((tag) => (
               <span key={tag} className="pill-grad rounded-full px-3 py-1.5 text-xs text-ink-dim/70">{tag}</span>
@@ -327,7 +350,7 @@ function ProjectDetailModal({ project, onClose }: { project: Project; onClose: (
             rel="noopener noreferrer"
             className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(37,99,235,0.28)] transition hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:w-auto"
           >
-            查看交互 Demo
+            {project.cta ?? '查看交互 Demo'}
             <ExternalLink size={16} />
           </a>
         </footer>
