@@ -25,6 +25,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    scroll-padding-inline: 7.5vw;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
@@ -35,6 +36,6 @@
   }
 
   .product-card {
-    scroll-snap-align: start;
+    scroll-snap-align: center;
   }
 }
