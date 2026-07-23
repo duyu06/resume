@@ -1,0 +1,59 @@
+name: Cross-border Visual Comparison
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/demos/cross-border/**'
+      - 'scripts/cross-border-visual-compare.mjs'
+      - 'scripts/yola-review-e2e.mjs'
+      - '.github/workflows/cross-border-visual-compare.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cross-border-visual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start production preview
+        run: |
+          npm run preview -- --host 127.0.0.1 > /tmp/cross-border-preview.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/resume/demos/cross-border/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/cross-border-preview.log
+          exit 1
+      - name: Capture before and after screenshots
+        run: node scripts/cross-border-visual-compare.mjs
+        env:
+          COMPARE_BEFORE_URL: https://duyu06.github.io/resume/demos/cross-border/#about
+          COMPARE_AFTER_URL: http://127.0.0.1:4173/resume/demos/cross-border/#about
+          COMPARE_OUTPUT_DIR: test-results/cross-border-visual-compare
+      - name: Upload visual comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-border-before-after
+          path: test-results/cross-border-visual-compare
+          if-no-files-found: error
+          retention-days: 14
