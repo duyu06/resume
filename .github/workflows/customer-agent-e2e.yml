@@ -46,11 +46,18 @@ jobs:
           TEST_BASE_URL: http://127.0.0.1:4173/resume
           TEST_TARGET: local-preview
           TEST_OUTPUT_DIR: test-results/customer-agent
+      - name: Run review regressions
+        run: node scripts/customer-agent-review-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_OUTPUT_DIR: test-results/customer-agent-review
       - name: Upload customer agent evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: customer-agent-e2e
-          path: test-results/customer-agent
+          path: |
+            test-results/customer-agent
+            test-results/customer-agent-review
           if-no-files-found: ignore
           retention-days: 14
