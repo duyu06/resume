@@ -3,6 +3,10 @@
   box-sizing: border-box;
 }
 
+body[data-demo-mode-theme="cross-border"] .demo-mode-actions button:first-child {
+  color: #ffffff;
+}
+
 @media (max-width: 680px) {
   .demo-mode-panel,
   .demo-mode-panel.is-open {
