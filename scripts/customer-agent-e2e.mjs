@@ -37,6 +37,23 @@ async function sendText(page, message) {
   await page.locator('#send-message').click();
 }
 
+async function assertMotionExperience(page, deviceName) {
+  await page.waitForFunction(() => Boolean(window.gsap && window.ScrollTrigger), null, { timeout: 15000 });
+  assert((await page.locator('.workflow-card').count()) === 4, `${deviceName}: workflow story does not contain four stages`);
+  assert(await page.locator('.avatar-frame img').isVisible(), `${deviceName}: illustrated digital human avatar is missing`);
+  assert(await page.locator('.service-chart').isVisible(), `${deviceName}: service chart is missing`);
+
+  await page.locator('#agent-workflow').scrollIntoViewIfNeeded();
+  await page.locator('.workflow-card').nth(2).scrollIntoViewIfNeeded();
+  await page.waitForFunction(
+    () => document.querySelectorAll('.workflow-card')[2]?.classList.contains('active'),
+    null,
+    { timeout: 10000 },
+  );
+  assert((await page.locator('#workflow-output').textContent()) === 'result.verified', `${deviceName}: GSAP workflow stage did not update`);
+  await page.locator('#workspace').scrollIntoViewIfNeeded();
+}
+
 async function runDevice(browser, device) {
   const context = await browser.newContext({
     viewport: device.viewport,
@@ -51,10 +68,11 @@ async function runDevice(browser, device) {
   try {
     await page.goto(`${baseURL}/demos/digitalhuman/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForSelector('#chat-thread', { timeout: 15000 });
-    assert((await page.title()).includes('AI 客服数字人 Agent'), 'Customer agent: page title is stale');
-    assert((await page.locator('h1').textContent())?.includes('处理客服问题'), 'Customer agent: hero copy missing');
+    assert((await page.title()).includes('AI 客服数字人'), 'Customer agent: page title is stale');
+    assert((await page.locator('h1').textContent())?.includes('真正解决问题'), 'Customer agent: redesigned hero copy missing');
     assert(await page.getByRole('textbox', { name: '客户 ID', exact: true }).isVisible(), 'Customer agent: customer ID input has no accessible name');
     await assertNoOverflow(page, `Customer agent ${device.name} initial`);
+    await assertMotionExperience(page, device.name);
 
     const initialAgentMessages = await page.locator('.message.agent').count();
     assert(initialAgentMessages >= 1, 'Customer agent: initial welcome message missing');
