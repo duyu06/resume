@@ -154,9 +154,77 @@ async function testProject(browser, project) {
   }
 }
 
+async function testYolaMobileSnap(browser) {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+    reducedMotion: 'no-preference',
+  });
+  const page = await context.newPage();
+
+  try {
+    await page.goto(`${baseURL}/demos/cross-border/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForSelector('.awards-grid .product-card', { timeout: 15000 });
+    const grid = page.locator('.awards-grid');
+    await grid.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(250);
+
+    const snapCss = await grid.evaluate((element) => ({
+      type: getComputedStyle(element).scrollSnapType,
+      aligns: [...element.querySelectorAll('.product-card')].map((card) => getComputedStyle(card).scrollSnapAlign),
+    }));
+    assert(snapCss.type.includes('x') && snapCss.type.includes('mandatory'), `YOLA: missing mandatory horizontal snap (${snapCss.type})`);
+    assert(snapCss.aligns.every((value) => value.includes('center')), `YOLA: product cards do not use center snap (${snapCss.aligns.join(', ')})`);
+
+    const box = await grid.boundingBox();
+    assert(box && box.width > 0 && box.height > 0, 'YOLA: mobile product rail has no interactive geometry');
+    await page.mouse.move(box.x + box.width / 2, box.y + Math.min(box.height / 2, 280));
+
+    const observed = [];
+    let previousScrollLeft = -1;
+    for (let step = 0; step < 4; step += 1) {
+      await page.mouse.wheel(360, 0);
+      await page.waitForTimeout(850);
+      const state = await grid.evaluate((element) => {
+        const railRect = element.getBoundingClientRect();
+        const railCenter = railRect.left + railRect.width / 2;
+        const cards = [...element.querySelectorAll('.product-card')].map((card, index) => {
+          const rect = card.getBoundingClientRect();
+          return {
+            index,
+            distance: Math.abs(rect.left + rect.width / 2 - railCenter),
+          };
+        });
+        cards.sort((a, b) => a.distance - b.distance);
+        return {
+          scrollLeft: element.scrollLeft,
+          nearest: cards[0],
+        };
+      });
+
+      assert(state.scrollLeft >= previousScrollLeft, `YOLA: horizontal wheel input moved backwards (${previousScrollLeft} -> ${state.scrollLeft})`);
+      assert(state.nearest.distance <= 18, `YOLA: rail did not settle on a card center (${JSON.stringify(state)})`);
+      previousScrollLeft = state.scrollLeft;
+      observed.push(state.nearest.index);
+    }
+
+    const unique = [...new Set(observed)];
+    assert(unique.length >= 3, `YOLA: real horizontal wheel input reached too few snapped cards (${unique.join(', ')})`);
+    await page.screenshot({ path: `${outputDir}/${targetName}-mobile-cross-border-scroll-snap.png`, fullPage: true });
+    results.push({ project: 'cross-border-scroll-snap', status: 'passed', theme: 'cross-border', kicker: 'REAL WHEEL INPUT' });
+  } catch (error) {
+    await page.screenshot({ path: `${outputDir}/${targetName}-mobile-cross-border-scroll-snap-failed.png`, fullPage: true }).catch(() => {});
+    results.push({ project: 'cross-border-scroll-snap', status: 'failed', error: error instanceof Error ? error.message : String(error) });
+  } finally {
+    await context.close();
+  }
+}
+
 await mkdir(outputDir, { recursive: true });
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 for (const project of projects) await testProject(browser, project);
+await testYolaMobileSnap(browser);
 await browser.close();
 
 const failed = results.filter((item) => item.status === 'failed');
