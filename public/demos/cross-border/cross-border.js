@@ -4,325 +4,251 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
-  const root = $('#scroll-spacer');
-  const panel = $('#collection');
-  const wrap = $('.gallery-wrap');
-  const grid = $('#gallery-grid');
-  const cards = $$('.bp-card', grid);
-  const leftVideo = $('#video-left');
-  const rightVideo = $('#video-right');
-  const canvas = $('#main-canvas');
-  const overlay = $('#outro-overlay');
-  const outroInfo = $('#outro-info');
-  const outroBuy = $('#outro-buy');
-  const outroFooter = $('#outro-footer');
-  const symbol = $('#circle-symbol');
+  const heroSection = $('.hero-scroll');
+  const heroVideo = $('#hero-video');
+  const collectionVideo = $('#collection-video');
+  const awardsSection = $('.awards-section');
+  const awardsGrid = $('.awards-grid');
+  const videoWrapper = $('.video-scaling-wrapper');
+  const footer = $('.site-footer');
+  const footerSpacer = $('.footer-spacer');
   const menuButton = $('.menu-button');
   const menuPanel = $('.menu-panel');
-  const cursor = $('.custom-cursor');
-  const legacyHeroProbe = $('.legacy-hero-probe');
-  const legacyCollectionProbe = $('.legacy-collection-probe');
-  const legacySnapRail = $('.legacy-snap-rail');
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const touchMode = matchMedia('(hover: none), (pointer: coarse), (max-width: 1023px)').matches;
-  const symbols = ['8', '$', '^^', '%', '/'];
-
-  let viewportHeight = innerHeight;
-  let maxScroll = 0;
-  let pointerX = innerWidth / 2;
-  let activeSide = 'right';
-  let lastSymbolAt = 0;
+  const heroChars = [];
+  const scrubbers = [];
+  let resizeTimer = 0;
+  let lastWidth = window.innerWidth;
   let rafId = 0;
-  let layoutCols = 0;
-  let videosReady = 0;
 
-  function buildLayout(count, cols) {
-    const placements = [];
-    let imageIndex = 0;
-    let row = 0;
+  const splitChars = (element, className) => {
+    if (!element || element.dataset.split === 'true') return [];
+    const text = element.textContent || '';
+    element.textContent = '';
+    const result = [...text].map((character) => {
+      const span = document.createElement('span');
+      span.className = className;
+      span.textContent = character === ' ' ? '\u00a0' : character;
+      element.appendChild(span);
+      return span;
+    });
+    element.dataset.split = 'true';
+    return result;
+  };
 
-    while (imageIndex < count) {
-      const cells = Array(cols).fill(-1);
-      const a = (row * 2 + (row % 2)) % cols;
-      cells[a] = imageIndex;
-      imageIndex += 1;
+  const splitWords = (element) => {
+    if (!element || element.dataset.split === 'true') return [];
+    const words = (element.textContent || '').trim().split(/\s+/);
+    element.textContent = '';
+    const result = words.map((word) => {
+      const span = document.createElement('span');
+      span.className = 'detail-word';
+      span.textContent = word;
+      element.appendChild(span);
+      return span;
+    });
+    element.dataset.split = 'true';
+    return result;
+  };
 
-      if (row % 3 === 0 && imageIndex < count) {
-        let b = (a + 2) % cols;
-        if (b === a) b = (a + 1) % cols;
-        cells[b] = imageIndex;
-        imageIndex += 1;
+  const createScrubber = (video) => {
+    if (!video) return null;
+    const scrubber = { video, target: 0, current: 0 };
+    video.pause();
+    video.addEventListener('loadedmetadata', () => {
+      scrubber.current = clamp(video.currentTime || 0, 0, Math.max(0, video.duration - 0.04));
+      video.pause();
+    });
+    scrubbers.push(scrubber);
+    return scrubber;
+  };
+
+  const heroScrubber = createScrubber(heroVideo);
+  const collectionScrubber = createScrubber(collectionVideo);
+
+  const scrubLoop = () => {
+    scrubbers.forEach((scrubber) => {
+      const duration = Number.isFinite(scrubber.video.duration) ? Math.max(0, scrubber.video.duration - 0.04) : 0;
+      if (!duration) return;
+      const targetTime = clamp(scrubber.target) * duration;
+      scrubber.current += (targetTime - scrubber.current) * 0.08;
+      if (!scrubber.video.seeking && Math.abs(scrubber.video.currentTime - scrubber.current) > 0.01) {
+        scrubber.video.currentTime = clamp(scrubber.current, 0, duration);
       }
-
-      placements.push(cells);
-      row += 1;
-    }
-    return placements.flat();
-  }
-
-  function renderGrid() {
-    const cols = innerWidth < 640 ? 2 : innerWidth < 1024 ? 3 : 4;
-    if (cols === layoutCols && grid.dataset.built === '1') return;
-    layoutCols = cols;
-
-    const fragments = document.createDocumentFragment();
-    const order = buildLayout(cards.length, cols);
-    order.forEach((index) => {
-      if (index === -1) {
-        const spacer = document.createElement('div');
-        spacer.className = 'gallery-spacer';
-        spacer.setAttribute('aria-hidden', 'true');
-        fragments.append(spacer);
-        return;
-      }
-      const card = cards[index];
-      const column = fragments.childNodes.length % cols;
-      card.style.transformOrigin = column < cols / 2 ? 'right bottom' : 'left bottom';
-      fragments.append(card);
     });
-    grid.replaceChildren(fragments);
-    grid.dataset.built = '1';
-  }
+    rafId = requestAnimationFrame(scrubLoop);
+  };
 
-  function updateMeasurements() {
-    viewportHeight = Math.max(1, innerHeight);
-    renderGrid();
-    panel.style.transform = 'translateY(0)';
-    wrap.style.transform = 'translateY(0)';
-    const wrapHeight = wrap.scrollHeight;
-    maxScroll = Math.max(0, wrapHeight - viewportHeight);
-    root.style.height = `${viewportHeight + maxScroll + viewportHeight * 2}px`;
-    const rootHeight = Number.parseFloat(root.style.height) || root.scrollHeight;
-    const split = Math.max(viewportHeight * 2, rootHeight * 0.58);
-    if (legacyHeroProbe) {
-      legacyHeroProbe.style.top = '0px';
-      legacyHeroProbe.style.height = `${split}px`;
-    }
-    if (legacyCollectionProbe) {
-      legacyCollectionProbe.style.top = `${split}px`;
-      legacyCollectionProbe.style.height = `${Math.max(viewportHeight * 2, rootHeight - split)}px`;
-    }
-  }
-
-  function updateCards() {
-    const vh = viewportHeight;
-    $$('.bp-card', grid).forEach((card) => {
-      const rect = card.getBoundingClientRect();
-      const top = rect.top;
-      const bottom = rect.bottom;
-      let scale = 0;
-      if (bottom > 0 && top < vh) {
-        const enter = clamp((vh - top) / (vh * 0.6));
-        const exit = clamp(bottom / (vh * 0.4));
-        scale = Math.min(enter, exit);
-      }
-      card.style.transform = `scale(${scale.toFixed(4)})`;
+  const animateHeroExit = (progress) => {
+    const exit = clamp((progress - 0.8) / 0.2);
+    heroChars.forEach((character, index) => {
+      const stagger = index / Math.max(1, heroChars.length - 1) * 0.28;
+      const local = clamp((exit - stagger) / Math.max(0.01, 1 - stagger));
+      const eased = 1 - Math.pow(1 - local, 3);
+      character.style.opacity = String(1 - eased);
+      character.style.filter = `blur(${eased * 8}px)`;
+      character.style.transform = `translate3d(0, ${-eased * 28}px, 0)`;
     });
-  }
-
-  function updateScrollScene() {
-    const y = Math.max(0, scrollY);
-    const split = Number.parseFloat(legacyCollectionProbe?.style.top || '0') || viewportHeight * 2;
-    if (y < split) {
-      const progress = clamp(y / Math.max(1, split - viewportHeight));
-      document.body.dataset.yolaSection = 'hero';
-      document.body.dataset.yolaKeyframe = String(Math.min(14, Math.floor(progress * 14) + 1)).padStart(2, '0');
-    } else {
-      const collectionHeight = Number.parseFloat(legacyCollectionProbe?.style.height || '0') || viewportHeight * 2;
-      const progress = clamp((y - split) / Math.max(1, collectionHeight - viewportHeight));
-      document.body.dataset.yolaSection = 'collection';
-      document.body.dataset.yolaKeyframe = `C${String(Math.min(8, Math.floor(progress * 8) + 1)).padStart(2, '0')}`;
+    const discover = $('.discover-button');
+    if (discover) {
+      const eased = Math.pow(exit, 4);
+      discover.style.opacity = String(1 - eased);
+      discover.style.transform = `translate3d(0, ${-eased * 24}px, 0)`;
     }
-    const vh = viewportHeight;
-    let panelY = vh;
-    let wrapY = 0;
+  };
 
-    if (y <= vh) {
-      panelY = vh - y;
-      document.body.dataset.prmptPhase = 'hero';
-    } else {
-      panelY = 0;
-      wrapY = -Math.min(maxScroll, y - vh);
-      document.body.dataset.prmptPhase = y < vh + maxScroll ? 'gallery' : 'outro';
-    }
+  const updateFooterSpacer = () => {
+    if (!footer || !footerSpacer) return;
+    footerSpacer.style.height = `${Math.ceil(footer.getBoundingClientRect().height)}px`;
+  };
 
-    panel.style.transform = `translateY(${panelY}px)`;
-    wrap.style.transform = `translateY(${wrapY}px)`;
-    updateCards();
+  const updateKeyframe = (progress) => {
+    const frame = Math.min(14, Math.max(1, Math.floor(progress * 14) + 1));
+    document.body.dataset.yolaKeyframe = String(frame).padStart(2, '0');
+  };
 
-    const outroStart = vh + maxScroll;
-    const outroProgress = clamp((y - outroStart) / Math.max(1, vh - 100));
-    overlay.style.opacity = String(outroProgress);
-    outroInfo.style.transform = `translateY(${-outroProgress * (innerWidth < 640 ? 132 : 166)}px)`;
-    outroBuy.style.transform = `scale(${outroProgress})`;
-    outroFooter.style.opacity = String(outroProgress);
-    canvas.style.visibility = y > vh ? 'hidden' : 'visible';
+  const initScrollMotion = () => {
+    if (!window.gsap || !window.ScrollTrigger) return;
+    const { gsap, ScrollTrigger } = window;
+    gsap.registerPlugin(ScrollTrigger);
 
-    const now = performance.now();
-    if (y > 4 && now - lastSymbolAt > 80) {
-      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-      lastSymbolAt = now;
-    }
-  }
-
-  function seekVideo(video, progress) {
-    if (!video || !Number.isFinite(video.duration) || video.duration <= 0 || video.seeking) return;
-    const target = clamp(progress) * video.duration;
-    if (Math.abs(video.currentTime - target) > 0.025) video.currentTime = target;
-  }
-
-  function updateDesktopVideo() {
-    if (touchMode || reducedMotion) return;
-    const width = Math.max(1, innerWidth);
-    const center = width / 2;
-    const deadZone = Math.max(30, width * 0.05);
-    const leftEdge = center - deadZone;
-    const rightEdge = center + deadZone;
-
-    if (pointerX < leftEdge) {
-      activeSide = 'right';
-      leftVideo.style.display = 'none';
-      rightVideo.style.display = 'block';
-      const progress = (leftEdge - pointerX) / Math.max(1, leftEdge);
-      seekVideo(rightVideo, progress);
-    } else if (pointerX > rightEdge) {
-      activeSide = 'left';
-      leftVideo.style.display = 'block';
-      rightVideo.style.display = 'none';
-      const progress = (pointerX - rightEdge) / Math.max(1, width - rightEdge);
-      seekVideo(leftVideo, progress);
-    } else {
-      const activeVideo = activeSide === 'left' ? leftVideo : rightVideo;
-      const inactiveVideo = activeSide === 'left' ? rightVideo : leftVideo;
-      activeVideo.style.display = 'block';
-      inactiveVideo.style.display = 'none';
-      [leftVideo, rightVideo].forEach((video) => {
-        if (!video.seeking && video.currentTime > 0.04) video.currentTime = 0;
-      });
-    }
-  }
-
-  function frame() {
-    updateScrollScene();
-    updateDesktopVideo();
-    rafId = requestAnimationFrame(frame);
-  }
-
-  function startTouchPlayback() {
-    if (!touchMode || reducedMotion) return;
-    const play = async (video, other) => {
-      other.pause();
-      other.style.display = 'none';
-      video.style.display = 'block';
-      try { await video.play(); } catch { /* Autoplay can be blocked. */ }
-    };
-    leftVideo.addEventListener('ended', () => play(rightVideo, leftVideo));
-    rightVideo.addEventListener('ended', () => play(leftVideo, rightVideo));
-    play(leftVideo, rightVideo);
-  }
-
-  function onVideoReady() {
-    videosReady += 1;
-    if (videosReady >= 2) {
-      canvas.classList.add('is-ready');
-      if (!touchMode) {
-        leftVideo.pause();
-        rightVideo.pause();
-        leftVideo.currentTime = 0;
-        rightVideo.currentTime = 0;
-      }
-    }
-  }
-
-  function patchSharedPrototypeCopy() {
-    const setText = (element, value) => {
-      if (element && element.textContent !== value) element.textContent = value;
-    };
-    const apply = () => {
-      setText($('.motion-enrich-drawer h2'), 'prmpt Archive Collection');
-      const status = $('.motion-enrich-status span');
-      if (status && /YOLA/i.test(status.textContent || '')) setText(status, 'PRMPT ARCHIVE · PROTOTYPE');
-      setText($('.motion-product-dialog__content small'), 'PRMPT · ARCHIVE PROTOTYPE');
-      setText(
-        $('.motion-product-dialog__copy'),
-        'Quick view demonstrates archive item inspection and cart feedback. Price, availability and checkout are presentation data only.',
-      );
-    };
-    let scheduled = false;
-    const observer = new MutationObserver(() => {
-      if (scheduled) return;
-      scheduled = true;
-      requestAnimationFrame(() => {
-        scheduled = false;
-        apply();
-      });
+    ScrollTrigger.create({
+      trigger: heroSection,
+      start: 'top top',
+      end: 'bottom bottom',
+      onUpdate: ({ progress }) => {
+        if (heroScrubber) heroScrubber.target = progress;
+        animateHeroExit(progress);
+        updateKeyframe(progress);
+      },
     });
-    apply();
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
 
-  function setupLegacySnapRail() {
-    if (!legacySnapRail) return;
-    if (!navigator.webdriver) {
-      legacySnapRail.remove();
-      return;
-    }
-    legacySnapRail.style.zIndex = '260';
-    legacySnapRail.addEventListener('scroll', () => {
-      const max = Math.max(1, legacySnapRail.scrollWidth - legacySnapRail.clientWidth);
-      const progress = clamp(legacySnapRail.scrollLeft / max);
-      document.body.dataset.yolaSection = 'collection';
-      document.body.dataset.yolaKeyframe = `C${String(Math.min(8, Math.floor(progress * 8) + 1)).padStart(2, '0')}`;
-    }, { passive: true });
-  }
-
-  function setupMenu() {
-    menuButton.addEventListener('click', () => {
-      const open = menuButton.getAttribute('aria-expanded') !== 'true';
-      menuButton.setAttribute('aria-expanded', String(open));
-      menuPanel.classList.toggle('is-open', open);
+    const overflow = () => Math.max(0, awardsGrid.scrollWidth - window.innerWidth);
+    const carousel = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: {
+        trigger: awardsSection,
+        start: 'top top',
+        end: () => `+=${Math.max(window.innerHeight * 1.5, overflow() + window.innerHeight * 1.1)}`,
+        pin: true,
+        scrub: 1,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: ({ progress }) => {
+          if (collectionScrubber) collectionScrubber.target = clamp((progress - 0.645) / 0.355);
+          document.body.dataset.yolaSection = progress < 0.645 ? 'collection' : 'collection-film';
+        },
+      },
     });
-    menuPanel.addEventListener('click', (event) => {
-      if (!(event.target instanceof HTMLAnchorElement)) return;
-      menuButton.setAttribute('aria-expanded', 'false');
-      menuPanel.classList.remove('is-open');
-    });
-  }
+    carousel.to(awardsGrid, { x: () => -overflow(), duration: 1 });
+    carousel.to(videoWrapper, { width: '100%', duration: 0.55 });
 
-  function setupNavigation() {
+    gsap.utils.toArray('[data-fade-slide-in]').forEach((element, index) => {
+      gsap.fromTo(element,
+        { autoAlpha: 0, y: 20 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          delay: index * 0.04,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: element, start: 'top 88%', once: true },
+        });
+    });
+
+    $$('.stat-card').forEach((card) => {
+      const chars = $$('.stat-char', card);
+      const words = $$('.detail-word', card);
+      gsap.fromTo(chars,
+        { yPercent: 115, autoAlpha: 0 },
+        {
+          yPercent: 0,
+          autoAlpha: 1,
+          stagger: 0.025,
+          duration: 0.72,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: card, start: 'top 75%', once: true },
+        });
+      gsap.fromTo(words,
+        { y: 12, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          stagger: 0.025,
+          duration: 0.46,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: card, start: 'top 69%', once: true },
+        });
+    });
+
+    ScrollTrigger.create({
+      trigger: $('.craft-section'),
+      start: 'top center',
+      end: 'bottom center',
+      onEnter: () => { document.body.dataset.yolaSection = 'about'; },
+      onEnterBack: () => { document.body.dataset.yolaSection = 'about'; },
+    });
+
+    ScrollTrigger.refresh();
+  };
+
+  const rebuildScrollMotion = () => {
+    if (!window.ScrollTrigger || !window.gsap) return;
+    window.ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    window.gsap.set(awardsGrid, { clearProps: 'transform' });
+    window.gsap.set(videoWrapper, { width: '0%' });
+    initScrollMotion();
+  };
+
+  const bindControls = () => {
     $$('[data-scroll-target]').forEach((control) => {
       control.addEventListener('click', () => {
         const target = $(control.dataset.scrollTarget);
-        if (!target) return;
-        const destination = target.id === 'collection' ? viewportHeight + 2 : target.offsetTop;
-        scrollTo({ top: destination, behavior: reducedMotion ? 'auto' : 'smooth' });
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
-  }
 
-  if (cursor) {
-    addEventListener('mousemove', (event) => {
-      pointerX = event.clientX;
-      cursor.style.left = `${event.clientX}px`;
-      cursor.style.top = `${event.clientY}px`;
+    menuButton?.addEventListener('click', () => {
+      const open = menuButton.getAttribute('aria-expanded') !== 'true';
+      menuButton.setAttribute('aria-expanded', String(open));
+      menuPanel?.classList.toggle('is-open', open);
+    });
+    $$('.menu-panel a').forEach((link) => link.addEventListener('click', () => {
+      menuButton?.setAttribute('aria-expanded', 'false');
+      menuPanel?.classList.remove('is-open');
+    }));
+
+    $('.newsletter-form')?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      window.alert("You're on the list. Welcome.");
+      event.currentTarget.reset();
+    });
+
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        updateFooterSpacer();
+        if (window.innerWidth !== lastWidth) {
+          lastWidth = window.innerWidth;
+          rebuildScrollMotion();
+        } else {
+          window.ScrollTrigger?.refresh();
+        }
+      }, 200);
     }, { passive: true });
-  }
+  };
 
-  [leftVideo, rightVideo].forEach((video) => {
-    video.addEventListener('loadedmetadata', onVideoReady, { once: true });
-  });
-
-  addEventListener('resize', () => {
+  const init = () => {
+    $$('.hero-title-line-inner').forEach((line) => heroChars.push(...splitChars(line, 'hero-char')));
+    $$('.heading-style-h1').forEach((heading) => splitChars(heading, 'stat-char'));
+    $$('.detail-paragraph').forEach(splitWords);
+    bindControls();
+    updateFooterSpacer();
+    initScrollMotion();
     cancelAnimationFrame(rafId);
-    updateMeasurements();
-    rafId = requestAnimationFrame(frame);
-  }, { passive: true });
+    rafId = requestAnimationFrame(scrubLoop);
+    document.documentElement.classList.add('yola-ready');
+  };
 
-  patchSharedPrototypeCopy();
-  setupLegacySnapRail();
-  setupMenu();
-  setupNavigation();
-  updateMeasurements();
-  startTouchPlayback();
-  rafId = requestAnimationFrame(frame);
+  const ready = document.fonts?.ready || Promise.resolve();
+  ready.then(init).catch(init);
 })();
