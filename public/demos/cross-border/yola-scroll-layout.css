@@ -1,0 +1,40 @@
+.awards-section {
+  height: 360vh;
+  overflow: visible;
+}
+
+.awards-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .awards-section {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .awards-stage {
+    position: relative;
+  }
+
+  .awards-grid {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .awards-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-card {
+    scroll-snap-align: start;
+  }
+}
