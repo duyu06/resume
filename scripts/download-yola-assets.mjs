@@ -1,4 +1,5 @@
-import { mkdir, rename, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, rename, stat, writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 
 const root = process.cwd();
@@ -35,6 +36,21 @@ const assets = [
   },
 ];
 
+const posters = [
+  {
+    video: 'public/demos/cross-border/assets/videos/hero-measured-purity.mp4',
+    poster: 'public/demos/cross-border/assets/videos/hero-poster.webp',
+    fallback: 'public/demos/cross-border/assets/products/obsidian-coil.webp',
+    seek: '0.8',
+  },
+  {
+    video: 'public/demos/cross-border/assets/videos/collection-reveal.mp4',
+    poster: 'public/demos/cross-border/assets/videos/collection-poster.webp',
+    fallback: 'public/demos/cross-border/assets/products/void-arc.webp',
+    seek: '0.8',
+  },
+];
+
 async function isUsable(file, minimumBytes) {
   try {
     return (await stat(file)).size >= minimumBytes;
@@ -68,4 +84,37 @@ async function download(asset) {
   console.log(`Downloaded ${asset.path} (${bytes.byteLength} bytes)`);
 }
 
+async function createPoster(item) {
+  const video = resolve(root, item.video);
+  const poster = resolve(root, item.poster);
+  const fallback = resolve(root, item.fallback);
+  if (await isUsable(poster, 10_000)) {
+    console.log(`YOLA poster ready: ${item.poster}`);
+    return;
+  }
+
+  await mkdir(dirname(poster), { recursive: true });
+  const result = spawnSync('ffmpeg', [
+    '-hide_banner',
+    '-loglevel', 'error',
+    '-ss', item.seek,
+    '-i', video,
+    '-frames:v', '1',
+    '-vf', 'scale=1600:-2',
+    '-c:v', 'libwebp',
+    '-quality', '82',
+    '-y', poster,
+  ], { encoding: 'utf8' });
+
+  if (result.status === 0 && await isUsable(poster, 10_000)) {
+    console.log(`Generated ${item.poster}`);
+    return;
+  }
+
+  console.warn(`ffmpeg poster generation unavailable; using product fallback for ${item.poster}`);
+  if (result.stderr) console.warn(result.stderr.trim());
+  await copyFile(fallback, poster);
+}
+
 for (const asset of assets) await download(asset);
+for (const poster of posters) await createPoster(poster);
