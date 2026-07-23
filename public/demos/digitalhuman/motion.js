@@ -9,6 +9,9 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
   function stabilizeLayout() {
+    const shell = $('.experience-shell');
+    if (shell) shell.style.width = 'auto';
+
     const footer = $('.page-footer');
     if (footer) {
       footer.style.marginLeft = '0';
