@@ -87,7 +87,7 @@ const escalationMessage = (text) => ({
 });
 
 const summaryMessage = (text) => {
-  if (text.includes('升级工单已生成')) {
+  if (text.includes('升级工单已生成') || text.includes('意图分类: complaint')) {
     return { role: 'assistant', content: '很抱歉给您带来不便。我已创建高优先级人工客服工单，坐席会携带当前问题摘要继续处理，您无需重复描述。请问还有其他信息需要补充吗？' };
   }
   if (text.includes('track_shipment')) {
@@ -96,10 +96,10 @@ const summaryMessage = (text) => {
   if (text.includes('query_order')) {
     return { role: 'assistant', content: '您好，已查询到订单 ORD-001：智能蓝牙耳机 Pro，订单状态为已发货，订单金额299元。请问需要继续查询物流吗？' };
   }
-  if (/(7天无理由|退货政策)/.test(text)) {
+  if (text.includes('用户问题: 怎么退货') || /(7天无理由|退货政策)/.test(text)) {
     return { role: 'assistant', content: '您好，电子产品支持7天无理由退货，需要保持包装完整、配件齐全；收到退货后3至5个工作日原路退款。请问还需要其他帮助吗？' };
   }
-  if (/(智能蓝牙耳机|无线充电板|机械键盘)/.test(text)) {
+  if (text.includes('意图分类: product_inquiry') || text.includes('用户问题: 你们有什么产品') || /(智能蓝牙耳机|无线充电板|机械键盘)/.test(text)) {
     return { role: 'assistant', content: '您好，目前有智能蓝牙耳机 Pro、无线充电板和机械键盘 K8 三款演示商品，价格分别为299元、89元和459元。请问想了解哪一款？' };
   }
   return { role: 'assistant', content: '您好，我可以协助商品、订单、物流、退货政策和投诉升级。请问需要什么帮助？' };
