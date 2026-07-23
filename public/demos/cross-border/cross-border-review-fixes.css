@@ -1,6 +1,13 @@
 /* Review-driven compatibility fixes for YOLA.
    Loaded after the shared incremental enhancement stylesheet. */
 
+@media (min-width: 769px) {
+  .awards-pin {
+    position: sticky;
+    top: 0;
+  }
+}
+
 body[data-demo-enrich='cross-border'] .yola-story-frame.motion-enrich-reveal {
   opacity: 0 !important;
   transform: translate3d(0, 34px, 0) rotateX(-7deg) !important;
