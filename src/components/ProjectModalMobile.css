@@ -21,6 +21,63 @@ body.project-modal-open .mobile-dock-nav {
   height: 0.25rem;
 }
 
+/*
+ * Portfolio project cards use the corresponding subproject page capture as
+ * the dominant left panel. Each card spans the full group width so the page
+ * screenshot remains legible instead of being reduced to a small thumbnail.
+ */
+#projects .glass.group {
+  grid-column: 1 / -1;
+}
+
+#projects .glass.group > div:first-child img {
+  object-position: top center;
+}
+
+@media (min-width: 768px) {
+  #projects .glass.group {
+    display: grid;
+    min-height: clamp(360px, 32vw, 500px);
+    grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
+    align-items: stretch;
+  }
+
+  #projects .glass.group > div:first-child {
+    min-height: 100%;
+    aspect-ratio: auto;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  #projects .glass.group > div:first-child img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  #projects .glass.group > div:last-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.75rem, 3vw, 3.5rem);
+  }
+
+  #projects .glass.group > div:last-child > span:last-child {
+    margin-top: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  #projects .glass.group > div:first-child {
+    aspect-ratio: 16 / 9;
+  }
+
+  #projects .glass.group > div:first-child img {
+    object-fit: cover;
+    object-position: top center;
+  }
+}
+
 @media (max-width: 639px) {
   .project-modal-shell {
     width: 100%;
