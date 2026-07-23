@@ -38,20 +38,16 @@ async function sendText(page, message) {
 }
 
 async function assertMotionExperience(page, deviceName) {
-  await page.waitForFunction(() => Boolean(window.gsap && window.ScrollTrigger), null, { timeout: 15000 });
-  assert((await page.locator('.workflow-card').count()) === 4, `${deviceName}: workflow story does not contain four stages`);
-  assert(await page.locator('.avatar-frame img').isVisible(), `${deviceName}: illustrated digital human avatar is missing`);
-  assert(await page.locator('.service-chart').isVisible(), `${deviceName}: service chart is missing`);
-
-  await page.locator('#agent-workflow').scrollIntoViewIfNeeded();
-  await page.locator('.workflow-card').nth(2).scrollIntoViewIfNeeded();
   await page.waitForFunction(
-    () => document.querySelectorAll('.workflow-card')[2]?.classList.contains('active'),
+    () => Boolean(window.gsap) && document.documentElement.classList.contains('motion-ready'),
     null,
-    { timeout: 10000 },
+    { timeout: 15000 },
   );
-  assert((await page.locator('#workflow-output').textContent()) === 'result.verified', `${deviceName}: GSAP workflow stage did not update`);
-  await page.locator('#workspace').scrollIntoViewIfNeeded();
+  assert(await page.locator('.hero-video').isVisible(), `${deviceName}: fullscreen hero video is missing`);
+  assert(await page.locator('.dashboard-preview').isVisible(), `${deviceName}: coded dashboard preview is missing`);
+  assert(await page.locator('.service-chart').isVisible(), `${deviceName}: service chart is missing`);
+  assert((await page.locator('.metrics article').count()) === 4, `${deviceName}: dashboard does not contain four service metrics`);
+  assert((await page.locator('.quick-actions [data-quick]').count()) === 4, `${deviceName}: quick service actions are incomplete`);
 }
 
 async function runDevice(browser, device) {
@@ -69,7 +65,7 @@ async function runDevice(browser, device) {
     await page.goto(`${baseURL}/demos/digitalhuman/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForSelector('#chat-thread', { timeout: 15000 });
     assert((await page.title()).includes('AI 客服数字人'), 'Customer agent: page title is stale');
-    assert((await page.locator('h1').textContent())?.includes('真正解决问题'), 'Customer agent: redesigned hero copy missing');
+    assert((await page.locator('h1').textContent())?.includes('Smarter'), 'Customer agent: SaaS hero copy missing');
     assert(await page.getByRole('textbox', { name: '客户 ID', exact: true }).isVisible(), 'Customer agent: customer ID input has no accessible name');
     await assertNoOverflow(page, `Customer agent ${device.name} initial`);
     await assertMotionExperience(page, device.name);
