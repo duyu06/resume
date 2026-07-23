@@ -1,0 +1,239 @@
+/* Digitalhuman scroll + themed navigation patch */
+html,
+body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: clip !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto;
+}
+
+body {
+  min-height: 100svh !important;
+}
+
+.page-shell {
+  height: auto !important;
+  min-height: 100svh !important;
+  overflow: visible !important;
+}
+
+.hero {
+  min-height: calc(100svh - 84px) !important;
+  overflow: visible !important;
+}
+
+.hero-content {
+  min-height: 0;
+  padding-bottom: clamp(40px, 7vw, 96px) !important;
+}
+
+.dashboard-preview,
+.dashboard-frame,
+.dashboard-body,
+.dashboard-main,
+.workspace-grid,
+.insight-column {
+  min-height: 0;
+}
+
+.dashboard-body {
+  height: auto !important;
+  min-height: 620px;
+}
+
+.dashboard-main {
+  background:
+    radial-gradient(circle at 85% 8%, hsl(var(--accent) / 0.08), transparent 31%),
+    hsl(var(--secondary) / 0.4) !important;
+}
+
+.dashboard-sidebar {
+  position: relative;
+  border-color: hsl(var(--accent) / 0.14) !important;
+  background:
+    linear-gradient(180deg, hsl(var(--accent) / 0.075), hsl(var(--secondary) / 0.72) 48%, hsl(var(--background) / 0.96)) !important;
+}
+
+.dashboard-sidebar::after {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, hsl(var(--accent) / 0.28), transparent);
+  content: '';
+  pointer-events: none;
+}
+
+.sidebar-item {
+  position: relative;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.sidebar-item > span:first-child {
+  color: hsl(var(--accent));
+  opacity: 0.82;
+}
+
+.sidebar-item:hover,
+.sidebar-item.active {
+  background: hsl(var(--accent) / 0.11) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.sidebar-item.active::before {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 3px;
+  border-radius: 999px;
+  background: hsl(var(--accent));
+  box-shadow: 0 0 14px hsl(var(--accent) / 0.32);
+  content: '';
+}
+
+.sidebar-item:focus-visible {
+  outline-offset: -1px;
+}
+
+.sidebar-item b,
+.product-logo,
+.user-avatar,
+.mini-agent {
+  box-shadow: 0 7px 20px hsl(var(--accent) / 0.18);
+}
+
+.workflow-links {
+  border-top: 1px solid hsl(var(--accent) / 0.12);
+  padding-top: 14px !important;
+}
+
+.workflow-links small {
+  color: hsl(var(--accent)) !important;
+}
+
+.chat-thread,
+.tool-log,
+.performance-report-card pre {
+  overscroll-behavior: contain;
+  scrollbar-color: hsl(var(--accent) / 0.34) transparent;
+}
+
+#customer-id {
+  min-width: 0;
+}
+
+@media (max-width: 820px) {
+  .hero {
+    min-height: auto !important;
+  }
+
+  .dashboard-body {
+    display: block !important;
+    min-height: 0;
+    overflow: visible !important;
+  }
+
+  .dashboard-sidebar {
+    display: flex !important;
+    width: 100%;
+    overflow-x: auto;
+    border-right: 0 !important;
+    border-bottom: 1px solid hsl(var(--accent) / 0.14);
+    padding: 8px !important;
+    scrollbar-width: none;
+  }
+
+  .dashboard-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dashboard-sidebar::after,
+  .workflow-links {
+    display: none !important;
+  }
+
+  .dashboard-sidebar .sidebar-section:first-child {
+    display: flex;
+    width: max-content;
+    min-width: max-content;
+    gap: 6px;
+  }
+
+  .sidebar-item {
+    display: inline-grid;
+    min-width: max-content;
+    grid-template-columns: 16px auto auto;
+    padding-inline: 11px !important;
+  }
+
+  .sidebar-item.active::before {
+    top: auto;
+    right: 10px;
+    bottom: 0;
+    left: 10px;
+    width: auto;
+    height: 2px;
+  }
+
+  .dashboard-main {
+    padding: 13px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    min-height: 100dvh !important;
+  }
+
+  .hero-content {
+    padding-bottom: 54px !important;
+  }
+
+  .dashboard-preview {
+    margin-bottom: 0;
+  }
+
+  .dashboard-frame,
+  .dashboard-body {
+    overflow: visible !important;
+  }
+
+  .dashboard-main {
+    border-radius: 0 0 12px 12px;
+  }
+
+  .workspace-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .chat-panel {
+    height: min(430px, 68dvh) !important;
+    min-height: 360px;
+  }
+
+  .insight-column {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    padding-top: 10px;
+  }
+
+  .profile-card,
+  .performance-card,
+  .tool-card,
+  .sentiment-card,
+  .performance-report-card {
+    min-width: 0;
+  }
+
+  .metrics article:nth-child(n + 3) {
+    display: block !important;
+  }
+
+  .settings-panel {
+    position: fixed;
+    max-height: calc(100dvh - 72px);
+    overflow-y: auto;
+  }
+}
