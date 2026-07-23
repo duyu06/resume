@@ -99,10 +99,10 @@ jobs:
         run: |
           if [[ "$JOB_STATUS" == "success" ]]; then
             state=success
-            description='prmpt before/after screenshots and regression checks passed'
+            description='YOLA before/after screenshots and regression checks passed'
           else
             state=failure
-            description='prmpt visual comparison failed'
+            description='YOLA visual comparison failed'
           fi
           payload=$(printf '{"state":"%s","context":"cross-border/visual-compare","description":"%s","target_url":"%s"}' "$state" "$description" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
           curl --fail --silent --show-error \
