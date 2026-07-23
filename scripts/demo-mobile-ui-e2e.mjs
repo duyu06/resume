@@ -9,7 +9,7 @@ const projects = [
   { slug: 'guoyang', kicker: 'AI CONTENT WORKFLOW', logic: false },
   { slug: 'cross-border', kicker: 'YOLA / ATELIER EXPERIENCE', logic: true },
   { slug: 'ai-ecommerce', kicker: 'VISUAL PRODUCTION LAB', logic: false },
-  { slug: 'digitalhuman', kicker: 'REALTIME CHARACTER LAB', logic: false },
+  { slug: 'digitalhuman', kicker: 'CUSTOMER SERVICE AGENT', logic: false },
   { slug: 'rpa', kicker: 'AUTOMATION RUNBOOK', logic: false },
   { slug: 'webui', kicker: 'LOCAL INFERENCE CONSOLE', logic: true },
   { slug: 'soulcaller', kicker: 'NARRATIVE ORCHESTRATION', logic: true },
