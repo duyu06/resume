@@ -27,11 +27,18 @@ for (const device of devices) {
     page.on('pageerror', (error) => errors.push(error.message));
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
-      await page.waitForTimeout(2500);
+      await page.waitForTimeout(1500);
       if (label === 'after') {
-        await page.waitForSelector('.prmpt-logo', { timeout: 15000 });
-        await page.waitForFunction(() => document.querySelectorAll('#gallery-grid .product-card').length === 10, null, { timeout: 15000 });
+        await page.waitForSelector('.yola-logo', { timeout: 15000 });
+        await page.waitForFunction(() => document.querySelectorAll('.awards-grid .product-card').length === 6, null, { timeout: 15000 });
+        await page.waitForFunction(() => {
+          const hero = document.querySelector('#hero-video source')?.getAttribute('src') || '';
+          const reveal = document.querySelector('#collection-video source')?.getAttribute('src') || '';
+          return hero.startsWith('./assets/videos/') && reveal.startsWith('./assets/videos/');
+        }, null, { timeout: 15000 });
       }
+      const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth);
+      if (overflow > 2) throw new Error(`${label} horizontal overflow: ${overflow}px`);
       await page.screenshot({ path: `${outputDir}/${device.name}-${label}.png`, fullPage: false });
       results.push({ device: device.name, label, status: 'passed', errors });
     } catch (error) {
@@ -45,7 +52,7 @@ for (const device of devices) {
 
 await browser.close();
 
-const html = `<!doctype html><meta charset="utf-8"><title>Cross-border visual comparison</title><style>body{font-family:Arial,sans-serif;margin:24px;background:#f3f3f3;color:#111}section{margin-bottom:40px}div{display:grid;grid-template-columns:1fr 1fr;gap:16px}figure{margin:0;background:#fff;padding:12px;border-radius:12px}img{width:100%;display:block}figcaption{margin-top:8px;font-weight:700}</style>${devices.map((device) => `<section><h1>${device.name}</h1><div><figure><img src="${device.name}-before.png"><figcaption>Before</figcaption></figure><figure><img src="${device.name}-after.png"><figcaption>After</figcaption></figure></div></section>`).join('')}`;
+const html = `<!doctype html><meta charset="utf-8"><title>Cross-border visual comparison</title><style>body{font-family:Arial,sans-serif;margin:24px;background:#f3f3f3;color:#111}section{margin-bottom:40px}div{display:grid;grid-template-columns:1fr 1fr;gap:16px}figure{margin:0;background:#fff;padding:12px;border-radius:12px}img{width:100%;display:block}figcaption{margin-top:8px;font-weight:700}</style>${devices.map((device) => `<section><h1>${device.name}</h1><div><figure><img src="${device.name}-before.png"><figcaption>Before · preserved baseline</figcaption></figure><figure><img src="${device.name}-after.png"><figcaption>After · YOLA jewelry</figcaption></figure></div></section>`).join('')}`;
 await writeFile(`${outputDir}/comparison.html`, html, 'utf8');
 await writeFile(`${outputDir}/report.json`, JSON.stringify({ beforeURL, afterURL, results }, null, 2), 'utf8');
 
