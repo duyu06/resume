@@ -101,7 +101,7 @@
     fileInput.value = '';
     $('#product-preview').src = `${SAMPLE_ROOT}/product_ref.png`;
     $('#file-label').textContent = '示例：DDLYQ005 产品身份证';
-    notify('已恢复 PrismPix 上游示例');
+    notify('示例产品已载入');
   });
 
   function setStage(name) {
@@ -321,7 +321,7 @@
       }
       renderImages(workspace);
       setStage('images');
-      notify(state.real ? '真实图片任务已完成' : '演示图片已载入（来自 PrismPix 上游 samples）');
+      notify(state.real ? '真实图片任务已完成' : '演示图片已载入');
     } catch (error) {
       notify(error.message);
     } finally {

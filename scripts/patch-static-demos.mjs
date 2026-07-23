@@ -95,6 +95,12 @@ const demoIndexes = [
   'dist/demos/soulcaller/index.html',
 ];
 
+const runtimeCopyFiles = [
+  'dist/demos/ai-ecommerce/app.js',
+  'dist/demos/digitalhuman/app.js',
+  'dist/demos/rpa/app.js',
+];
+
 const demoStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode.css" />';
 const demoFitStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode-fit.css" />';
 const demoScript = '<script defer src="/resume/demos/demo-mode.js"></script>';
@@ -102,7 +108,7 @@ const demoFixScript = '<script defer src="/resume/demos/demo-mode-review-fixes.j
 const demoThemeScript = '<script defer src="/resume/demos/demo-mode-theme.js"></script>';
 const upstreamSourceAnchorPattern = /<a\b[^>]*>\s*[^<]*上游源码[^<]*<\/a>/giu;
 const provenanceMarkerPattern = /<(span|p|small)\b[^>]*>\s*[^<]{0,140}\b(?:ADAPTER|UPSTREAM|COMPATIBLE|COMPATIBILITY\s+DEMO)\b[^<]{0,140}<\/\1>/giu;
-const provenanceMarkerCheck = /\b(?:ADAPTER|UPSTREAM|COMPATIBLE|COMPATIBILITY\s+DEMO)\b/iu;
+const removedPresentationCopy = /(?:上游源码|上游|原项目|\bADAPTER\b|\bUPSTREAM\b|\bCOMPATIBLE\b|COMPATIBILITY\s+DEMO|(?:GPL-3\.0|AGPL-3\.0|MIT)\s*↗)/iu;
 const yolaMarkerTemplate = Array.from(
   { length: 14 },
   (_, index) => `<i data-yola-marker="${String(index + 1).padStart(2, '0')}"></i>`,
@@ -112,8 +118,6 @@ const unresolvedYolaMarkerTemplate = '${Array.from({length:14},(_,index)=>`<i da
 for (const path of demoIndexes) {
   let content = await readFile(path, 'utf8');
 
-  // Demo pages should present the project itself. Source attribution and
-  // licensing remain in repository documentation instead of visible badges.
   content = content
     .replace(upstreamSourceAnchorPattern, '')
     .replace(provenanceMarkerPattern, '');
@@ -143,15 +147,11 @@ for (const path of demoIndexes) {
     content = content.replace('</body>', `  ${demoThemeScript}\n</body>`);
   }
 
-  if (/<a\b[^>]*>\s*[^<]*上游源码/iu.test(content)) {
-    throw new Error(`${path}: visible upstream source link survived sanitization`);
-  }
-
   const visibleMarkup = content
     .replace(/<script\b[\s\S]*?<\/script>/giu, '')
     .replace(/<style\b[\s\S]*?<\/style>/giu, '');
-  if (provenanceMarkerCheck.test(visibleMarkup)) {
-    throw new Error(`${path}: visible adapter/upstream/compatible marker survived sanitization`);
+  if (removedPresentationCopy.test(visibleMarkup)) {
+    throw new Error(`${path}: removed provenance or source copy is still visible`);
   }
 
   if (path.endsWith('/cross-border/index.html')) {
@@ -162,7 +162,14 @@ for (const path of demoIndexes) {
   await writeFile(path, content, 'utf8');
 }
 
+for (const path of runtimeCopyFiles) {
+  const content = await readFile(path, 'utf8');
+  if (removedPresentationCopy.test(content)) {
+    throw new Error(`${path}: removed provenance or source copy remains in runtime JavaScript`);
+  }
+}
+
 const deploymentRevision = process.env.GITHUB_SHA || 'local-build';
 await writeFile('dist/deploy-revision.txt', `${deploymentRevision}\n`, 'utf8');
 
-console.log(`Patched ${stylesheets.length} static demo stylesheets, 5 demo scripts, ${demoIndexes.length} themed demo pages, and revision ${deploymentRevision}.`);
+console.log(`Patched ${stylesheets.length} static demo stylesheets, audited ${runtimeCopyFiles.length} runtime scripts, themed ${demoIndexes.length} demo pages, and wrote revision ${deploymentRevision}.`);
