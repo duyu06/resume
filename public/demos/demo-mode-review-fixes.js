@@ -84,8 +84,8 @@
       session: [],
     },
     digitalhuman: {
-      local: ['fengge_backend', 'fengge_region', 'fengge_real', 'fengge_demo_characters', 'fengge_demo_personas'],
-      session: ['fengge_api_key'],
+      local: ['customer_agent_backend', 'customer_agent_real', 'customer_agent_customer_id', 'customer_agent_conversation_id'],
+      session: ['customer_agent_token'],
     },
     rpa: {
       local: ['webrpa_backend', 'webrpa_real', 'webrpa_demo_workflow'],
@@ -111,6 +111,102 @@
     },
     true,
   );
+
+  if (slug === 'digitalhuman') {
+    $('#demo-mode-title', panel).textContent = 'AI 客服数字人 Agent';
+    $('.demo-mode-copy', panel).textContent = '演示数字人客服接待、订单查询、库存核验、退款处理、情绪识别、工具调用和人工转接。';
+    $('.demo-mode-boundary', panel).textContent = '默认使用本地演示 Agent，不调用真实订单、退款或模型服务。真实模式仅连接自行部署的客服 Agent API。';
+
+    const runButton = $('[data-demo-action="run"]', panel);
+    const errorButton = $('[data-demo-action="error"]', panel);
+
+    const ensureLocalAgent = () => {
+      const realMode = $('#real-mode');
+      if (!realMode?.checked) return;
+      realMode.checked = false;
+      realMode.dispatchEvent(new Event('change', { bubbles: true }));
+      addLog('已切换回本地演示 Agent');
+    };
+
+    const runCustomerAgentDemo = async () => {
+      if (runButton.disabled) return;
+      document.body.classList.remove('demo-mode-error');
+      log.innerHTML = '';
+      setActionsDisabled(true);
+      ensureLocalAgent();
+      addLog('开始运行 AI 客服数字人演示');
+
+      try {
+        setProgress(10, '建立客服会话');
+        $('#new-conversation')?.click();
+        await waitFor(() => $$('.message.agent').length >= 1, 5000);
+
+        setProgress(28, '查询客户订单');
+        $('[data-quick="order"]')?.click();
+        await waitFor(() => $$('.message.agent').length >= 2 && $('#tool-log')?.textContent?.includes('lookup_order'), 12000);
+        addLog('订单查询工具已返回物流状态', 'success');
+
+        setProgress(58, '处理退款预申请');
+        $('[data-quick="refund"]')?.click();
+        await waitFor(() => $$('.message.agent').length >= 3 && $('#tool-log')?.textContent?.includes('process_refund'), 12000);
+        addLog('退款资格已核验并生成预申请', 'success');
+
+        setProgress(82, '汇总服务质量');
+        $('#load-performance')?.click();
+        await waitFor(() => $('#performance-report')?.textContent?.includes('工具调用'), 5000);
+
+        setProgress(100, '演示完成');
+        addLog('客服会话、工具调用、情绪分析与性能报告均已完成', 'success');
+        showToast('AI 客服数字人演示完成');
+      } catch (error) {
+        document.body.classList.add('demo-mode-error');
+        setProgress(Number(percent.textContent.replace('%', '')) || 0, '演示失败');
+        addLog(error instanceof Error ? error.message : String(error), 'error');
+        showToast('客服 Agent 演示未完成');
+      } finally {
+        setActionsDisabled(false);
+      }
+    };
+
+    const runCustomerAgentError = async () => {
+      if (errorButton.disabled) return;
+      setActionsDisabled(true);
+      document.body.classList.add('demo-mode-error');
+      log.innerHTML = '';
+      setProgress(24, '模拟订单工具异常');
+      addLog('订单服务暂时不可用，Agent 保留会话上下文并启动降级策略');
+      await sleep(420);
+      setProgress(64, '转人工坐席');
+      addLog('自动处理停止，客户 ID、会话 ID 和问题摘要已准备转交', 'error');
+      await sleep(320);
+      setProgress(100, '异常已捕获');
+      showToast('客服 Agent 异常路径已完成');
+      setActionsDisabled(false);
+    };
+
+    runButton?.addEventListener(
+      'click',
+      (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        runCustomerAgentDemo();
+      },
+      true,
+    );
+
+    errorButton?.addEventListener(
+      'click',
+      (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        runCustomerAgentError();
+      },
+      true,
+    );
+
+    window.__portfolioDemoMode.run = runCustomerAgentDemo;
+    window.__portfolioDemoMode.error = runCustomerAgentError;
+  }
 
   if (slug === 'rpa') {
     const errorButton = $('[data-demo-action="error"]', panel);
