@@ -1,0 +1,92 @@
+name: Capture Project Card Screenshots
+
+on:
+  push:
+    branches: [main, feat/project-page-screenshots]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium screenshot runtime
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Build current subprojects
+        run: npm run build
+        env:
+          VITE_MAXKB_EMBED_URL: ${{ vars.MAXKB_EMBED_URL }}
+
+      - name: Start preview for subproject capture
+        run: |
+          npm run preview -- --host 127.0.0.1 > /tmp/project-capture-preview.log 2>&1 &
+          echo $! > /tmp/project-capture-preview.pid
+          for attempt in {1..40}; do
+            if curl --fail --silent http://127.0.0.1:4173/resume/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/project-capture-preview.log
+          exit 1
+
+      - name: Capture six subproject pages
+        run: node scripts/capture-project-card-images.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+
+      - name: Rebuild portfolio with captured images
+        run: |
+          kill "$(cat /tmp/project-capture-preview.pid)" || true
+          npm run build
+          npm run preview -- --host 127.0.0.1 > /tmp/project-verify-preview.log 2>&1 &
+          echo $! > /tmp/project-verify-preview.pid
+          for attempt in {1..40}; do
+            if curl --fail --silent http://127.0.0.1:4173/resume/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/project-verify-preview.log
+          exit 1
+        env:
+          VITE_MAXKB_EMBED_URL: ${{ vars.MAXKB_EMBED_URL }}
+
+      - name: Verify portfolio project cards
+        run: node scripts/verify-project-card-images.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_OUTPUT_DIR: test-results/project-card-images
+
+      - name: Upload visual evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-card-screenshots
+          path: test-results/project-card-images
+          retention-days: 14
+
+      - name: Commit captured project screenshots
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/components/ProjectsCatalog.tsx public/assets/projects/project-*-page-*.jpg
+          if git diff --cached --quiet; then
+            echo 'No screenshot changes to commit.'
+            exit 0
+          fi
+          git commit -m 'feat: use live subproject captures on project cards [skip project-capture]'
+          git push origin HEAD:${GITHUB_REF_NAME}
