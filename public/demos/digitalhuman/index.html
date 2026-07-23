@@ -3,225 +3,227 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#02090a" />
-  <meta name="description" content="AI 客服数字人 Agent 演示：智能问答、订单查询、物流跟踪、库存检查、退款、情绪分析、人工转接与会话记忆。" />
-  <title>AI 客服数字人 Agent · 智能服务工作台</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="AI 客服数字人 Agent 展示 Demo：订单查询、库存核验、退款处理、情绪识别与人工转接。" />
+  <title>AI 客服数字人 · Smarter Customer Service</title>
   <link rel="stylesheet" href="./app.css" />
-  <link rel="stylesheet" href="./reference-redesign.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script defer src="./storage-migration.js"></script>
   <script defer src="./app.js"></script>
   <script defer src="./motion.js"></script>
 </head>
 <body>
-  <div class="ambient-grid" aria-hidden="true"></div>
-  <div class="cursor-aura" aria-hidden="true"></div>
+  <div class="page-shell">
+    <video class="hero-video" autoplay muted loop playsinline aria-hidden="true">
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260319_015952_e1deeb12-8fb7-4071-a42a-60779fc64ab6.mp4" type="video/mp4" />
+    </video>
+    <div class="video-wash" aria-hidden="true"></div>
 
-  <header class="topbar" data-motion="topbar">
-    <a class="brand" href="#workspace" aria-label="返回 AI 客服数字人工作台顶部">
-      <span class="brand-orb" aria-hidden="true"><i></i></span>
-      <span><b>AI CS AGENT</b><small>智能服务 · 高效连接</small></span>
-    </a>
-    <div class="topbar-center">
-      <span id="connection-badge" class="connection-badge">演示模式</span>
-      <span class="demo-note">当前为离线演示，业务结果使用模拟数据</span>
-    </div>
-    <div class="top-actions">
-      <a class="portfolio-link" href="/resume/#projects">作品集</a>
-      <button id="settings-toggle" type="button" aria-expanded="false">系统状态 · 运行中</button>
-    </div>
-  </header>
+    <header class="navbar" data-motion="nav">
+      <a class="brand" href="#hero" aria-label="返回页面顶部">
+        <span class="brand-mark">✦</span>
+        <span>AI Customer Agent</span>
+      </a>
 
-  <section id="settings-panel" class="settings-panel" hidden>
-    <label>客服 Agent API 地址
-      <input id="backend-url" type="url" placeholder="http://127.0.0.1:8000" autocomplete="url" />
-    </label>
-    <label>网关访问令牌（可选，仅当前浏览器）
-      <input id="agent-token" type="password" placeholder="不要填写模型提供商 API Key" autocomplete="off" />
-    </label>
-    <label class="mode-switch"><input id="real-mode" type="checkbox" /> 使用真实客服 Agent 后端</label>
-    <button id="test-backend" type="button">测试连接</button>
-    <p>模型提供商密钥必须配置在服务端环境变量中。本页面不会保存 OpenAI、OpenRouter、Groq 等模型密钥。</p>
-  </section>
+      <nav class="nav-links" aria-label="页面导航">
+        <a href="#hero">Home</a>
+        <a href="#dashboard">Product</a>
+        <a href="#dashboard">Workflow</a>
+        <a href="/resume/#projects">About</a>
+      </nav>
 
-  <aside class="app-nav" aria-label="客服工作台导航" data-motion="sidebar">
-    <a class="nav-logo" href="#workspace"><span>CS</span><b>Agent OS</b></a>
-    <nav>
-      <button class="nav-item active" type="button" data-scroll-target="#workspace"><span>01</span>实时对话</button>
-      <button class="nav-item" type="button" data-scroll-target="#order-center"><span>02</span>订单查询</button>
-      <button class="nav-item" type="button" data-scroll-target="#agent-workflow"><span>03</span>物流跟踪</button>
-      <button class="nav-item" type="button" data-quick-nav="inventory"><span>04</span>商品库存</button>
-      <button class="nav-item" type="button" data-quick-nav="refund"><span>05</span>退款申请</button>
-      <button class="nav-item" type="button" data-scroll-target="#performance-zone"><span>06</span>数据看板</button>
-    </nav>
-    <div class="nav-status">
-      <i></i>
-      <span><b>演示服务正常</b><small>所有工具可模拟运行</small></span>
-    </div>
-  </aside>
-
-  <main class="experience-shell">
-    <header class="reference-hero" data-motion="hero-title">
-      <h1>AI 客服数字人 <span>Agent</span></h1>
-      <p>全渠道智能服务　·　订单查询　·　退货退款　·　情绪识别　·　人工转接</p>
+      <div class="nav-actions">
+        <a class="nav-text-link" href="/resume/#projects">作品集</a>
+        <button id="settings-toggle" class="primary-button nav-cta" type="button" aria-expanded="false">Agent 配置</button>
+      </div>
     </header>
 
-    <section id="workspace" class="hero-board" aria-label="AI 客服数字人工作台">
-      <article class="avatar-deck glass-panel" data-motion="avatar">
-        <div class="deck-kicker"><span>DIGITAL HUMAN</span><b>在线</b></div>
-        <div class="avatar-frame">
-          <div class="avatar-depth avatar-depth-one" aria-hidden="true"></div>
-          <div class="avatar-depth avatar-depth-two" aria-hidden="true"></div>
-          <img src="./customer-agent-avatar.svg" alt="AI 客服数字人形象" />
-          <button class="voice-toggle" type="button" aria-label="切换数字人语音状态"><span>◖</span></button>
-        </div>
-        <div class="listening-card">
-          <div class="voice-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div><b>林晓雨 · Gold</b><span>CUST-001 · Web · 中文</span></div>
-        </div>
-        <div class="avatar-caption">
-          <span>AI CUSTOMER SERVICE</span>
-          <h1>林晓雨</h1>
-          <p>订单查询 · 退货退款 · 库存核验 · 人工转接</p>
-        </div>
-      </article>
-
-      <section class="agent-console" data-motion="console">
-        <header class="console-head">
-          <div>
-            <small>LIVE SUPPORT WORKSPACE</small>
-            <h2>实时会话工作台</h2>
-          </div>
-          <div class="conversation-meta">
-            <span>会话 ID</span>
-            <b id="conversation-id">CONV-DEMO-001</b>
-          </div>
-          <div class="console-actions">
-            <button id="load-performance" type="button">性能报告</button>
-            <button id="new-conversation" type="button">新建会话</button>
-          </div>
-        </header>
-
-        <section id="order-center" class="metrics" aria-label="客服指标">
-          <article data-metric-card><span>当前客户</span><b id="metric-customer">CUST-001</b><small>会员等级 · Gold</small></article>
-          <article data-metric-card><span>情绪状态</span><b id="metric-sentiment">中性</b><small>实时风险识别</small></article>
-          <article data-metric-card><span>工具调用</span><b id="metric-tools">04</b><small>业务系统调用轨迹</small></article>
-          <article data-metric-card><span>未读消息</span><b id="metric-messages">08</b><small>当前会话上下文</small></article>
-        </section>
-
-        <section class="chat-panel glass-panel">
-          <div class="chat-head">
-            <div class="agent-id"><span class="mini-avatar">AI</span><span><b>AI 客服数字人</b><small>订单、库存、退款与售后</small></span></div>
-            <span id="agent-state">会话进行中</span>
-          </div>
-          <div id="chat-thread" class="chat-thread" role="log" aria-live="polite"></div>
-          <form id="chat-form" class="composer">
-            <textarea id="message-input" rows="2" placeholder="输入您的问题，例如：帮我查询订单 ORD-12345" required></textarea>
-            <button id="send-message" type="submit"><span>发送</span><b>↗</b></button>
-          </form>
-          <section class="quick-actions" aria-label="快捷客服场景">
-            <button type="button" data-quick="order"><span>01</span><b>订单查询</b><small>获取状态与物流</small></button>
-            <button type="button" data-quick="inventory"><span>02</span><b>库存核验</b><small>查看可售与配送</small></button>
-            <button type="button" data-quick="refund"><span>03</span><b>退款提交</b><small>进入确认闭环</small></button>
-            <button type="button" data-quick="angry"><span>04</span><b>人工转接</b><small>处理负面情绪</small></button>
-          </section>
-        </section>
-      </section>
-
-      <aside class="insight-deck" data-motion="insights">
-        <section class="customer-panel glass-panel">
-          <div class="panel-head"><small>CUSTOMER PROFILE</small><button type="button" aria-label="编辑客户资料">编辑</button></div>
-          <div class="customer-card">
-            <div class="customer-avatar">林</div>
-            <div><h3>林晓雨</h3><p>普通会员 · Web · 中文</p></div>
-          </div>
-          <dl class="customer-facts">
-            <div><dt>客户 ID</dt><dd><input id="customer-id" aria-label="客户 ID" value="CUST-001" /></dd></div>
-            <div><dt>最近订单</dt><dd id="customer-order">ORD-12345</dd></div>
-            <div><dt>累计订单</dt><dd>12</dd></div>
-            <div><dt>累计消费</dt><dd>¥2,856.00</dd></div>
-          </dl>
-        </section>
-
-        <section id="performance-zone" class="performance-panel glass-panel">
-          <div class="panel-head"><small>AGENT STATUS</small><b class="online-label"><i></i>正常服务中</b></div>
-          <div class="service-stats">
-            <div><span>响应速度</span><b>1.2s</b><small>优秀</small></div>
-            <div><span>解决率</span><b>98.6%</b><small>优秀</small></div>
-            <div><span>满意度</span><b>4.9/5</b><small>优秀</small></div>
-          </div>
-          <div class="service-chart" aria-label="24 小时服务趋势图">
-            <svg viewBox="0 0 320 110" role="img" aria-label="服务质量趋势">
-              <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5fe6a0" stop-opacity=".42"/><stop offset="1" stop-color="#5fe6a0" stop-opacity="0"/></linearGradient></defs>
-              <path d="M0 88 C28 76 42 36 66 54 S105 87 128 62 S171 42 194 65 S233 31 256 51 S292 65 320 42 L320 110 L0 110Z" fill="url(#chartFill)"/>
-              <path d="M0 88 C28 76 42 36 66 54 S105 87 128 62 S171 42 194 65 S233 31 256 51 S292 65 320 42" fill="none" stroke="#5fe6a0" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-          </div>
-        </section>
-
-        <section class="tool-panel">
-          <section class="glass-panel">
-            <div class="panel-head"><small>TOOL TRACE</small><b>Agent 工具调用</b></div>
-            <div id="tool-log" class="tool-log"><p>等待 Agent 选择工具。</p></div>
-          </section>
-          <section class="glass-panel sentiment-panel">
-            <div class="panel-head"><small>SENTIMENT</small><b>情绪识别 · 中性</b></div>
-            <div class="sentiment-meter"><i id="sentiment-fill"></i></div>
-            <strong id="sentiment-value">neutral · 0.00</strong>
-            <p id="handoff-note">当前无需人工接管。</p>
-          </section>
-          <section class="glass-panel performance-report-panel">
-            <div class="panel-head"><small>PERFORMANCE</small><b>服务质量报告</b></div>
-            <pre id="performance-report">完成一次会话后查看性能报告。</pre>
-          </section>
-        </section>
-      </aside>
-    </section>
-
-    <section id="agent-workflow" class="workflow-story" aria-label="客服 Agent 工作流程">
-      <header class="story-head">
-        <span>AGENT WORKFLOW</span>
-        <h2>从客户意图到业务结果，<br />每一步都可追踪。</h2>
-        <p>采用分层叙事和交互发现方式，把隐藏在对话背后的判断、工具调用与人工边界公开展示。</p>
-      </header>
-      <div class="story-layout">
-        <div class="workflow-stage glass-panel" aria-hidden="true">
-          <div class="workflow-orb" id="workflow-orb"><i></i><b>01</b></div>
-          <span id="workflow-label">理解客户意图</span>
-          <div class="workflow-line"><i></i></div>
-          <div class="workflow-output">
-            <small>LIVE OUTPUT</small>
-            <strong id="workflow-output">intent.detected</strong>
-          </div>
-        </div>
-        <div class="workflow-cards">
-          <article class="workflow-card active" data-step="0" data-label="理解客户意图" data-output="intent.detected">
-            <span>01</span><div><h3>意图与情绪识别</h3><p>提取订单号、售后诉求、负面情绪和人工接管意图。</p></div>
-          </article>
-          <article class="workflow-card" data-step="1" data-label="选择业务工具" data-output="tool.selected">
-            <span>02</span><div><h3>选择业务工具</h3><p>在订单、物流、库存、退款和知识库之间选择最小必要工具。</p></div>
-          </article>
-          <article class="workflow-card" data-step="2" data-label="验证业务结果" data-output="result.verified">
-            <span>03</span><div><h3>验证业务结果</h3><p>将工具返回值转成客户可理解的结论，并保留调用轨迹。</p></div>
-          </article>
-          <article class="workflow-card" data-step="3" data-label="人工安全接管" data-output="handoff.ready">
-            <span>04</span><div><h3>人工安全接管</h3><p>遇到强烈负面情绪或明确人工请求时，完整保留上下文并转接。</p></div>
-          </article>
-        </div>
+    <section id="settings-panel" class="settings-panel" hidden aria-label="Agent 配置">
+      <div class="settings-head">
+        <div><span>AGENT SETTINGS</span><h2>连接真实客服后端</h2></div>
+        <span id="connection-badge" class="status-chip">演示模式</span>
       </div>
+      <div class="settings-grid">
+        <label>客服 Agent API 地址
+          <input id="backend-url" type="url" placeholder="http://127.0.0.1:8000" autocomplete="url" />
+        </label>
+        <label>网关访问令牌
+          <input id="agent-token" type="password" placeholder="仅保存在当前浏览器会话" autocomplete="off" />
+        </label>
+        <label class="switch-row"><input id="real-mode" type="checkbox" /> 使用真实客服 Agent 后端</label>
+        <button id="test-backend" class="secondary-button" type="button">测试连接</button>
+      </div>
+      <p>这是展示 Demo。模型服务密钥应配置在服务端环境变量中，不应写入浏览器页面。</p>
     </section>
 
-    <footer class="page-footer">
-      <span>AI CUSTOMER SERVICE · DIGITAL HUMAN AGENT</span>
-      <p>浏览器演示不会创建真实订单、退款或人工工单。</p>
-      <a href="/resume/#projects">返回项目作品集</a>
-    </footer>
-  </main>
+    <main id="hero" class="hero">
+      <div class="hero-content">
+        <div class="hero-badge" data-motion="badge">Now powered by AI Agent <span>✨</span></div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+        <h1 data-motion="headline">
+          The Future of<br />
+          <em>Smarter</em> Customer Service
+        </h1>
+
+        <p class="hero-subtitle" data-motion="subtitle">
+          通过智能客服 Agent 自动完成订单查询、库存核验、退款处理、情绪识别与人工转接，
+          让团队把时间留给真正重要的客户问题。
+        </p>
+
+        <div class="hero-actions" data-motion="actions">
+          <button id="hero-demo" class="primary-button hero-primary" type="button">体验客服 Demo</button>
+          <button id="demo-play" class="play-button" type="button" aria-label="启动自动演示">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" /></svg>
+          </button>
+        </div>
+
+        <section id="dashboard" class="dashboard-preview" data-motion="dashboard" aria-label="AI 客服数字人工作台预览">
+          <div class="dashboard-frame">
+            <div class="dashboard-topbar">
+              <div class="product-switcher">
+                <span class="product-logo">A</span>
+                <strong>Agent OS</strong>
+                <span class="chevron">⌄</span>
+              </div>
+
+              <div class="dashboard-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+                <span>搜索客户、订单或会话</span>
+                <kbd>⌘K</kbd>
+              </div>
+
+              <div class="dashboard-user-actions">
+                <button type="button">新建工单</button>
+                <span class="bell" aria-label="通知">♢</span>
+                <span class="user-avatar">林</span>
+              </div>
+            </div>
+
+            <div class="dashboard-body">
+              <aside class="dashboard-sidebar" aria-label="工作台导航">
+                <div class="sidebar-section">
+                  <button class="sidebar-item active" type="button"><span>⌂</span>实时会话</button>
+                  <button class="sidebar-item" type="button"><span>◎</span>订单查询 <b>10</b></button>
+                  <button class="sidebar-item" type="button"><span>↗</span>物流跟踪</button>
+                  <button class="sidebar-item" type="button"><span>□</span>商品库存</button>
+                  <button class="sidebar-item" type="button"><span>↶</span>退款处理</button>
+                  <button class="sidebar-item" type="button"><span>◇</span>人工转接</button>
+                </div>
+                <div class="sidebar-section workflow-links">
+                  <small>WORKFLOWS</small>
+                  <span>意图识别</span>
+                  <span>工具调用</span>
+                  <span>情绪风控</span>
+                  <span>服务报告</span>
+                </div>
+              </aside>
+
+              <section class="dashboard-main agent-console">
+                <div class="workspace-heading">
+                  <div>
+                    <span>LIVE SUPPORT WORKSPACE</span>
+                    <h2>欢迎，林晓雨</h2>
+                  </div>
+                  <div class="workspace-actions">
+                    <button id="load-performance" class="pill-button" type="button">性能报告</button>
+                    <button id="new-conversation" class="pill-button accent" type="button">新建会话</button>
+                  </div>
+                </div>
+
+                <div class="quick-actions" aria-label="快捷客服场景">
+                  <button type="button" data-quick="order"><span>↗</span>查询订单</button>
+                  <button type="button" data-quick="inventory"><span>□</span>库存核验</button>
+                  <button type="button" data-quick="refund"><span>↶</span>申请退款</button>
+                  <button type="button" data-quick="angry"><span>◇</span>转接人工</button>
+                  <span class="customize-label">Customize</span>
+                </div>
+
+                <section class="metrics" aria-label="客服指标">
+                  <article><span>当前客户</span><b id="metric-customer">CUST-001</b><small>会员等级 · Gold</small></article>
+                  <article><span>情绪状态</span><b id="metric-sentiment">中性</b><small>实时风险识别</small></article>
+                  <article><span>工具调用</span><b id="metric-tools">0</b><small>本轮业务执行</small></article>
+                  <article><span>本轮消息</span><b id="metric-messages">0</b><small>当前会话上下文</small></article>
+                </section>
+
+                <div class="workspace-grid">
+                  <section class="chat-panel">
+                    <header class="chat-head">
+                      <div class="agent-id">
+                        <span class="mini-agent">AI</span>
+                        <span><b>AI 客服数字人</b><small>订单、库存、退款与售后</small></span>
+                      </div>
+                      <div class="conversation-state">
+                        <i></i><span id="agent-state">等待客户消息</span>
+                        <small id="conversation-id">CONV-DEMO-001</small>
+                      </div>
+                    </header>
+
+                    <div id="chat-thread" class="chat-thread" role="log" aria-live="polite"></div>
+
+                    <div class="composer-row">
+                      <form id="chat-form" class="composer">
+                        <textarea id="message-input" rows="1" placeholder="输入问题，例如：帮我查询订单 ORD-12345" required></textarea>
+                        <button id="send-message" type="submit" aria-label="发送消息">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-5 16-3-6z"/></svg>
+                        </button>
+                      </form>
+                    </div>
+                  </section>
+
+                  <aside class="insight-column">
+                    <section class="profile-card">
+                      <div class="panel-title"><span>CUSTOMER PROFILE</span><button type="button">编辑</button></div>
+                      <div class="profile-main">
+                        <span class="profile-avatar">林</span>
+                        <div><b>林晓雨</b><small>Gold · Web · 中文</small></div>
+                      </div>
+                      <dl class="profile-facts">
+                        <div><dt>客户 ID</dt><dd><input id="customer-id" aria-label="客户 ID" value="CUST-001" /></dd></div>
+                        <div><dt>最近订单</dt><dd id="customer-order">ORD-12345</dd></div>
+                        <div><dt>累计订单</dt><dd>12</dd></div>
+                        <div><dt>累计消费</dt><dd>¥2,856.00</dd></div>
+                      </dl>
+                    </section>
+
+                    <section class="performance-card">
+                      <div class="panel-title"><span>AGENT STATUS</span><b><i></i>正常服务中</b></div>
+                      <div class="performance-stats">
+                        <div><span>响应速度</span><b>1.2s</b><small>优秀</small></div>
+                        <div><span>解决率</span><b>98.6%</b><small>优秀</small></div>
+                        <div><span>满意度</span><b>4.9/5</b><small>优秀</small></div>
+                      </div>
+                      <svg class="service-chart" viewBox="0 0 320 88" role="img" aria-label="服务质量趋势图">
+                        <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="currentColor" stop-opacity=".16"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+                        <path d="M0 72 C28 62 43 29 68 43 S109 74 132 50 S174 30 198 54 S235 22 258 40 S294 53 320 27 L320 88 L0 88Z" fill="url(#chartFill)"/>
+                        <path d="M0 72 C28 62 43 29 68 43 S109 74 132 50 S174 30 198 54 S235 22 258 40 S294 53 320 27" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </section>
+
+                    <section class="tool-card">
+                      <div class="panel-title"><span>TOOL TRACE</span><b>工具调用轨迹</b></div>
+                      <div id="tool-log" class="tool-log"><p>等待 Agent 选择工具。</p></div>
+                    </section>
+
+                    <section class="sentiment-card">
+                      <div class="panel-title"><span>SENTIMENT</span><b>情绪与风险</b></div>
+                      <div class="sentiment-meter"><i id="sentiment-fill"></i></div>
+                      <div class="sentiment-copy"><strong id="sentiment-value">neutral · 0.00</strong><p id="handoff-note">当前无需人工接管。</p></div>
+                    </section>
+
+                    <section class="performance-report-card" aria-label="服务质量报告">
+                      <div class="panel-title"><span>PERFORMANCE</span><b>会话摘要</b></div>
+                      <pre id="performance-report">完成一次会话后查看性能报告。</pre>
+                    </section>
+                  </aside>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
 </body>
 </html>
