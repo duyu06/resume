@@ -2,7 +2,7 @@ name: Capture Project Card Screenshots
 
 on:
   push:
-    branches: [feat/project-page-screenshots]
+    branches: [main, feat/project-page-screenshots]
   workflow_dispatch:
 
 permissions:
