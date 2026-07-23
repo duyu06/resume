@@ -12,13 +12,18 @@
 
   const applyPanelCompatibility = () => {
     const title = document.querySelector('#demo-mode-title');
-    if (!title || title.dataset.customerAgentCompat === 'true') return false;
+    const kicker = document.querySelector('.demo-mode-kicker');
+    if (!title || !kicker || title.dataset.customerAgentCompat === 'true') return false;
+
     title.dataset.customerAgentCompat = 'true';
     const hidden = document.createElement('span');
     hidden.textContent = 'talk-to-fengge-live 数字人';
     hidden.setAttribute('aria-hidden', 'true');
     hidden.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
     title.append(hidden);
+
+    kicker.textContent = 'REALTIME CHARACTER LAB';
+    kicker.classList.add('customer-agent-kicker');
     return true;
   };
 
