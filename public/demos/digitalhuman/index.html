@@ -27,8 +27,7 @@
     <label>Vidu API Key（仅当前浏览器）<input id="api-key" type="password" placeholder="可留空，由后端 .env 提供" autocomplete="off" /></label>
     <label class="mode-switch"><input id="real-mode" type="checkbox" /> 使用真实后端</label>
     <button id="connect-backend" type="button">连接并同步</button>
-    <a id="open-native" href="http://127.0.0.1:8791" target="_blank" rel="noopener noreferrer">打开原生 RTC 控制台 ↗</a>
-    <p>真实视频通话由 talk-to-fengge-live 后端、WebSocket 代理与阿里云 RTC 完成。本页负责角色配置、音色克隆、会话创建和状态展示。</p>
+    <a id="open-native" href="http://127.0.0.1:8791" target="_blank" rel="noopener noreferrer">打开 RTC 控制台 ↗</a>
   </section>
 
   <main class="page">
@@ -41,7 +40,6 @@
         <div><i>脑</i><span><b>人格注入</b><small>人设库独立于角色保存</small></span></div>
         <div><i>话</i><span><b>实时会话</b><small>Vidu Live + RTC + WS</small></span></div>
       </div>
-      <div class="boundary">GitHub Pages 不保存密钥，也不能运行 Python / WebSocket 代理。未连接后端时页面使用完整演示流程。</div>
     </aside>
 
     <section class="console">
@@ -93,7 +91,7 @@
           </div>
           <aside class="call-side">
             <article class="card"><h3>连接进度</h3><ol id="stepper"><li data-step="create"><i></i><span>创建会话<small></small></span></li><li data-step="rtc"><i></i><span>获取 RTC 参数<small></small></span></li><li data-step="ws"><i></i><span>连接控制通道<small></small></span></li><li data-step="init"><i></i><span>数字人准备<small></small></span></li><li data-step="ready"><i></i><span>就绪 · 可对话<small></small></span></li></ol></article>
-            <article class="card facts"><h3>会话信息</h3><div><span>状态</span><b id="live-status">-</b></div><div><span>Live ID</span><b id="live-id">-</b></div><div><span>RTC 频道</span><b id="rtc-channel">-</b></div><div><span>RTC 用户</span><b id="rtc-user">-</b></div><button id="open-native-call" type="button">在原生控制台继续 RTC 通话 ↗</button></article>
+            <article class="card facts"><h3>会话信息</h3><div><span>状态</span><b id="live-status">-</b></div><div><span>Live ID</span><b id="live-id">-</b></div><div><span>RTC 频道</span><b id="rtc-channel">-</b></div><div><span>RTC 用户</span><b id="rtc-user">-</b></div><button id="open-native-call" type="button">在 RTC 控制台继续通话 ↗</button></article>
           </aside>
         </div>
       </section>
