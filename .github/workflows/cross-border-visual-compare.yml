@@ -9,6 +9,14 @@ on:
       - 'scripts/yola-review-e2e.mjs'
       - 'scripts/patch-static-demos.mjs'
       - '.github/workflows/cross-border-visual-compare.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'public/demos/cross-border/**'
+      - 'scripts/cross-border-visual-compare.mjs'
+      - 'scripts/yola-review-e2e.mjs'
+      - 'scripts/patch-static-demos.mjs'
+      - '.github/workflows/cross-border-visual-compare.yml'
   workflow_dispatch:
 
 permissions:
@@ -92,7 +100,7 @@ jobs:
           retention-days: 14
 
       - name: Publish visual comparison status
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
           JOB_STATUS: ${{ job.status }}
