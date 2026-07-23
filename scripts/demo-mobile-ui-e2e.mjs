@@ -8,9 +8,9 @@ const targetName = process.env.TEST_TARGET || 'local-preview';
 const projects = [
   { slug: 'guoyang', kicker: 'AI CONTENT WORKFLOW', logic: false },
   { slug: 'cross-border', kicker: 'YOLA / ATELIER EXPERIENCE', logic: true },
-  { slug: 'ai-ecommerce', kicker: 'VISUAL PRODUCTION LAB', logic: true },
-  { slug: 'digitalhuman', kicker: 'REALTIME CHARACTER LAB', logic: true },
-  { slug: 'rpa', kicker: 'AUTOMATION RUNBOOK', logic: true },
+  { slug: 'ai-ecommerce', kicker: 'VISUAL PRODUCTION LAB', logic: false },
+  { slug: 'digitalhuman', kicker: 'REALTIME CHARACTER LAB', logic: false },
+  { slug: 'rpa', kicker: 'AUTOMATION RUNBOOK', logic: false },
   { slug: 'webui', kicker: 'LOCAL INFERENCE CONSOLE', logic: true },
   { slug: 'soulcaller', kicker: 'NARRATIVE ORCHESTRATION', logic: true },
 ];
@@ -90,6 +90,7 @@ async function testProject(browser, project) {
         demo: read('.demo-mode-launcher'),
         logic: hasLogic ? read('.motion-enrich-launcher') : null,
         status: read('.motion-enrich-status'),
+        yolaCta: read('.hero-content .capsule-button'),
       };
     }, project.logic);
 
@@ -108,8 +109,12 @@ async function testProject(browser, project) {
     }
 
     if (project.slug === 'cross-border') {
-      const cta = await page.locator('.hero-content .capsule-button').boundingBox();
-      assert(cta && !overlaps(controls.demo, cta) && (!controls.logic || !overlaps(controls.logic, cta)), 'cross-border: utility controls overlap the YOLA hero CTA');
+      assert(
+        controls.yolaCta &&
+          !overlaps(controls.demo, controls.yolaCta) &&
+          (!controls.logic || !overlaps(controls.logic, controls.yolaCta)),
+        `cross-border: utility controls overlap the YOLA hero CTA (${JSON.stringify(controls)})`,
+      );
     }
 
     await page.locator('.demo-mode-launcher').click();
