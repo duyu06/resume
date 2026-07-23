@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: cross-border-visual-${{ github.ref }}
@@ -20,35 +21,66 @@ concurrency:
 jobs:
   compare:
     runs-on: ubuntu-latest
+    env:
+      BEFORE_SHA: 5efc9287f5a8c88598a7da924b8642e6d676b8bb
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run build
+
+      - name: Build baseline revision
+        run: |
+          git worktree add /tmp/resume-before "$BEFORE_SHA"
+          cd /tmp/resume-before
+          npm ci
+          npm run build
+
+      - name: Start baseline preview
+        run: |
+          cd /tmp/resume-before
+          npm run preview -- --host 127.0.0.1 --port 4172 > /tmp/cross-border-before.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4172/resume/demos/cross-border/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/cross-border-before.log
+          exit 1
+
+      - name: Build redesigned revision
+        run: |
+          npm ci
+          npm run build
+
       - name: Install Chromium
         run: |
           npm install --no-save playwright
           npx playwright install --with-deps chromium
-      - name: Start production preview
+
+      - name: Start redesigned preview
         run: |
-          npm run preview -- --host 127.0.0.1 > /tmp/cross-border-preview.log 2>&1 &
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/cross-border-after.log 2>&1 &
           for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:4173/resume/demos/cross-border/ >/dev/null; then
               exit 0
             fi
             sleep 1
           done
-          cat /tmp/cross-border-preview.log
+          cat /tmp/cross-border-after.log
           exit 1
+
       - name: Capture before and after screenshots
         run: node scripts/cross-border-visual-compare.mjs
         env:
-          COMPARE_BEFORE_URL: https://duyu06.github.io/resume/demos/cross-border/#about
+          COMPARE_BEFORE_URL: http://127.0.0.1:4172/resume/demos/cross-border/#about
           COMPARE_AFTER_URL: http://127.0.0.1:4173/resume/demos/cross-border/#about
           COMPARE_OUTPUT_DIR: test-results/cross-border-visual-compare
+
       - name: Upload visual comparison
         if: always()
         uses: actions/upload-artifact@v4
@@ -57,3 +89,25 @@ jobs:
           path: test-results/cross-border-visual-compare
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish visual comparison status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [[ "$JOB_STATUS" == "success" ]]; then
+            state=success
+            description='prmpt before/after screenshots and regression checks passed'
+          else
+            state=failure
+            description='prmpt visual comparison failed'
+          fi
+          payload=$(printf '{"state":"%s","context":"cross-border/visual-compare","description":"%s","target_url":"%s"}' "$state" "$description" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            -d "$payload"
