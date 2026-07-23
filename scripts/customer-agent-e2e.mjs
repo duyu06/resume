@@ -71,6 +71,7 @@ async function runDevice(browser, device) {
 
     await page.locator('[data-quick="angry"]').click();
     await page.waitForFunction(() => document.querySelector('#metric-sentiment')?.textContent === '负面', null, { timeout: 12000 });
+    await waitForTool(page, 'escalate_to_human');
     assert((await page.locator('#handoff-note').textContent())?.includes('人工'), 'Customer agent: negative sentiment did not recommend handoff');
 
     await page.locator('#load-performance').click();
