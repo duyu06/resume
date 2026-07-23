@@ -49,13 +49,16 @@ await replaceRequired('dist/demos/rpa/app.js', [
   ],
 ]);
 
-await replaceRequired('dist/demos/cross-border/cross-border.js', [
-  [
-    'if (!video || reducedMotion || document.hidden) return;',
+const crossBorderRuntimePath = 'dist/demos/cross-border/cross-border.js';
+let crossBorderRuntime = await readFile(crossBorderRuntimePath, 'utf8');
+const legacyVideoGuard = 'if (!video || reducedMotion || document.hidden) return;';
+if (crossBorderRuntime.includes(legacyVideoGuard)) {
+  crossBorderRuntime = crossBorderRuntime.replace(
+    legacyVideoGuard,
     'if (!video || reducedMotion || document.hidden || !video.paused) return;',
-    'avoid repeated play calls while YOLA video is already running',
-  ],
-]);
+  );
+  await writeFile(crossBorderRuntimePath, crossBorderRuntime, 'utf8');
+}
 
 const yolaMotionCssPath = 'dist/demos/cross-border/cross-border-motion.css';
 const yolaRuntimeRules = `
