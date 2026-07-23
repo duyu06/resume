@@ -8,6 +8,16 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
+  function stabilizeLayout() {
+    const footer = $('.page-footer');
+    if (footer) {
+      footer.style.marginLeft = '0';
+      footer.style.marginRight = '0';
+    }
+  }
+
+  stabilizeLayout();
+
   const setMotionReady = () => document.documentElement.classList.add('motion-ready');
 
   if (!gsap || !ScrollTrigger) {
@@ -340,6 +350,7 @@
   }
 
   function initialize() {
+    stabilizeLayout();
     revealPage();
     animateAvatar();
     setupCursorAura();
