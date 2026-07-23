@@ -1,0 +1,16 @@
+@media (max-width: 640px) {
+  .workspace-actions .pill-button:first-child {
+    display: inline-flex !important;
+  }
+
+  .workspace-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .workspace-actions .pill-button {
+    min-height: 30px;
+    padding-inline: 9px;
+    font-size: 8px;
+  }
+}
