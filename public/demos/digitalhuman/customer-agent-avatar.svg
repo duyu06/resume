@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="900" viewBox="0 0 760 900" role="img" aria-labelledby="title desc">
+  <title id="title">AI 客服数字人形象</title>
+  <desc id="desc">白色西装数字人客服站在紫蓝色智能光环前。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#091225"/><stop offset="1" stop-color="#11162b"/></linearGradient>
+    <linearGradient id="halo" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c5cff"/><stop offset=".5" stop-color="#3f7cff"/><stop offset="1" stop-color="#8f4dff"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f2c9b8"/><stop offset="1" stop-color="#c98773"/></linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#17131d"/><stop offset="1" stop-color="#34253c"/></linearGradient>
+    <linearGradient id="suit" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#cbd4e8"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#8f6cff" stop-opacity=".44"/><stop offset="1" stop-color="#8f6cff" stop-opacity="0"/></radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="24"/></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="26" stdDeviation="30" flood-color="#000" flood-opacity=".4"/></filter>
+  </defs>
+  <rect width="760" height="900" rx="48" fill="url(#bg)"/>
+  <circle cx="380" cy="330" r="290" fill="url(#glow)" filter="url(#blur)"/>
+  <circle cx="380" cy="330" r="235" fill="none" stroke="url(#halo)" stroke-width="6" opacity=".75"/>
+  <circle cx="380" cy="330" r="196" fill="none" stroke="#a99cff" stroke-opacity=".18" stroke-width="1.5"/>
+  <g opacity=".55" fill="#9f8cff">
+    <circle cx="121" cy="212" r="4"/><circle cx="650" cy="294" r="3"/><circle cx="579" cy="130" r="5"/><circle cx="177" cy="404" r="3"/><circle cx="611" cy="489" r="4"/>
+  </g>
+  <g filter="url(#shadow)">
+    <path d="M196 846c16-184 77-263 184-263s168 79 184 263Z" fill="url(#suit)"/>
+    <path d="M294 612 380 756 466 612l-30-38H324Z" fill="#f8fafc"/>
+    <path d="M318 603 380 756l-95-89 9-55Z" fill="#d7dfea"/>
+    <path d="M442 603 380 756l95-89-9-55Z" fill="#e5ebf3"/>
+    <ellipse cx="380" cy="398" rx="137" ry="172" fill="url(#skin)"/>
+    <path d="M250 360c5-141 71-223 169-223 111 0 158 95 144 225-32-71-107-120-205-103-56 10-91 43-108 101Z" fill="url(#hair)"/>
+    <path d="M259 310c-28 74-16 195 22 276l45-37c-40-75-48-171-22-249Z" fill="#241b29"/>
+    <path d="M515 292c37 72 30 202-12 294l-47-39c37-78 42-181 8-264Z" fill="#2f2036"/>
+    <ellipse cx="328" cy="409" rx="17" ry="12" fill="#241a1d"/><ellipse cx="432" cy="409" rx="17" ry="12" fill="#241a1d"/>
+    <circle cx="331" cy="406" r="4" fill="#dce8ff"/><circle cx="435" cy="406" r="4" fill="#dce8ff"/>
+    <path d="M351 497c19 14 39 14 58 0" fill="none" stroke="#7d3e49" stroke-width="5" stroke-linecap="round"/>
+    <path d="M377 424c-7 26-10 43-1 53 9 5 18 4 27-1" fill="none" stroke="#aa6f61" stroke-width="4" stroke-linecap="round"/>
+    <path d="M380 567c-24 0-43-7-60-22l8 68c35 28 69 27 104 0l8-68c-16 15-36 22-60 22Z" fill="url(#skin)"/>
+  </g>
+  <g transform="translate(116 760)">
+    <rect width="528" height="92" rx="28" fill="#080d18" fill-opacity=".82" stroke="#8d78ff" stroke-opacity=".32"/>
+    <circle cx="46" cy="46" r="12" fill="#6f5cff"/><circle cx="46" cy="46" r="23" fill="none" stroke="#6f5cff" stroke-opacity=".28"/>
+    <text x="82" y="38" fill="#fff" font-family="Arial,sans-serif" font-size="24" font-weight="700">AI 客服数字人在线</text>
+    <text x="82" y="67" fill="#8f9bb1" font-family="Arial,sans-serif" font-size="15">正在监听客户意图并协调业务工具</text>
+    <g transform="translate(402 28)" fill="#8b72ff"><rect width="5" height="35" rx="3"/><rect x="12" y="8" width="5" height="19" rx="3"/><rect x="24" y="3" width="5" height="29" rx="3"/><rect x="36" y="12" width="5" height="12" rx="3"/><rect x="48" y="5" width="5" height="26" rx="3"/></g>
+  </g>
+</svg>
