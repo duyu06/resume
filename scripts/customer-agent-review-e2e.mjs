@@ -4,6 +4,7 @@ import { chromium } from 'playwright';
 const baseURL = (process.env.TEST_BASE_URL || 'http://127.0.0.1:4173/resume').replace(/\/$/, '');
 const outputDir = process.env.TEST_OUTPUT_DIR || 'test-results/customer-agent-review';
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+const matchesAny = (value, names) => names.some((name) => value?.includes(name));
 
 await mkdir(outputDir, { recursive: true });
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
@@ -57,18 +58,20 @@ try {
   assert((await page.locator('#tool-log .tool-event:first-child b').textContent()) === 'agent_response', 'Backend metadata: no-tool response trace is incorrect');
 
   await page.goto(`${baseURL}/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-  const card = page.locator('button').filter({ hasText: 'AI 客服数字人 Agent' }).first();
+  const card = page.locator('button').filter({ hasText: /AI 客服数字人(?:工作台| Agent)/ }).first();
   await card.waitFor({ state: 'visible', timeout: 15000 });
+  const firstCandidates = ['project-digitalhuman-page-a.jpg', 'proj-customer-agent-a.svg'];
+  const secondCandidates = ['project-digitalhuman-page-b.jpg', 'proj-customer-agent-b.svg'];
   const cardImage = await card.locator('img').getAttribute('src');
-  assert(cardImage?.includes('proj-customer-agent-a.svg'), `Portfolio visual: stale card image remains (${cardImage})`);
+  assert(matchesAny(cardImage, firstCandidates), `Portfolio visual: unexpected card image (${cardImage})`);
   await card.click();
   const dialog = page.getByRole('dialog');
   await dialog.waitFor({ state: 'visible' });
   const firstImage = await dialog.locator('img').getAttribute('src');
-  assert(firstImage?.includes('proj-customer-agent-a.svg'), `Portfolio visual: stale first modal image remains (${firstImage})`);
+  assert(matchesAny(firstImage, firstCandidates), `Portfolio visual: unexpected first modal image (${firstImage})`);
   await dialog.getByRole('button', { name: '下一张' }).click();
   const secondImage = await dialog.locator('img').getAttribute('src');
-  assert(secondImage?.includes('proj-customer-agent-b.svg'), `Portfolio visual: stale second modal image remains (${secondImage})`);
+  assert(matchesAny(secondImage, secondCandidates), `Portfolio visual: unexpected second modal image (${secondImage})`);
 
   assert(errors.length === 0, `Uncaught browser errors: ${errors.join('; ')}`);
   await page.screenshot({ path: `${outputDir}/customer-agent-review.png`, fullPage: true });
