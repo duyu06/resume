@@ -1,0 +1,56 @@
+name: AI Customer Service Agent E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: customer-agent-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  customer-agent-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start production preview
+        run: |
+          npm run preview -- --host 127.0.0.1 > /tmp/customer-agent-preview.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/resume/demos/digitalhuman/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/customer-agent-preview.log
+          exit 1
+      - name: Run desktop and mobile customer agent acceptance
+        run: node scripts/customer-agent-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: local-preview
+          TEST_OUTPUT_DIR: test-results/customer-agent
+      - name: Upload customer agent evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: customer-agent-e2e
+          path: test-results/customer-agent
+          if-no-files-found: ignore
+          retention-days: 14
