@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#05090b" />
-  <meta name="description" content="talk-to-fengge-live 数字人控制台：角色、人设、音色克隆、会话创建与实时通话状态。" />
-  <title>talk-to-fengge-live｜数字人实时通话</title>
+  <meta name="theme-color" content="#06100e" />
+  <meta name="description" content="AI 客服数字人 Agent 演示：智能问答、订单查询、库存检查、退款、情绪分析、人工转接与会话记忆。" />
+  <title>AI 客服数字人 Agent</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
@@ -14,97 +14,124 @@
 </head>
 <body>
   <header class="topbar">
-    <a href="/resume/#projects">← 返回项目作品集</a>
+    <a class="back" href="/resume/#projects">← 返回项目作品集</a>
     <div class="top-actions">
-      <button id="settings-toggle" type="button" aria-expanded="false">⚙ API 配置</button>
+      <button id="settings-toggle" type="button" aria-expanded="false">⚙ Agent 配置</button>
       <span id="connection-badge" class="connection-badge">演示模式</span>
     </div>
   </header>
 
   <section id="settings-panel" class="settings-panel" hidden>
-    <label>后端地址<input id="backend-url" type="url" placeholder="http://127.0.0.1:8791" /></label>
-    <label>区域<select id="region"><option value="cn">国内 · api.vidu.cn</option><option value="global">海外 · api.vidu.com</option></select></label>
-    <label>Vidu API Key（仅当前浏览器）<input id="api-key" type="password" placeholder="可留空，由后端 .env 提供" autocomplete="off" /></label>
-    <label class="mode-switch"><input id="real-mode" type="checkbox" /> 使用真实后端</label>
-    <button id="connect-backend" type="button">连接并同步</button>
-    <a id="open-native" href="http://127.0.0.1:8791" target="_blank" rel="noopener noreferrer">打开原生 RTC 控制台 ↗</a>
-    <p>浏览器内负责角色、音色、人设与会话状态配置；真实音视频媒体需在 RTC 控制台中继续。</p>
+    <label>客服 Agent API 地址
+      <input id="backend-url" type="url" placeholder="http://127.0.0.1:8000" autocomplete="url" />
+    </label>
+    <label>网关访问令牌（可选，仅当前浏览器）
+      <input id="agent-token" type="password" placeholder="不要填写模型提供商 API Key" autocomplete="off" />
+    </label>
+    <label class="mode-switch"><input id="real-mode" type="checkbox" /> 使用真实客服 Agent 后端</label>
+    <button id="test-backend" type="button">测试连接</button>
+    <p>模型提供商密钥必须配置在服务端环境变量中。本页面不会保存 OpenAI、OpenRouter、Groq 等模型密钥。</p>
   </section>
 
   <main class="page">
-    <aside class="intro">
-      <h1>实时数字人<br />视频与语音通话</h1>
-      <p>形象、音色和人格解耦。选择角色后创建 Vidu Live 会话，完成创建会话、RTC 参数、控制通道与数字人准备状态。</p>
+    <aside class="identity-panel">
+      <div class="identity-copy">
+        <span class="eyebrow">AI CUSTOMER SERVICE · DIGITAL HUMAN</span>
+        <h1>让数字人<br />真正处理客服问题</h1>
+        <p>将数字人形象与客服 Agent 能力结合，完成咨询应答、订单查询、库存核验、退款处理、情绪识别和人工转接。</p>
+      </div>
+
+      <div class="avatar-stage" aria-label="AI 客服数字人形象">
+        <div class="avatar-halo"></div>
+        <div class="avatar">
+          <span class="avatar-eye left"></span>
+          <span class="avatar-eye right"></span>
+          <span class="avatar-mouth"></span>
+        </div>
+        <div class="voice-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="avatar-status"><i></i><span>客服 Agent 在线</span></div>
+      </div>
+
       <div class="capabilities">
-        <div><i>脸</i><span><b>数字人形象</b><small>上传图片或公网地址</small></span></div>
-        <div><i>声</i><span><b>音色与克隆</b><small>内置音色或参考音频</small></span></div>
-        <div><i>脑</i><span><b>人格注入</b><small>人设库独立于角色保存</small></span></div>
-        <div><i>话</i><span><b>实时会话</b><small>Vidu Live + RTC + WS</small></span></div>
+        <article><b>ORDER</b><span>订单状态与物流查询</span></article>
+        <article><b>REFUND</b><span>退款资格与流程处理</span></article>
+        <article><b>STOCK</b><span>商品库存与可售状态</span></article>
+        <article><b>HANDOFF</b><span>复杂问题转人工坐席</span></article>
       </div>
     </aside>
 
-    <section class="console">
-      <nav class="view-tabs" aria-label="数字人功能">
-        <button class="active" data-view="library" type="button">角色库</button>
-        <button data-view="editor" type="button">角色编辑器</button>
-        <button data-view="call" type="button">通话控制台</button>
-        <button data-view="diagnostics" type="button">诊断与设备</button>
-      </nav>
-
-      <section id="view-library" class="view active">
-        <div class="section-head"><div><small>CHARACTER LIBRARY</small><h2>选择一个角色开始通话</h2></div><button id="new-character" class="primary" type="button">＋ 新建角色</button></div>
-        <div id="character-grid" class="character-grid"></div>
-        <div class="persona-library">
-          <div class="section-head"><div><small>PERSONA LIBRARY</small><h3>人格库</h3></div><span id="persona-count">0 个</span></div>
-          <div id="persona-list" class="persona-list"></div>
+    <section class="agent-console">
+      <header class="console-head">
+        <div>
+          <small>LIVE SUPPORT WORKSPACE</small>
+          <h2>AI 客服工作台</h2>
         </div>
-      </section>
-
-      <section id="view-editor" class="view">
-        <div class="section-head"><div><small>CHARACTER COMPOSER</small><h2 id="editor-title">新建角色</h2></div><button id="back-library" type="button">返回角色库</button></div>
-        <form id="character-form" class="editor-grid">
-          <div class="avatar-editor">
-            <div id="avatar-preview" class="avatar-preview"><span>上传形象</span></div>
-            <input id="avatar-file" type="file" accept="image/png,image/jpeg,image/webp" />
-            <label class="upload" for="avatar-file">选择本地图片</label>
-            <input id="avatar-url" type="url" placeholder="或粘贴公网图片地址" />
-          </div>
-          <div class="fields">
-            <label>角色名称<input id="character-name" required value="峰哥数字人" /></label>
-            <div class="two">
-              <label>音色<select id="voice"><option value="Tina">Tina · 温暖女声</option><option value="Raymond">Raymond · 沉稳男声</option><option value="Ethan">Ethan · 阳光男声</option><option value="__custom__">自定义 / 克隆音色</option></select></label>
-              <label>通话模式<select id="call-mode"><option value="video">视频通话</option><option value="audio">语音通话</option></select></label>
-            </div>
-            <label id="custom-voice-row" hidden>自定义音色<input id="custom-voice" placeholder="voice_name" /></label>
-            <label>套用人格<select id="persona-preset"><option value="">不套用</option></select></label>
-            <label>人设<textarea id="persona" rows="8">你是一位表达直接、观点鲜明但保持诚实边界的数字人。使用口语化短句，先回应问题核心，再给出判断依据。</textarea></label>
-            <details class="voice-clone"><summary>克隆新音色（可选）</summary><div><input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a" /><input id="audio-url" type="url" placeholder="或填写公网音频地址" /><input id="clone-name" value="fengge_voice" maxlength="16" placeholder="音色名称" /><button id="clone-voice" type="button">克隆音色</button><small id="clone-status"></small></div></details>
-            <div class="form-actions"><button id="save-character" type="submit">保存角色</button><button id="save-call" class="primary" type="button">保存并开始通话</button></div>
-          </div>
-        </form>
-      </section>
-
-      <section id="view-call" class="view">
-        <div class="call-grid">
-          <div class="stage">
-            <div id="remote-stage" class="remote-stage"><div id="active-avatar" class="active-avatar"></div><div class="scan"></div><p id="stage-message">等待创建数字人会话</p><span id="call-timer">00:00</span></div>
-            <div class="call-controls"><button id="mic-toggle" type="button" disabled>🎙 麦克风</button><button id="cam-toggle" type="button" disabled>📷 摄像头</button><button id="query-live" type="button" disabled>查询状态</button><button id="hangup" class="danger" type="button" disabled>挂断</button></div>
-          </div>
-          <aside class="call-side">
-            <article class="card"><h3>连接进度</h3><ol id="stepper"><li data-step="create"><i></i><span>创建会话<small></small></span></li><li data-step="rtc"><i></i><span>获取 RTC 参数<small></small></span></li><li data-step="ws"><i></i><span>连接控制通道<small></small></span></li><li data-step="init"><i></i><span>数字人准备<small></small></span></li><li data-step="ready"><i></i><span>就绪 · 可对话<small></small></span></li></ol></article>
-            <article class="card facts"><h3>会话信息</h3><div><span>状态</span><b id="live-status">-</b></div><div><span>Live ID</span><b id="live-id">-</b></div><div><span>RTC 频道</span><b id="rtc-channel">-</b></div><div><span>RTC 用户</span><b id="rtc-user">-</b></div><button id="open-native-call" type="button">在原生控制台继续 RTC 通话 ↗</button></article>
-          </aside>
+        <div class="console-actions">
+          <button id="load-performance" type="button">查看性能报告</button>
+          <button id="new-conversation" type="button">新建会话</button>
         </div>
+      </header>
+
+      <section class="metrics" aria-label="客服指标">
+        <article><span>当前客户</span><b id="metric-customer">CUST-001</b></article>
+        <article><span>情绪状态</span><b id="metric-sentiment">中性</b></article>
+        <article><span>工具调用</span><b id="metric-tools">0</b></article>
+        <article><span>本轮消息</span><b id="metric-messages">0</b></article>
       </section>
 
-      <section id="view-diagnostics" class="view">
-        <div class="diagnostic-grid">
-          <article class="card"><h3>设备检测</h3><button id="device-check" class="primary" type="button">请求摄像头与麦克风权限</button><video id="local-preview" autoplay muted playsinline></video><div id="device-result">尚未检测</div></article>
-          <article class="card"><div class="section-head"><h3>诊断日志</h3><button id="clear-log" type="button">清空</button></div><div id="log" class="log" role="log" aria-live="polite"></div></article>
-        </div>
-      </section>
+      <div class="workspace-grid">
+        <aside class="customer-panel">
+          <div class="customer-card">
+            <div class="customer-avatar">C</div>
+            <div><small>CUSTOMER PROFILE</small><h3>林晓雨</h3><p>会员等级 · Gold</p></div>
+          </div>
+          <dl class="customer-facts">
+            <div><dt>客户 ID</dt><dd><input id="customer-id" value="CUST-001" /></dd></div>
+            <div><dt>会话 ID</dt><dd id="conversation-id">CONV-DEMO-001</dd></div>
+            <div><dt>最近订单</dt><dd id="customer-order">ORD-12345</dd></div>
+            <div><dt>渠道</dt><dd>Web · 中文</dd></div>
+          </dl>
+          <section class="quick-actions">
+            <h3>快捷场景</h3>
+            <button type="button" data-quick="order">查询订单 ORD-12345</button>
+            <button type="button" data-quick="inventory">黑色耳机还有库存吗？</button>
+            <button type="button" data-quick="refund">我要为 ORD-12345 申请退款</button>
+            <button type="button" data-quick="angry">等了很久还没收到，我很生气</button>
+          </section>
+        </aside>
+
+        <section class="chat-panel">
+          <div class="chat-head">
+            <div><i></i><span>AI 客服数字人</span></div>
+            <span id="agent-state">等待客户消息</span>
+          </div>
+          <div id="chat-thread" class="chat-thread" role="log" aria-live="polite"></div>
+          <form id="chat-form" class="composer">
+            <textarea id="message-input" rows="2" placeholder="输入客户问题，例如：帮我查询订单 ORD-12345" required></textarea>
+            <button id="send-message" type="submit">发送</button>
+          </form>
+        </section>
+
+        <aside class="tool-panel">
+          <section>
+            <div class="panel-head"><small>TOOL TRACE</small><b>Agent 工具调用</b></div>
+            <div id="tool-log" class="tool-log"><p>等待 Agent 选择工具。</p></div>
+          </section>
+          <section>
+            <div class="panel-head"><small>SENTIMENT</small><b>情绪与风险</b></div>
+            <div class="sentiment-meter"><i id="sentiment-fill"></i></div>
+            <strong id="sentiment-value">neutral · 0.00</strong>
+            <p id="handoff-note">当前无需人工接管。</p>
+          </section>
+          <section>
+            <div class="panel-head"><small>PERFORMANCE</small><b>服务质量</b></div>
+            <pre id="performance-report">完成一次会话后查看性能报告。</pre>
+          </section>
+        </aside>
+      </div>
     </section>
   </main>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
