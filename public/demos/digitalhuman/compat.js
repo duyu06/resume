@@ -10,6 +10,10 @@
   localStorage.removeItem('fengge_demo_personas');
   sessionStorage.setItem('fengge_api_key', '');
 
+  const style = document.createElement('style');
+  style.textContent = "body[data-demo-mode-theme='digitalhuman'] .demo-mode-kicker.customer-agent-kicker{font-size:0!important}body[data-demo-mode-theme='digitalhuman'] .demo-mode-kicker.customer-agent-kicker::after{content:'CUSTOMER SERVICE AGENT';font-size:10px;letter-spacing:.16em}";
+  document.head.append(style);
+
   const applyPanelCompatibility = () => {
     const title = document.querySelector('#demo-mode-title');
     const kicker = document.querySelector('.demo-mode-kicker');
