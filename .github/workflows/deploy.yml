@@ -63,6 +63,20 @@ jobs:
           TEST_TARGET: local-preview
           TEST_OUTPUT_DIR: test-results/all-demo-mode-local
 
+      - name: Run YOLA review regression suite
+        run: node scripts/yola-review-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: local-preview
+          TEST_OUTPUT_DIR: test-results/yola-review-local
+
+      - name: Run themed mobile demo UI suite
+        run: node scripts/demo-mobile-ui-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: local-preview
+          TEST_OUTPUT_DIR: test-results/demo-mobile-ui-local
+
       - name: Upload local end-to-end evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -71,6 +85,8 @@ jobs:
           path: |
             test-results/full-e2e-local
             test-results/all-demo-mode-local
+            test-results/yola-review-local
+            test-results/demo-mobile-ui-local
           if-no-files-found: ignore
           retention-days: 14
 
@@ -133,6 +149,18 @@ jobs:
           TEST_BASE_URL: https://duyu06.github.io/resume
           TEST_TARGET: github-pages
           TEST_OUTPUT_DIR: test-results/all-demo-mode-live
+      - name: Run deployed YOLA review regression suite
+        run: node scripts/yola-review-e2e.mjs
+        env:
+          TEST_BASE_URL: https://duyu06.github.io/resume
+          TEST_TARGET: github-pages
+          TEST_OUTPUT_DIR: test-results/yola-review-live
+      - name: Run deployed themed mobile demo UI suite
+        run: node scripts/demo-mobile-ui-e2e.mjs
+        env:
+          TEST_BASE_URL: https://duyu06.github.io/resume
+          TEST_TARGET: github-pages
+          TEST_OUTPUT_DIR: test-results/demo-mobile-ui-live
       - name: Upload deployed-site end-to-end evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -141,6 +169,8 @@ jobs:
           path: |
             test-results/full-e2e-live
             test-results/all-demo-mode-live
+            test-results/yola-review-live
+            test-results/demo-mobile-ui-live
           if-no-files-found: ignore
           retention-days: 14
       - name: Publish live end-to-end commit status
@@ -151,7 +181,7 @@ jobs:
         run: |
           if [[ "$LIVE_JOB_STATUS" == "success" ]]; then
             state=success
-            description='14/14 live project demo scenarios passed'
+            description='All live demo scenarios, YOLA regressions, and mobile UI checks passed'
           else
             state=failure
             description='Live project demo acceptance failed'

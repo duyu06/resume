@@ -1,0 +1,45 @@
+/* Review-driven compatibility fixes for YOLA.
+   Loaded after the shared incremental enhancement stylesheet. */
+
+@media (min-width: 769px) {
+  .awards-pin {
+    position: sticky;
+    top: 0;
+  }
+}
+
+body[data-demo-enrich='cross-border'] .yola-story-frame.motion-enrich-reveal {
+  opacity: 0 !important;
+  transform: translate3d(0, 34px, 0) rotateX(-7deg) !important;
+  filter: none !important;
+  translate: none !important;
+}
+
+body[data-demo-enrich='cross-border'] .yola-story-frame.motion-enrich-reveal.is-active {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) rotateX(0deg) !important;
+}
+
+body[data-demo-enrich='cross-border'] .product-card.motion-enrich-reveal {
+  opacity: .48 !important;
+  filter: none !important;
+  translate: 0 0 !important;
+}
+
+body[data-demo-enrich='cross-border'] .product-card.motion-enrich-reveal.is-focus {
+  opacity: 1 !important;
+}
+
+@media (max-width: 768px) {
+  body[data-demo-enrich='cross-border'] .product-card.motion-enrich-reveal {
+    opacity: 1 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .craft-reveal {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+}

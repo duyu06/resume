@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#fff8f3" />
-  <meta name="description" content="PrismPix AI 电商视觉生成引擎适配演示：产品分析、营销策略、14 条 Prompt 与电商图片生成。" />
+  <meta name="description" content="PrismPix AI 电商视觉生成引擎演示：产品分析、营销策略、14 条 Prompt 与电商图片生成。" />
   <title>PrismPix｜AI 电商视觉生成引擎</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,7 +16,6 @@
   <header class="topbar">
     <a class="back" href="/resume/#projects">← 返回项目作品集</a>
     <div class="top-actions">
-      <a class="source" href="https://github.com/keirosang/PrismPix" target="_blank" rel="noopener noreferrer">上游源码 · PrismPix ↗</a>
       <span id="mode-badge" class="mode-badge">演示模式</span>
     </div>
   </header>
@@ -24,10 +23,9 @@
   <main class="shell">
     <aside class="intro">
       <div>
-        <span class="badge">PRISMPIX ADAPTER · GPL-3.0 UPSTREAM</span>
         <h1><span>AI</span> 电商视觉生成引擎</h1>
         <p class="subtitle">Product Intelligence → Campaign → 14 Prompts → 14 Images</p>
-        <p class="intro-copy">接入 PrismPix 的三阶段工作流。GitHub Pages 默认运行可交互演示；配置自行部署的 PrismPix 后端后，可调用原项目的 Flask API。</p>
+        <p class="intro-copy">通过三阶段工作流完成商品理解、营销策略、生产 Prompt 与电商图片交付；连接自行部署的后端后，可切换为真实生成流程。</p>
         <div class="feature-list">
           <div class="feature"><i>01</i><div><b>产品视觉分析</b><small>材质、颜色、结构、不可修改项</small></div></div>
           <div class="feature"><i>02</i><div><b>营销策略</b><small>卖点、痛点、场景与信任元素</small></div></div>
@@ -35,13 +33,11 @@
           <div class="feature"><i>04</i><div><b>图片生成与交付</b><small>任务状态、预览、Prompt JSON 导出</small></div></div>
         </div>
       </div>
-      <div class="license-note">兼容前端由本项目独立实现；未复制 PrismPix 源码。真实生成需要部署上游 Python 服务并自行配置 API Key。</div>
     </aside>
 
     <section class="workspace" aria-label="PrismPix AI 电商视觉工作台">
       <div class="workspace-header">
         <div>
-          <p>PRISMPIX COMPATIBLE CONSOLE</p>
           <h2>AI 电商视觉生成</h2>
         </div>
         <button id="connection-toggle" class="connection-button" type="button" aria-expanded="false">⚙ 后端连接</button>
@@ -65,7 +61,7 @@
                 <img id="product-preview" src="https://raw.githubusercontent.com/keirosang/PrismPix/main/samples/DDLYQ005/product_ref.png" alt="PrismPix 示例产品参考图" />
                 <input id="image-file" name="image" type="file" accept="image/*" />
                 <label class="upload-button" for="image-file">上传产品图</label>
-                <button id="load-sample" type="button">恢复上游示例</button>
+                <button id="load-sample" type="button">恢复示例</button>
                 <small id="file-label">示例：DDLYQ005 产品身份证</small>
               </div>
             </section>

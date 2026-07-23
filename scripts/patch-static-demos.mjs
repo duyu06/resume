@@ -57,6 +57,34 @@ await replaceRequired('dist/demos/rpa/app.js', [
   ],
 ]);
 
+await replaceRequired('dist/demos/cross-border/cross-border.js', [
+  [
+    'if (!video || reducedMotion || document.hidden) return;',
+    'if (!video || reducedMotion || document.hidden || !video.paused) return;',
+    'avoid repeated play calls while YOLA video is already running',
+  ],
+]);
+
+const yolaMotionCssPath = 'dist/demos/cross-border/cross-border-motion.css';
+const yolaRuntimeRules = `
+@media (min-width:769px){.awards-pin{position:sticky;top:0}}
+body[data-demo-enrich='cross-border'] .yola-story-frame.motion-enrich-reveal{
+  opacity:0!important;
+  transform:translate3d(0,34px,0) rotateX(-7deg)!important;
+  filter:none!important;
+  translate:none!important;
+}
+body[data-demo-enrich='cross-border'] .yola-story-frame.motion-enrich-reveal.is-active{
+  opacity:1!important;
+  transform:translate3d(0,0,0) rotateX(0deg)!important;
+}
+`;
+let yolaMotionCss = await readFile(yolaMotionCssPath, 'utf8');
+if (!yolaMotionCss.includes(".yola-story-frame.motion-enrich-reveal.is-active")) {
+  yolaMotionCss += yolaRuntimeRules;
+  await writeFile(yolaMotionCssPath, yolaMotionCss, 'utf8');
+}
+
 const demoIndexes = [
   'dist/demos/guoyang/index.html',
   'dist/demos/cross-border/index.html',
@@ -71,9 +99,29 @@ const demoStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode.css" />'
 const demoFitStyle = '<link rel="stylesheet" href="/resume/demos/demo-mode-fit.css" />';
 const demoScript = '<script defer src="/resume/demos/demo-mode.js"></script>';
 const demoFixScript = '<script defer src="/resume/demos/demo-mode-review-fixes.js"></script>';
+const demoThemeScript = '<script defer src="/resume/demos/demo-mode-theme.js"></script>';
+const upstreamSourceAnchorPattern = /<a\b[^>]*>\s*[^<]*上游源码[^<]*<\/a>/giu;
+const provenanceMarkerPattern = /<(span|p|small)\b[^>]*>\s*[^<]{0,140}\b(?:ADAPTER|UPSTREAM|COMPATIBLE|COMPATIBILITY\s+DEMO)\b[^<]{0,140}<\/\1>/giu;
+const provenanceMarkerCheck = /\b(?:ADAPTER|UPSTREAM|COMPATIBLE|COMPATIBILITY\s+DEMO)\b/iu;
+const yolaMarkerTemplate = Array.from(
+  { length: 14 },
+  (_, index) => `<i data-yola-marker="${String(index + 1).padStart(2, '0')}"></i>`,
+).join('');
+const unresolvedYolaMarkerTemplate = '${Array.from({length:14},(_,index)=>`<i data-yola-marker="${String(index+1).padStart(2,\'0\')}"></i>`).join(\'\')}';
 
 for (const path of demoIndexes) {
   let content = await readFile(path, 'utf8');
+
+  // Demo pages should present the project itself. Source attribution and
+  // licensing remain in repository documentation instead of visible badges.
+  content = content
+    .replace(upstreamSourceAnchorPattern, '')
+    .replace(provenanceMarkerPattern, '');
+
+  if (path.endsWith('/cross-border/index.html')) {
+    content = content.replace(unresolvedYolaMarkerTemplate, yolaMarkerTemplate);
+  }
+
   if (!content.includes('/resume/demos/demo-mode.css')) {
     if (!content.includes('</head>')) throw new Error(`${path}: missing </head>`);
     content = content.replace('</head>', `  ${demoStyle}\n</head>`);
@@ -90,10 +138,31 @@ for (const path of demoIndexes) {
     if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
     content = content.replace('</body>', `  ${demoFixScript}\n</body>`);
   }
+  if (!content.includes('/resume/demos/demo-mode-theme.js')) {
+    if (!content.includes('</body>')) throw new Error(`${path}: missing </body>`);
+    content = content.replace('</body>', `  ${demoThemeScript}\n</body>`);
+  }
+
+  if (/<a\b[^>]*>\s*[^<]*上游源码/iu.test(content)) {
+    throw new Error(`${path}: visible upstream source link survived sanitization`);
+  }
+
+  const visibleMarkup = content
+    .replace(/<script\b[\s\S]*?<\/script>/giu, '')
+    .replace(/<style\b[\s\S]*?<\/style>/giu, '');
+  if (provenanceMarkerCheck.test(visibleMarkup)) {
+    throw new Error(`${path}: visible adapter/upstream/compatible marker survived sanitization`);
+  }
+
+  if (path.endsWith('/cross-border/index.html')) {
+    const markerCount = (content.match(/data-yola-marker=/g) || []).length;
+    if (markerCount !== 14) throw new Error(`${path}: expected 14 YOLA keyframe markers, found ${markerCount}`);
+  }
+
   await writeFile(path, content, 'utf8');
 }
 
 const deploymentRevision = process.env.GITHUB_SHA || 'local-build';
 await writeFile('dist/deploy-revision.txt', `${deploymentRevision}\n`, 'utf8');
 
-console.log(`Patched ${stylesheets.length} static demo stylesheets, 3 demo scripts, ${demoIndexes.length} demo pages, and revision ${deploymentRevision}.`);
+console.log(`Patched ${stylesheets.length} static demo stylesheets, 5 demo scripts, ${demoIndexes.length} themed demo pages, and revision ${deploymentRevision}.`);

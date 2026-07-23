@@ -1,0 +1,640 @@
+/* MotionSites-inspired YOLA motion layer.
+   Editorial ecommerce + layered depth + cinematic chapter transitions.
+   Loaded after cross-border.css so the existing product/dialog contract stays intact. */
+
+:root {
+  --yola-ink: #080808;
+  --yola-paper: #eeeae2;
+  --yola-accent: #a3111e;
+  --yola-progress: 0;
+  --yola-collection-progress: 0;
+}
+
+body {
+  background: var(--yola-ink);
+}
+
+.site-header {
+  mix-blend-mode: difference;
+}
+
+.site-header,
+.site-header .brand-logo,
+.site-header .header-nav,
+.site-header .header-action,
+.site-header .menu-button {
+  color: #fff;
+}
+
+.demo-back {
+  color: #fff;
+  border-color: rgba(255,255,255,.18);
+  background: rgba(8,8,8,.7);
+}
+
+.hero-scroll {
+  height: 720vh;
+  background: var(--yola-ink);
+}
+
+.hero-sticky {
+  align-items: stretch;
+  padding: 0;
+  isolation: isolate;
+  color: #fff;
+}
+
+.hero-sticky::before {
+  transform: scale(calc(1.08 - var(--yola-progress) * .035));
+  filter: grayscale(1) contrast(1.12) brightness(.56);
+  transition: none;
+}
+
+.hero-video {
+  opacity: .64;
+  filter: grayscale(1) contrast(1.16) brightness(.66);
+  transform:
+    translate3d(calc((var(--yola-progress) - .5) * -3vw), calc((var(--yola-progress) - .5) * 2vh), 0)
+    scale(calc(1.1 - var(--yola-progress) * .045));
+  transition: opacity .3s ease;
+}
+
+.hero-video.is-ready {
+  opacity: .72;
+}
+
+.hero-overlay {
+  background:
+    radial-gradient(circle at calc(68% - var(--yola-progress) * 18%) calc(44% + var(--yola-progress) * 8%), rgba(255,255,255,.13), transparent 24%),
+    linear-gradient(90deg, rgba(0,0,0,.84) 0%, rgba(0,0,0,.28) 48%, rgba(0,0,0,.64) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.6));
+}
+
+.yola-frame-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: .22;
+  background-image:
+    linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px);
+  background-size: 9.5vw 9.5vw;
+  mask-image: linear-gradient(90deg, transparent, #000 45%, #000);
+}
+
+.yola-orbit {
+  position: absolute;
+  z-index: 3;
+  right: 8vw;
+  top: 50%;
+  width: min(48vw, 680px);
+  aspect-ratio: 1;
+  translate: 0 -50%;
+  pointer-events: none;
+  transform: rotate(calc(var(--yola-progress) * 140deg));
+  opacity: calc(.2 + var(--yola-progress) * .45);
+}
+
+.yola-orbit i {
+  position: absolute;
+  inset: calc(var(--ring, 0) * 9%);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 50%;
+}
+
+.yola-orbit i:nth-child(2) { --ring: 1; border-style: dashed; }
+.yola-orbit i:nth-child(3) { --ring: 2; }
+
+.hero-content {
+  position: absolute;
+  z-index: 8;
+  left: clamp(24px, 5vw, 76px);
+  top: 50%;
+  width: min(720px, 66vw);
+  translate: 0 -50%;
+  transform: translate3d(0, calc(var(--yola-progress) * -12vh), 0);
+}
+
+.hero-kicker {
+  margin-bottom: 18px;
+  font-size: 11px;
+  letter-spacing: .22em;
+  opacity: calc(1 - var(--yola-progress) * 1.6);
+}
+
+.hero-title {
+  color: #fff;
+  font-size: clamp(64px, 10.5vw, 168px);
+  line-height: .76;
+  letter-spacing: -.055em;
+  text-transform: uppercase;
+}
+
+.hero-title-line:nth-child(2) {
+  padding-left: clamp(28px, 6vw, 96px);
+  font-style: italic;
+}
+
+.hero-title-line-inner {
+  transform-origin: left center;
+}
+
+.hero-declaration {
+  width: min(460px, 70vw);
+  margin-top: 28px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(18px, 2vw, 28px);
+  line-height: 1.08;
+  opacity: calc(1 - var(--yola-progress) * 2.1);
+}
+
+.hero-content .capsule-button {
+  margin-top: 28px;
+  opacity: calc(1 - var(--yola-progress) * 2.4);
+}
+
+.yola-story-frames {
+  position: absolute;
+  z-index: 9;
+  right: clamp(24px, 6vw, 88px);
+  bottom: clamp(76px, 10vh, 132px);
+  width: min(390px, 34vw);
+  pointer-events: none;
+}
+
+.yola-story-frame {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  opacity: 0;
+  transform: translate3d(0, 34px, 0) rotateX(-7deg);
+  transform-origin: bottom center;
+  transition: opacity .2s linear, transform .35s cubic-bezier(.22,1,.36,1);
+}
+
+.yola-story-frame.is-active {
+  opacity: 1;
+  transform: translate3d(0,0,0) rotateX(0deg);
+}
+
+.yola-story-frame span,
+.collection-intro > span,
+.craft-reveal > span,
+.product-meta small {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .62;
+}
+
+.yola-story-frame strong {
+  display: block;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(36px, 4.6vw, 72px);
+  font-weight: 400;
+  line-height: .92;
+  letter-spacing: -.035em;
+}
+
+.yola-story-frame p {
+  max-width: 320px;
+  margin-top: 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: .72;
+}
+
+.yola-material-index {
+  position: absolute;
+  z-index: 9;
+  left: clamp(24px, 5vw, 76px);
+  bottom: clamp(24px, 5vh, 58px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(100px, 1fr));
+  width: min(590px, 58vw);
+  border-top: 1px solid rgba(255,255,255,.32);
+  opacity: 0;
+  transform: translate3d(0,18px,0);
+  transition: opacity .3s ease, transform .4s cubic-bezier(.22,1,.36,1);
+}
+
+body[data-yola-keyframe]:not([data-yola-keyframe='01']):not([data-yola-keyframe='02']) .yola-material-index {
+  opacity: 1;
+  transform: none;
+}
+
+.yola-material-index div {
+  padding: 14px 14px 0 0;
+}
+
+.yola-material-index span,
+.yola-material-index b {
+  display: block;
+}
+
+.yola-material-index span {
+  margin-bottom: 6px;
+  font-size: 9px;
+  letter-spacing: .18em;
+  opacity: .52;
+}
+
+.yola-material-index b {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .08em;
+}
+
+.yola-keyframe-rail {
+  position: absolute;
+  z-index: 10;
+  right: 20px;
+  top: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  translate: 0 -50%;
+  font-size: 9px;
+  letter-spacing: .14em;
+}
+
+.yola-keyframe-track {
+  display: grid;
+  gap: 6px;
+}
+
+.yola-keyframe-track i {
+  width: 3px;
+  height: 13px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.25);
+  transition: height .2s ease, background .2s ease;
+}
+
+.yola-keyframe-track i.is-active {
+  height: 28px;
+  background: #fff;
+}
+
+.awards-section {
+  height: 420vh;
+  overflow: visible;
+  border-color: rgba(0,0,0,.18);
+  background: var(--yola-paper);
+}
+
+.awards-pin {
+  height: 100vh;
+  overflow: hidden;
+  background: var(--yola-paper);
+}
+
+.awards-grid {
+  position: relative;
+  z-index: 3;
+}
+
+.product-card {
+  position: relative;
+  width: 38vw;
+  min-width: 38vw;
+  padding: clamp(84px, 12vh, 128px) clamp(32px, 4vw, 70px) 52px;
+  justify-content: space-between;
+  background: var(--yola-paper);
+  border-color: rgba(0,0,0,.2);
+  cursor: pointer;
+  transform: translateZ(0) scale(.9);
+  opacity: .48;
+  transition: opacity .28s ease, transform .38s cubic-bezier(.22,1,.36,1), background .3s ease;
+}
+
+.product-card.is-focus {
+  opacity: 1;
+  transform: translateZ(0) scale(1);
+  background: #f7f4ee;
+}
+
+.product-image-wrap {
+  height: min(54vh, 520px);
+  max-width: 94%;
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+
+.product-card.is-focus .product-image-wrap {
+  transform: translate3d(0,-10px,0) rotate(-1deg) scale(1.04);
+}
+
+.product-meta {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  text-align: left;
+}
+
+.product-meta small {
+  grid-column: 1 / -1;
+}
+
+.product-name {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(28px, 3vw, 46px);
+  line-height: .95;
+  letter-spacing: -.03em;
+}
+
+.product-price {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: .08em;
+}
+
+.collection-intro {
+  position: absolute;
+  z-index: 6;
+  left: clamp(24px, 5vw, 76px);
+  top: clamp(92px, 13vh, 140px);
+  width: min(440px, 38vw);
+  pointer-events: none;
+  opacity: calc(1 - min(1, var(--yola-collection-progress) * 4));
+  transform: translate3d(0, calc(var(--yola-collection-progress) * -70px), 0);
+}
+
+.collection-intro h2 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(50px, 7vw, 110px);
+  font-weight: 400;
+  line-height: .78;
+  letter-spacing: -.05em;
+}
+
+.collection-intro p {
+  margin-top: 24px;
+  font-size: 13px;
+}
+
+.collection-progress {
+  position: absolute;
+  z-index: 9;
+  right: 28px;
+  top: 50%;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  translate: 0 -50%;
+  font-size: 9px;
+  letter-spacing: .16em;
+  mix-blend-mode: difference;
+  color: #fff;
+}
+
+.collection-progress i {
+  width: 1px;
+  height: 150px;
+  background: linear-gradient(to bottom, #fff calc(var(--yola-collection-progress) * 100%), rgba(255,255,255,.24) 0);
+}
+
+.video-scaling-wrapper {
+  z-index: 4;
+  left: 0;
+  right: 0;
+  width: 100%;
+  transform: scaleX(0) translateZ(0);
+  transform-origin: center;
+  background-color: #080808;
+  will-change: transform;
+}
+
+.reveal-video {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(0) scale(1.04);
+  filter: grayscale(1) contrast(1.15) brightness(.62);
+}
+
+.craft-reveal {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  top: 50%;
+  width: min(680px, 76vw);
+  translate: -50% -50%;
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(0,40px,0) scale(.94);
+}
+
+.craft-reveal strong {
+  display: block;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(58px, 9vw, 142px);
+  font-weight: 400;
+  line-height: .76;
+  letter-spacing: -.055em;
+}
+
+.craft-reveal p {
+  width: min(460px, 82%);
+  margin: 28px auto 0;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: .72;
+}
+
+.stats-copy-section,
+.site-footer {
+  background: var(--yola-paper);
+}
+
+body[data-demo-enrich='cross-border']::after {
+  display: none !important;
+}
+
+body[data-demo-enrich='cross-border'] .motion-enrich-reveal {
+  opacity: 1 !important;
+  translate: 0 0 !important;
+  filter: none !important;
+}
+
+@media (max-width: 768px) {
+  .hero-scroll {
+    height: 600vh;
+  }
+
+  .hero-content {
+    left: 16px;
+    top: 44%;
+    width: calc(100vw - 32px);
+  }
+
+  .hero-title {
+    font-size: clamp(58px, 22vw, 92px);
+  }
+
+  .hero-title-line:nth-child(2) {
+    padding-left: 24px;
+  }
+
+  .hero-declaration {
+    font-size: 17px;
+  }
+
+  .yola-story-frames {
+    left: 16px;
+    right: auto;
+    bottom: 112px;
+    width: calc(100vw - 54px);
+  }
+
+  .yola-story-frame strong {
+    font-size: clamp(38px, 13vw, 58px);
+  }
+
+  .yola-material-index {
+    left: 16px;
+    bottom: 30px;
+    width: calc(100vw - 56px);
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .yola-material-index b {
+    font-size: 9px;
+  }
+
+  .yola-keyframe-rail {
+    right: 8px;
+  }
+
+  .yola-keyframe-track {
+    gap: 3px;
+  }
+
+  .yola-keyframe-track i {
+    height: 6px;
+  }
+
+  .yola-keyframe-track i.is-active {
+    height: 14px;
+  }
+
+  .awards-section {
+    height: auto;
+    overflow: hidden;
+    padding: 72px 0 56px;
+  }
+
+  .awards-pin {
+    height: auto;
+    overflow: visible;
+  }
+
+  .collection-intro {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    margin: 0 16px 42px;
+    opacity: 1;
+    transform: none;
+  }
+
+  .collection-intro h2 {
+    font-size: clamp(54px, 18vw, 78px);
+  }
+
+  .awards-grid {
+    width: auto;
+    display: flex;
+    gap: 12px;
+    padding: 0 16px 20px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .awards-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-card {
+    width: 86vw;
+    min-width: 86vw;
+    height: min(68vh, 590px);
+    padding: 42px 24px 28px;
+    scroll-snap-align: center;
+    opacity: 1;
+    transform: none;
+  }
+
+  .product-image-wrap {
+    height: min(42vh, 350px);
+  }
+
+  .product-name {
+    font-size: 34px;
+  }
+
+  .collection-progress,
+  .video-scaling-wrapper {
+    display: none;
+  }
+
+  .craft-reveal {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    margin: 38px 16px 0;
+    padding: 64px 24px;
+    translate: none;
+    opacity: 1;
+    transform: none;
+    color: #fff;
+    background: #090909;
+  }
+
+  .craft-reveal strong {
+    font-size: clamp(52px, 17vw, 82px);
+  }
+}
+
+@media (max-height: 560px) and (orientation: landscape) {
+  .hero-title { font-size: clamp(46px, 11vw, 76px); }
+  .hero-declaration, .hero-content .capsule-button { display: none; }
+  .yola-story-frames { bottom: 38px; width: 42vw; }
+  .yola-material-index { display: none; }
+  .yola-keyframe-track { gap: 2px; }
+  .yola-keyframe-track i { height: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll { height: 100svh; }
+  .hero-sticky::before,
+  .hero-video,
+  .hero-content,
+  .yola-orbit,
+  .yola-story-frame,
+  .yola-material-index,
+  .product-card,
+  .product-image-wrap,
+  .collection-intro,
+  .craft-reveal {
+    transform: none !important;
+    transition: none !important;
+  }
+  .yola-story-frame { display: none; }
+  .yola-story-frame[data-yola-frame='14'] { display: block; opacity: 1; }
+  .yola-material-index { opacity: 1; }
+  .awards-section { height: auto; }
+  .awards-pin { height: auto; }
+  .awards-grid { overflow-x: auto; }
+}
