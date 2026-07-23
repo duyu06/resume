@@ -1,3 +1,11 @@
+main {
+  background: transparent;
+}
+
+.footer-spacer {
+  background: transparent;
+}
+
 .awards-section {
   height: 360vh;
   overflow: visible;
