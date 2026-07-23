@@ -19,8 +19,8 @@
       launcher: '演示控制',
     },
     digitalhuman: {
-      kicker: 'REALTIME CHARACTER LAB',
-      launcher: '演示控制',
+      kicker: 'CUSTOMER SERVICE AGENT',
+      launcher: '客服演示',
     },
     rpa: {
       kicker: 'AUTOMATION RUNBOOK',
