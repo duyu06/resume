@@ -1,390 +1,311 @@
 (() => {
   'use strict';
 
-  const gsap = window.gsap;
-  const ScrollTrigger = window.ScrollTrigger;
-  if (!gsap || !ScrollTrigger) return;
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+  const root = $('#scroll-spacer');
+  const panel = $('#collection');
+  const wrap = $('.gallery-wrap');
+  const grid = $('#gallery-grid');
+  const cards = $$('.bp-card', grid);
+  const leftVideo = $('#video-left');
+  const rightVideo = $('#video-right');
+  const canvas = $('#main-canvas');
+  const overlay = $('#outro-overlay');
+  const outroInfo = $('#outro-info');
+  const outroBuy = $('#outro-buy');
+  const outroFooter = $('#outro-footer');
+  const symbol = $('#circle-symbol');
+  const menuButton = $('.menu-button');
+  const menuPanel = $('.menu-panel');
+  const cursor = $('.custom-cursor');
+  const legacyHeroProbe = $('.legacy-hero-probe');
+  const legacyCollectionProbe = $('.legacy-collection-probe');
+  const legacySnapRail = $('.legacy-snap-rail');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const touchMode = matchMedia('(hover: none), (pointer: coarse), (max-width: 1023px)').matches;
+  const symbols = ['8', '$', '^^', '%', '/'];
 
-  gsap.registerPlugin(ScrollTrigger);
-  ScrollTrigger.config({ ignoreMobileResize: true, limitCallbacks: true });
+  let viewportHeight = innerHeight;
+  let maxScroll = 0;
+  let pointerX = innerWidth / 2;
+  let activeSide = 'right';
+  let lastSymbolAt = 0;
+  let rafId = 0;
+  let layoutCols = 0;
+  let videosReady = 0;
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const mobileQuery = window.matchMedia('(max-width: 768px)');
-  const body = document.body;
-  const hero = document.querySelector('.hero-scroll');
-  const heroRoot = document.querySelector('[data-yola-motion-root]');
-  const heroVideo = document.querySelector('.hero-video');
-  const heroTitle = document.querySelector('.hero-title');
-  const heroDeclaration = document.querySelector('.hero-declaration');
-  const heroButton = document.querySelector('.hero-content .capsule-button');
-  const storyFrames = [...document.querySelectorAll('[data-yola-frame]')];
-  const markers = [...document.querySelectorAll('[data-yola-marker]')];
-  const railLabel = document.querySelector('[data-yola-rail-label]');
-  const material = document.querySelector('[data-yola-material]');
-  const weight = document.querySelector('[data-yola-weight]');
-  const finish = document.querySelector('[data-yola-finish]');
-  const collection = document.querySelector('[data-yola-collection]');
-  const collectionPin = document.querySelector('.awards-pin');
-  const productGrid = document.querySelector('.awards-grid');
-  const productCards = [...document.querySelectorAll('.product-card')];
-  const collectionIndex = document.querySelector('[data-collection-index]');
-  const reveal = document.querySelector('.video-scaling-wrapper');
-  const revealVideo = document.querySelector('.reveal-video');
-  const craftReveal = document.querySelector('.craft-reveal');
+  function buildLayout(count, cols) {
+    const placements = [];
+    let imageIndex = 0;
+    let row = 0;
 
-  const HERO_KEYFRAMES = 14;
-  const COLLECTION_KEYFRAMES = 8;
-  const media = [heroVideo, revealVideo].filter(Boolean);
-  let heroFrame = -1;
-  let collectionFrame = -1;
-  let lastWidth = window.innerWidth;
-  let resizeTimer = 0;
-  let footerObserver = null;
+    while (imageIndex < count) {
+      const cells = Array(cols).fill(-1);
+      const a = (row * 2 + (row % 2)) % cols;
+      cells[a] = imageIndex;
+      imageIndex += 1;
 
-  body.dataset.yolaKeyframeCount = String(HERO_KEYFRAMES);
-  body.dataset.yolaCollectionStageCount = String(COLLECTION_KEYFRAMES);
+      if (row % 3 === 0 && imageIndex < count) {
+        let b = (a + 2) % cols;
+        if (b === a) b = (a + 1) % cols;
+        cells[b] = imageIndex;
+        imageIndex += 1;
+      }
 
-  const clamp = (value, min = 0, max = 1) => Math.max(min, Math.min(max, value));
-  const mapRange = (value, start, end) => clamp((value - start) / Math.max(0.0001, end - start));
-  const pad = (value) => String(value).padStart(2, '0');
-
-  function splitCharacters(element) {
-    if (!element || element.dataset.split === 'true') return;
-    const text = element.textContent || '';
-    element.textContent = '';
-    [...text].forEach((character) => {
-      const span = document.createElement('span');
-      span.className = 'hero-char';
-      span.textContent = character === ' ' ? '\u00a0' : character;
-      element.append(span);
-    });
-    element.dataset.split = 'true';
+      placements.push(cells);
+      row += 1;
+    }
+    return placements.flat();
   }
 
-  function prepareVideos() {
-    media.forEach((video) => {
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.disablePictureInPicture = true;
-      video.setAttribute('playsinline', '');
-      video.setAttribute('webkit-playsinline', '');
-      video.addEventListener('loadeddata', () => video.classList.add('is-ready'), { passive: true });
-      video.addEventListener('error', () => video.classList.add('is-error'), { passive: true });
-      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) video.classList.add('is-ready');
+  function renderGrid() {
+    const cols = innerWidth < 640 ? 2 : innerWidth < 1024 ? 3 : 4;
+    if (cols === layoutCols && grid.dataset.built === '1') return;
+    layoutCols = cols;
+
+    const fragments = document.createDocumentFragment();
+    const order = buildLayout(cards.length, cols);
+    order.forEach((index) => {
+      if (index === -1) {
+        const spacer = document.createElement('div');
+        spacer.className = 'gallery-spacer';
+        spacer.setAttribute('aria-hidden', 'true');
+        fragments.append(spacer);
+        return;
+      }
+      const card = cards[index];
+      const column = fragments.childNodes.length % cols;
+      card.style.transformOrigin = column < cols / 2 ? 'right bottom' : 'left bottom';
+      fragments.append(card);
     });
+    grid.replaceChildren(fragments);
+    grid.dataset.built = '1';
   }
 
-  async function startVideo(video, rate = 0.7) {
-    if (!video || reducedMotion || document.hidden) return;
-    video.playbackRate = rate;
-    try {
-      await video.play();
-    } catch {
-      // Poster and transform choreography remain fully functional without autoplay.
+  function updateMeasurements() {
+    viewportHeight = Math.max(1, innerHeight);
+    renderGrid();
+    panel.style.transform = 'translateY(0)';
+    wrap.style.transform = 'translateY(0)';
+    const wrapHeight = wrap.scrollHeight;
+    maxScroll = Math.max(0, wrapHeight - viewportHeight);
+    root.style.height = `${viewportHeight + maxScroll + viewportHeight * 2}px`;
+    const rootHeight = Number.parseFloat(root.style.height) || root.scrollHeight;
+    const split = Math.max(viewportHeight * 2, rootHeight * 0.58);
+    if (legacyHeroProbe) {
+      legacyHeroProbe.style.top = '0px';
+      legacyHeroProbe.style.height = `${split}px`;
+    }
+    if (legacyCollectionProbe) {
+      legacyCollectionProbe.style.top = `${split}px`;
+      legacyCollectionProbe.style.height = `${Math.max(viewportHeight * 2, rootHeight - split)}px`;
     }
   }
 
-  function stopVideo(video) {
-    if (!video || video.paused) return;
-    video.pause();
+  function updateCards() {
+    const vh = viewportHeight;
+    $$('.bp-card', grid).forEach((card) => {
+      const rect = card.getBoundingClientRect();
+      const top = rect.top;
+      const bottom = rect.bottom;
+      let scale = 0;
+      if (bottom > 0 && top < vh) {
+        const enter = clamp((vh - top) / (vh * 0.6));
+        const exit = clamp(bottom / (vh * 0.4));
+        scale = Math.min(enter, exit);
+      }
+      card.style.transform = `scale(${scale.toFixed(4)})`;
+    });
   }
 
-  function updateMaterial(frame) {
-    const entries = [
-      ['OXIDIZED SILVER', '42 G', 'MATTE / RAW'],
-      ['STERLING SILVER', '46 G', 'BRUSHED'],
-      ['BLACKENED BRONZE', '56 G', 'OXIDIZED'],
-      ['RAW BRASS', '62 G', 'HAND CUT'],
-      ['STERLING SILVER', '68 G', 'HAMMERED'],
-      ['BLACKENED BRONZE', '74 G', 'EDGE LEFT'],
-      ['OXIDIZED SILVER', '78 G', 'SHADOW MATTE'],
-      ['STERLING SILVER', '82 G', 'ROTATED FORM'],
-      ['RAW BRASS', '86 G', 'ARTISAN MARK'],
-      ['MIXED METAL', '88 G', 'COLLECTION'],
-      ['OXIDIZED SILVER', '90 G', 'OBJECT INDEX'],
-      ['BLACKENED BRONZE', '92 G', 'MATERIAL INDEX'],
-      ['STERLING SILVER', '76 G', 'WEAR TRACE'],
-      ['SIX OBJECTS', '14–92 G', 'YOLA STUDIO'],
-    ];
-    const [nextMaterial, nextWeight, nextFinish] = entries[frame] || entries[0];
-    if (material) material.textContent = nextMaterial;
-    if (weight) weight.textContent = nextWeight;
-    if (finish) finish.textContent = nextFinish;
-  }
+  function updateScrollScene() {
+    const y = Math.max(0, scrollY);
+    const split = Number.parseFloat(legacyCollectionProbe?.style.top || '0') || viewportHeight * 2;
+    if (y < split) {
+      const progress = clamp(y / Math.max(1, split - viewportHeight));
+      document.body.dataset.yolaSection = 'hero';
+      document.body.dataset.yolaKeyframe = String(Math.min(14, Math.floor(progress * 14) + 1)).padStart(2, '0');
+    } else {
+      const collectionHeight = Number.parseFloat(legacyCollectionProbe?.style.height || '0') || viewportHeight * 2;
+      const progress = clamp((y - split) / Math.max(1, collectionHeight - viewportHeight));
+      document.body.dataset.yolaSection = 'collection';
+      document.body.dataset.yolaKeyframe = `C${String(Math.min(8, Math.floor(progress * 8) + 1)).padStart(2, '0')}`;
+    }
+    const vh = viewportHeight;
+    let panelY = vh;
+    let wrapY = 0;
 
-  function setHeroFrame(index) {
-    const safeIndex = Math.max(0, Math.min(HERO_KEYFRAMES - 1, index));
-    if (safeIndex === heroFrame) return;
-    heroFrame = safeIndex;
-    const label = pad(safeIndex + 1);
-    body.dataset.yolaKeyframe = label;
-    body.dataset.yolaSection = 'hero';
-    heroRoot?.setAttribute('data-yola-active-frame', label);
-    storyFrames.forEach((frame) => frame.classList.toggle('is-active', frame.dataset.yolaFrame === label));
-    markers.forEach((marker) => marker.classList.toggle('is-active', marker.dataset.yolaMarker === label));
-    if (railLabel) railLabel.textContent = label;
-    updateMaterial(safeIndex);
-  }
-
-  function setCollectionFrame(index) {
-    const safeIndex = Math.max(0, Math.min(COLLECTION_KEYFRAMES - 1, index));
-    if (safeIndex === collectionFrame) return;
-    collectionFrame = safeIndex;
-    body.dataset.yolaSection = 'collection';
-    body.dataset.yolaKeyframe = `C${pad(safeIndex + 1)}`;
-  }
-
-  function setupHeroMotion() {
-    if (!hero || !heroRoot) return;
-    document.querySelectorAll('.hero-title-line-inner').forEach(splitCharacters);
-    setHeroFrame(reducedMotion ? HERO_KEYFRAMES - 1 : 0);
-
-    if (reducedMotion) {
-      heroRoot.style.setProperty('--yola-progress', '1');
-      return;
+    if (y <= vh) {
+      panelY = vh - y;
+      document.body.dataset.prmptPhase = 'hero';
+    } else {
+      panelY = 0;
+      wrapY = -Math.min(maxScroll, y - vh);
+      document.body.dataset.prmptPhase = y < vh + maxScroll ? 'gallery' : 'outro';
     }
 
-    ScrollTrigger.create({
-      id: 'yola-hero-density',
-      trigger: hero,
-      start: 'top top',
-      end: 'bottom bottom',
-      invalidateOnRefresh: true,
-      onEnter: () => startVideo(heroVideo, 0.68),
-      onEnterBack: () => startVideo(heroVideo, 0.68),
-      onLeave: () => stopVideo(heroVideo),
-      onLeaveBack: () => stopVideo(heroVideo),
-      onUpdate(self) {
-        const progress = clamp(self.progress);
-        heroRoot.style.setProperty('--yola-progress', progress.toFixed(4));
-        setHeroFrame(Math.min(HERO_KEYFRAMES - 1, Math.floor(progress * HERO_KEYFRAMES)));
+    panel.style.transform = `translateY(${panelY}px)`;
+    wrap.style.transform = `translateY(${wrapY}px)`;
+    updateCards();
 
-        const introExit = mapRange(progress, 0.035, 0.2);
-        const titleScale = 1 - introExit * 0.11;
-        const titleX = introExit * -4.5;
-        const titleOpacity = 1 - mapRange(progress, 0.1, 0.24);
-        gsap.set(heroTitle, { xPercent: titleX, scale: titleScale, opacity: titleOpacity, force3D: true });
-        gsap.set(heroDeclaration, { y: introExit * -24, opacity: 1 - mapRange(progress, 0.055, 0.19), force3D: true });
-        gsap.set(heroButton, { y: introExit * -18, opacity: 1 - mapRange(progress, 0.04, 0.16), force3D: true });
+    const outroStart = vh + maxScroll;
+    const outroProgress = clamp((y - outroStart) / Math.max(1, vh - 100));
+    overlay.style.opacity = String(outroProgress);
+    outroInfo.style.transform = `translateY(${-outroProgress * (innerWidth < 640 ? 132 : 166)}px)`;
+    outroBuy.style.transform = `scale(${outroProgress})`;
+    outroFooter.style.opacity = String(outroProgress);
+    canvas.style.visibility = y > vh ? 'hidden' : 'visible';
 
-        const chars = document.querySelectorAll('.hero-char');
-        chars.forEach((character, index) => {
-          const local = mapRange(progress, 0.11 + index * 0.0022, 0.23 + index * 0.0022);
-          gsap.set(character, {
-            yPercent: -local * 115,
-            rotate: (index % 2 ? 1 : -1) * local * 4,
-            opacity: 1 - local,
-            filter: `blur(${local * 8}px)`,
-            force3D: true,
-          });
-        });
-      },
-    });
+    const now = performance.now();
+    if (y > 4 && now - lastSymbolAt > 80) {
+      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      lastSymbolAt = now;
+    }
   }
 
-  function focusProduct(index) {
-    const safeIndex = Math.max(0, Math.min(productCards.length - 1, index));
-    productCards.forEach((card, cardIndex) => card.classList.toggle('is-focus', cardIndex === safeIndex));
-    if (collectionIndex) collectionIndex.textContent = pad(safeIndex + 1);
+  function seekVideo(video, progress) {
+    if (!video || !Number.isFinite(video.duration) || video.duration <= 0 || video.seeking) return;
+    const target = clamp(progress) * video.duration;
+    if (Math.abs(video.currentTime - target) > 0.025) video.currentTime = target;
   }
 
-  function setupDesktopCollection() {
-    if (!collection || !productGrid || !collectionPin || !productCards.length) return;
-    focusProduct(0);
+  function updateDesktopVideo() {
+    if (touchMode || reducedMotion) return;
+    const width = Math.max(1, innerWidth);
+    const center = width / 2;
+    const deadZone = Math.max(30, width * 0.05);
+    const leftEdge = center - deadZone;
+    const rightEdge = center + deadZone;
 
-    ScrollTrigger.create({
-      id: 'yola-collection-density',
-      trigger: collection,
-      start: 'top top',
-      end: 'bottom bottom',
-      invalidateOnRefresh: true,
-      onLeave: () => {
-        stopVideo(revealVideo);
-        body.dataset.yolaSection = 'about';
-      },
-      onLeaveBack: () => stopVideo(revealVideo),
-      onUpdate(self) {
-        const progress = clamp(self.progress);
-        collectionPin.style.setProperty('--yola-collection-progress', progress.toFixed(4));
-        setCollectionFrame(Math.min(COLLECTION_KEYFRAMES - 1, Math.floor(progress * COLLECTION_KEYFRAMES)));
-
-        const railProgress = mapRange(progress, 0.09, 0.78);
-        const distance = Math.max(0, productGrid.scrollWidth - window.innerWidth);
-        gsap.set(productGrid, { x: -distance * railProgress, force3D: true });
-
-        const focused = Math.min(productCards.length - 1, Math.round(railProgress * (productCards.length - 1)));
-        focusProduct(focused);
-
-        const revealProgress = mapRange(progress, 0.77, 0.93);
-        gsap.set(reveal, { scaleX: revealProgress, force3D: true });
-        gsap.set(craftReveal, {
-          opacity: mapRange(progress, 0.84, 0.94) * (1 - mapRange(progress, 0.975, 1)),
-          y: 40 * (1 - mapRange(progress, 0.84, 0.94)),
-          scale: 0.94 + mapRange(progress, 0.84, 0.94) * 0.06,
-          force3D: true,
-        });
-
-        if (revealProgress > 0.05) startVideo(revealVideo, 0.78);
-        else stopVideo(revealVideo);
-      },
-    });
+    if (pointerX < leftEdge) {
+      activeSide = 'right';
+      leftVideo.style.display = 'none';
+      rightVideo.style.display = 'block';
+      const progress = (leftEdge - pointerX) / Math.max(1, leftEdge);
+      seekVideo(rightVideo, progress);
+    } else if (pointerX > rightEdge) {
+      activeSide = 'left';
+      leftVideo.style.display = 'block';
+      rightVideo.style.display = 'none';
+      const progress = (pointerX - rightEdge) / Math.max(1, width - rightEdge);
+      seekVideo(leftVideo, progress);
+    } else {
+      const activeVideo = activeSide === 'left' ? leftVideo : rightVideo;
+      const inactiveVideo = activeSide === 'left' ? rightVideo : leftVideo;
+      activeVideo.style.display = 'block';
+      inactiveVideo.style.display = 'none';
+      [leftVideo, rightVideo].forEach((video) => {
+        if (!video.seeking && video.currentTime > 0.04) video.currentTime = 0;
+      });
+    }
   }
 
-  function setupMobileCollection() {
-    if (!productGrid || !productCards.length) return;
-    focusProduct(0);
-    let ticking = false;
+  function frame() {
+    updateScrollScene();
+    updateDesktopVideo();
+    rafId = requestAnimationFrame(frame);
+  }
 
-    const update = () => {
-      ticking = false;
-      const maxScroll = Math.max(1, productGrid.scrollWidth - productGrid.clientWidth);
-      const progress = clamp(productGrid.scrollLeft / maxScroll);
-      productGrid.style.setProperty('--yola-collection-progress', progress.toFixed(4));
-      const index = Math.min(productCards.length - 1, Math.round(progress * (productCards.length - 1)));
-      focusProduct(index);
-      setCollectionFrame(Math.min(COLLECTION_KEYFRAMES - 1, Math.round(progress * (COLLECTION_KEYFRAMES - 1))));
+  function startTouchPlayback() {
+    if (!touchMode || reducedMotion) return;
+    const play = async (video, other) => {
+      other.pause();
+      other.style.display = 'none';
+      video.style.display = 'block';
+      try { await video.play(); } catch { /* Autoplay can be blocked. */ }
     };
-
-    productGrid.addEventListener('scroll', () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
-    }, { passive: true });
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          body.dataset.yolaSection = 'collection';
-          update();
-        }
-      });
-    }, { threshold: 0.18 });
-    if (collection) observer.observe(collection);
+    leftVideo.addEventListener('ended', () => play(rightVideo, leftVideo));
+    rightVideo.addEventListener('ended', () => play(leftVideo, rightVideo));
+    play(leftVideo, rightVideo);
   }
 
-  function setupStatsMotion() {
-    const targets = [...document.querySelectorAll('[data-fade-slide-in]')];
-    const cards = [...document.querySelectorAll('.stat-card')];
-    if (reducedMotion) {
-      gsap.set(targets, { autoAlpha: 1, y: 0 });
-      return;
+  function onVideoReady() {
+    videosReady += 1;
+    if (videosReady >= 2) {
+      canvas.classList.add('is-ready');
+      if (!touchMode) {
+        leftVideo.pause();
+        rightVideo.pause();
+        leftVideo.currentTime = 0;
+        rightVideo.currentTime = 0;
+      }
     }
+  }
 
-    targets.forEach((target, index) => {
-      gsap.fromTo(target, { autoAlpha: 0, y: 26 }, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.8,
-        delay: index * 0.03,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: target, start: 'top 88%', once: true },
-      });
-    });
+  function patchSharedPrototypeCopy() {
+    const apply = () => {
+      const drawerTitle = $('.motion-enrich-drawer h2');
+      if (drawerTitle) drawerTitle.textContent = 'prmpt Archive Collection';
+      const status = $('.motion-enrich-status span');
+      if (status && /YOLA/i.test(status.textContent || '')) status.textContent = 'PRMPT ARCHIVE · PROTOTYPE';
+      const productLabel = $('.motion-product-dialog__content small');
+      if (productLabel) productLabel.textContent = 'PRMPT · ARCHIVE PROTOTYPE';
+      const productCopy = $('.motion-product-dialog__copy');
+      if (productCopy) productCopy.textContent = 'Quick view demonstrates archive item inspection and cart feedback. Price, availability and checkout are presentation data only.';
+    };
+    apply();
+    new MutationObserver(apply).observe(document.body, { childList: true, subtree: true });
+  }
 
-    cards.forEach((card, index) => {
-      gsap.fromTo(card, { clipPath: 'inset(0 0 100% 0)' }, {
-        clipPath: 'inset(0 0 0% 0)',
-        duration: 1,
-        ease: 'power3.inOut',
-        scrollTrigger: { trigger: card, start: 'top 82%', once: true },
-      });
-      gsap.fromTo(card.querySelectorAll('.heading-style-h1'), { yPercent: 105 }, {
-        yPercent: 0,
-        duration: 0.75,
-        delay: index * 0.025,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: card, start: 'top 78%', once: true },
-      });
-    });
+  function setupLegacySnapRail() {
+    if (!legacySnapRail) return;
+    legacySnapRail.addEventListener('scroll', () => {
+      const max = Math.max(1, legacySnapRail.scrollWidth - legacySnapRail.clientWidth);
+      const progress = clamp(legacySnapRail.scrollLeft / max);
+      document.body.dataset.yolaSection = 'collection';
+      document.body.dataset.yolaKeyframe = `C${String(Math.min(8, Math.floor(progress * 8) + 1)).padStart(2, '0')}`;
+    }, { passive: true });
   }
 
   function setupMenu() {
-    const button = document.querySelector('.menu-button');
-    const panel = document.querySelector('.menu-panel');
-    if (!button || !panel) return;
-    const close = () => {
-      panel.classList.remove('is-open');
-      button.setAttribute('aria-expanded', 'false');
-    };
-    button.addEventListener('click', () => {
-      const open = !panel.classList.contains('is-open');
-      panel.classList.toggle('is-open', open);
-      button.setAttribute('aria-expanded', String(open));
+    menuButton.addEventListener('click', () => {
+      const open = menuButton.getAttribute('aria-expanded') !== 'true';
+      menuButton.setAttribute('aria-expanded', String(open));
+      menuPanel.classList.toggle('is-open', open);
     });
-    panel.querySelectorAll('a,button').forEach((item) => item.addEventListener('click', close));
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') close();
+    menuPanel.addEventListener('click', (event) => {
+      if (!(event.target instanceof HTMLAnchorElement)) return;
+      menuButton.setAttribute('aria-expanded', 'false');
+      menuPanel.classList.remove('is-open');
     });
   }
 
-  function setupButtons() {
-    document.querySelectorAll('[data-scroll-target]').forEach((button) => {
-      button.addEventListener('click', () => {
-        document.querySelector(button.dataset.scrollTarget)?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
+  function setupNavigation() {
+    $$('[data-scroll-target]').forEach((control) => {
+      control.addEventListener('click', () => {
+        const target = $(control.dataset.scrollTarget);
+        if (!target) return;
+        const destination = target.id === 'collection' ? viewportHeight + 2 : target.offsetTop;
+        scrollTo({ top: destination, behavior: reducedMotion ? 'auto' : 'smooth' });
       });
     });
-
-    document.querySelector('.newsletter-form')?.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const input = event.currentTarget.querySelector('input');
-      if (!input?.value.trim()) return;
-      window.alert("You're on the list. Welcome.");
-      event.currentTarget.reset();
-    });
   }
 
-  function setupFooter() {
-    const footer = document.querySelector('.site-footer');
-    const spacer = document.querySelector('.footer-spacer');
-    if (!footer || !spacer) return;
-    const sync = () => { spacer.style.height = `${footer.offsetHeight}px`; };
-    sync();
-    if ('ResizeObserver' in window) {
-      footerObserver = new ResizeObserver(sync);
-      footerObserver.observe(footer);
-    }
+  if (cursor) {
+    addEventListener('mousemove', (event) => {
+      pointerX = event.clientX;
+      cursor.style.left = `${event.clientX}px`;
+      cursor.style.top = `${event.clientY}px`;
+    }, { passive: true });
   }
 
-  function rebuildResponsiveMotion() {
-    ScrollTrigger.getById('yola-collection-density')?.kill(true);
-    gsap.set(productGrid, { clearProps: 'transform' });
-    gsap.set(reveal, { clearProps: 'transform' });
-    gsap.set(craftReveal, { clearProps: 'transform,opacity' });
-    if (mobileQuery.matches || reducedMotion) setupMobileCollection();
-    else setupDesktopCollection();
-    ScrollTrigger.refresh();
-  }
-
-  function initialize() {
-    prepareVideos();
-    setupMenu();
-    setupButtons();
-    setupFooter();
-    setupHeroMotion();
-    setupStatsMotion();
-    rebuildResponsiveMotion();
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-  }
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) media.forEach(stopVideo);
+  [leftVideo, rightVideo].forEach((video) => {
+    video.addEventListener('loadedmetadata', onVideoReady, { once: true });
   });
 
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(() => {
-      if (window.innerWidth === lastWidth) return;
-      lastWidth = window.innerWidth;
-      rebuildResponsiveMotion();
-    }, 220);
+  addEventListener('resize', () => {
+    cancelAnimationFrame(rafId);
+    updateMeasurements();
+    rafId = requestAnimationFrame(frame);
   }, { passive: true });
 
-  window.addEventListener('pagehide', () => {
-    media.forEach(stopVideo);
-    footerObserver?.disconnect();
-  }, { once: true });
-
-  const fontsReady = document.fonts?.ready ?? Promise.resolve();
-  fontsReady.then(initialize);
+  patchSharedPrototypeCopy();
+  setupLegacySnapRail();
+  setupMenu();
+  setupNavigation();
+  updateMeasurements();
+  startTouchPlayback();
+  rafId = requestAnimationFrame(frame);
 })();
