@@ -1,0 +1,33 @@
+name: Check published links
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check published website links
+        uses: lycheeverse/lychee-action@v2.4.0
+        with:
+          args: >-
+            --verbose
+            --no-progress
+            --exclude-mail
+            --exclude 'https://fonts.googleapis.com/.*'
+            --exclude 'https://fonts.gstatic.com/.*'
+            --exclude 'https://d8j0ntlcm91z4.cloudfront.net/.*'
+            https://duyu06.github.io/resume/
+            https://duyu06.github.io/resume/demos/cross-border/
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
