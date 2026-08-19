@@ -1,0 +1,88 @@
+name: Mirror Cross-border Assets
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mirror-cross-border-assets
+  cancel-in-progress: true
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download external cross-border media
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="public/demos/cross-border/assets"
+          mkdir -p "$base"
+
+          declare -A assets=(
+            [hero.webp]="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min.webp"
+            [void-arc.webp]="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min.webp"
+            [onyx-hex.webp]="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144747_f21bc119-e460-45be-a071-851291bd71c5_min.webp"
+            [shadow-sigil.webp]="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_215521_100b78bd-d24a-4225-b2e8-5bb30d44af73_min.webp"
+            [hero.mp4]="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_212146_743b92b3-40a3-46cb-988d-7bf716564ec3.mp4"
+            [reveal.mp4]="https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_122130_8b16d300-75cb-49f5-82ce-afd6b79c2d79.mp4"
+          )
+
+          for name in "${!assets[@]}"; do
+            if [[ ! -s "$base/$name" ]]; then
+              echo "Downloading $name"
+              curl --fail --location --retry 4 --retry-delay 2 --connect-timeout 20 --max-time 600 \
+                "${assets[$name]}" -o "$base/$name"
+            else
+              echo "Keeping existing $name"
+            fi
+          done
+
+      - name: Protect repository from oversized media
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            bytes=$(stat -c '%s' "$file")
+            echo "$file: $bytes bytes"
+            if (( bytes > 94371840 )); then
+              echo "ERROR: $file is larger than 90 MiB. GitHub enforces a 100 MiB single-object limit; compress this media before mirroring it."
+              exit 1
+            fi
+          done < <(find public/demos/cross-border/assets -type f -print0)
+
+      - name: Rewrite cross-border media references to local files
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(demos/cross-border/index.html demos/cross-border/cross-border.css)
+          for file in "${files[@]}"; do
+            sed -i 's#https://d8j0ntlcm91z4\.cloudfront\.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144408_92b74dc4-ca69-412a-acfd-304f9b29eb5e_min\.webp#./assets/hero.webp#g' "$file"
+            sed -i 's#https://d8j0ntlcm91z4\.cloudfront\.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_145142_ed02063b-d983-47d2-b60b-4b4a5a3448bd_min\.webp#./assets/void-arc.webp#g' "$file"
+            sed -i 's#https://d8j0ntlcm91z4\.cloudfront\.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_144747_f21bc119-e460-45be-a071-851291bd71c5_min\.webp#./assets/onyx-hex.webp#g' "$file"
+            sed -i 's#https://d8j0ntlcm91z4\.cloudfront\.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_215521_100b78bd-d24a-4225-b2e8-5bb30d44af73_min\.webp#./assets/shadow-sigil.webp#g' "$file"
+            sed -i 's#https://d8j0ntlcm91z4\.cloudfront\.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260627_212146_743b92b3-40a3-46cb-988d-7bf716564ec3\.mp4#./assets/hero.mp4#g' "$file"
+            sed -i 's#https://d8j0ntlcm91z4\.cloudfront\.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260628_122130_8b16d300-75cb-49f5-82ce-afd6b79c2d79\.mp4#./assets/reveal.mp4#g' "$file"
+          done
+
+      - name: Commit mirrored assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/demos/cross-border/assets demos/cross-border/index.html demos/cross-border/cross-border.css
+          if git diff --cached --quiet; then
+            echo "No mirroring changes needed."
+            exit 0
+          fi
+          git commit -m "chore: self-host cross-border media"
+          git push
