@@ -20,10 +20,18 @@ const actions = [
 ];
 
 const highlights = [
-  'AI 产品 0→1：需求分析、MVP、产品架构、PRD、原型与验收',
+  'AI 产品 0→1：需求分析、场景拆解、MVP、产品架构、PRD、原型与验收',
   'AI 技术产品化：大模型、多模态、RAG、Agent、Prompt 与模型评测',
-  '研发协同：API、异步任务、WebSocket、日志、失败重试与部署验证',
-  '产品价值：质量、成功率、时延、稳定性、成本与商业化能力',
+  '研发协同：模型/API 接入、异步任务、WebSocket、日志、失败重试与部署验证',
+  '产品价值：质量、成功率、时延、稳定性、调用成本、用户体验与商业化',
+];
+
+const jdMatch = [
+  ['AI 产品规划', '需求调研 → 场景拆解 → MVP → 版本迭代'],
+  ['AI 平台 / 中台', '模型服务 → 推理 → 监控 → 参数与任务管理'],
+  ['Agent 场景落地', '多 Agent → 工具调用 → 状态管理 → 人工接管'],
+  ['模型生命周期', '数据 → Prompt / 微调 → 评测 → 部署 → API'],
+  ['跨部门协作', '产品方案 → PRD → 技术联调 → 测试验收 → 交付'],
 ];
 
 export default function ContactSection() {
@@ -75,7 +83,7 @@ export default function ContactSection() {
                 ))}
               </div>
               <p className="mt-5 font-body text-lg font-medium leading-relaxed text-ink sm:text-xl">
-                能够连接业务、产品、模型与工程，把 AI 能力转化为可评测、可追踪、可交付的产品方案。
+                能够连接业务、产品、模型与工程，把复杂业务痛点转化为可评测、可追踪、可交付的 AI 产品方案。
               </p>
               <p className="mt-3 font-body text-sm leading-relaxed text-ink-dim">
                 2026 届毕业生 · 现居长沙 · 意向北京、上海、广州、深圳、苏州、佛山 · 可接受合理出差
@@ -83,7 +91,19 @@ export default function ContactSection() {
             </div>
 
             <div className="liquid-glass-strong rounded-3xl p-6 sm:p-8">
-              <p className="mb-4 font-mono text-[0.65rem] uppercase tracking-[0.22em] text-accent">Why me</p>
+              <p className="mb-4 font-mono text-[0.65rem] uppercase tracking-[0.22em] text-accent">JD MATCH</p>
+              <div className="space-y-4">
+                {jdMatch.map(([title, detail]) => (
+                  <div key={title} className="grid gap-1 border-b border-ink/8 pb-3 last:border-0 last:pb-0 sm:grid-cols-[8.5rem_1fr] sm:gap-3">
+                    <span className="text-sm font-medium text-ink">{title}</span>
+                    <span className="text-sm leading-relaxed text-ink-dim">{detail}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="liquid-glass-strong rounded-3xl p-6 sm:p-8">
+              <p className="mb-4 font-mono text-[0.65rem] uppercase tracking-[0.22em] text-accent">WHY ME</p>
               <ul className="space-y-3">
                 {highlights.map((highlight) => (
                   <li key={highlight} className="flex items-start gap-3 text-sm leading-relaxed text-ink-dim">
@@ -160,9 +180,9 @@ export default function ContactSection() {
               </div>
 
               <div className="mt-auto rounded-2xl border border-ink/8 bg-white/55 p-5">
-                <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-accent">PRODUCT · MODEL · ENGINEERING · DELIVERY</p>
+                <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-accent">PRODUCT · AI · ENGINEERING · DELIVERY</p>
                 <p className="mt-2 text-sm leading-relaxed text-ink-dim">
-                  需求分析 → 产品架构 → AI能力选型 → 原型 / PRD → 研发协同 → 测试验收 → 部署交付
+                  需求分析 → 场景拆解 → AI能力选型 → 产品架构 → PRD / 原型 → Agent / 多模态 → 研发协同 → 测试验收 → 部署交付
                 </p>
               </div>
             </div>
