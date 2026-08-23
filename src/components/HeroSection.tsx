@@ -2,7 +2,7 @@ import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
 import LayeredIntelligence from './LayeredIntelligence';
 
-const tags = ['AI 产品规划', '模型评测与选型', '多模态工作流', '原型开发与部署交付'];
+const tags = ['AI 产品 0→1', 'Agent / 多模态', '模型评测与选型', 'PRD · 原型 · 研发协同'];
 
 export default function HeroSection() {
   return (
@@ -28,14 +28,14 @@ export default function HeroSection() {
         </div>
         <div className="glass inline-flex max-w-full items-center gap-2 rounded-full px-3 py-2 text-[0.65rem] leading-relaxed tracking-wide text-ink-dim sm:whitespace-nowrap sm:text-[0.72rem]">
           <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#22c55e] shadow-[0_0_12px_rgba(34,197,94,0.65)]" />
-          <span>2026 届毕业生 · 现居长沙 · 意向北上广深、苏州、佛山</span>
+          <span>AI 产品经理 · 2026 届毕业生 · 现居长沙</span>
         </div>
       </FadeIn>
 
       <div className="relative z-20 flex flex-1 flex-col items-center justify-center gap-4 py-10 text-center">
         <FadeIn delay={0.12} y={18} className="mb-1">
           <span className="rounded-full border border-accent/15 bg-white/65 px-3 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-accent shadow-[0_8px_24px_rgba(37,99,235,0.05)] backdrop-blur-xl sm:text-[0.68rem]">
-            Layered Intelligence · AI Product × Technology
+            AI PRODUCT · BUSINESS × MODEL × ENGINEERING
           </span>
         </FadeIn>
 
@@ -47,23 +47,23 @@ export default function HeroSection() {
 
         <FadeIn delay={0.32} y={24}>
           <p className="hero-role-safe font-display text-[clamp(0.95rem,2.8vw,1.75rem)] font-medium tracking-wide text-ink">
-            AI 产品经理 · 技术产品经理 · AI 解决方案产品经理
+            AI 产品经理 · AI 应用产品经理 · 技术产品经理
           </p>
         </FadeIn>
 
         <FadeIn delay={0.4} y={20}>
-          <div className="mt-1 max-w-2xl rounded-[28px] border border-white/70 bg-white/78 px-5 py-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:px-7 sm:py-5">
+          <div className="mt-1 max-w-3xl rounded-[28px] border border-white/70 bg-white/78 px-5 py-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:px-7 sm:py-5">
             <p className="font-body text-base font-medium leading-relaxed text-ink md:text-lg">
-              将模型能力转化为可评测、可追踪、可交付的 AI 产品。
+              把业务痛点翻译成可落地、可评测、可追踪的 AI 产品方案。
             </p>
             <p className="mt-2 font-body text-sm leading-relaxed text-ink-dim md:text-base">
-              从业务场景、需求拆解、模型选型和 Prompt 设计，到产品原型、接口联调、部署验证与交付文档，在产品、模型与工程之间建立完整连接。
+              从需求分析、场景拆解、AI能力选型和 Prompt 设计，到产品架构、PRD、原型、Agent / 多模态工作流、研发协同、测试验收与部署交付，连接业务、模型与工程。
             </p>
           </div>
         </FadeIn>
 
         <FadeIn delay={0.48} y={20}>
-          <div className="mt-2 flex max-w-2xl flex-wrap justify-center gap-2">
+          <div className="mt-2 flex max-w-3xl flex-wrap justify-center gap-2">
             {tags.map((tag) => (
               <span
                 key={tag}
@@ -79,11 +79,11 @@ export default function HeroSection() {
       <div className="relative z-30 flex flex-wrap items-end justify-between gap-5">
         <FadeIn delay={0.56} y={20}>
           <div>
-            <p className="max-w-[420px] font-display text-[clamp(0.75rem,1.4vw,1.05rem)] font-light uppercase leading-snug tracking-wide text-ink">
-              产品设计 + AI 应用落地 + 技术协同 + 原型开发与部署验证
+            <p className="max-w-[520px] font-display text-[clamp(0.75rem,1.4vw,1.05rem)] font-light uppercase leading-snug tracking-wide text-ink">
+              产品规划 + AI能力产品化 + Agent / 多模态 + 研发协同与交付
             </p>
             <p className="mt-2 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-ink/40">
-              PRODUCT · MODEL · ENGINEERING · DELIVERY
+              PRODUCT · AI · ENGINEERING · DELIVERY
             </p>
           </div>
         </FadeIn>
