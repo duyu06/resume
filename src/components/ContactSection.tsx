@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Check, Code, Copy, ExternalLink, FileDown, Mail, MapPin, Phone } from 'lucide-react';
+import { Check, Code, Copy, ExternalLink, FileDown, FileText, Mail, MapPin, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } };
 const item = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
 const pdfUrl = `${import.meta.env.BASE_URL}resume.pdf`;
+const onlineResumeUrl = `${import.meta.env.BASE_URL}online-resume/`;
 const EMAIL = '3245485135@qq.com';
 const PHONE = '18163794793';
 const actions = [
+  { icon: FileText, label: '在线简历', type: 'link' as const, href: onlineResumeUrl },
   { icon: FileDown, label: '下载 PDF 简历', type: 'link' as const, href: pdfUrl, download: true },
   { icon: Copy, label: '复制邮箱', type: 'copy' as const },
   { icon: Code, label: '查看 GitHub', type: 'link' as const, href: 'https://github.com/duyu06' },

@@ -1,7 +1,8 @@
-import { Code, Mail } from 'lucide-react';
+import { Code, FileText, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const links = [
+  { icon: FileText, href: `${import.meta.env.BASE_URL}online-resume/`, label: '在线简历' },
   { icon: Code, href: 'https://github.com/duyu06', label: 'GitHub' },
   { icon: Mail, href: 'mailto:3245485135@qq.com', label: 'Email' },
 ];

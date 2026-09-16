@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>张滨文 · AI 产品经理 · 在线简历</title>
+<meta name="description" content="张滨文 · AI 产品经理在线简历：AI 产品 0→1、Agent / 多模态、RAG 知识中台、AI 平台与推理服务、模型评测与选型。" />
+<style>
+  :root{
+    --ink:#0f172a; --dim:rgba(15,23,42,.66); --faint:rgba(15,23,42,.46);
+    --accent:#2563eb; --accent2:#0ea5e9; --line:rgba(15,23,42,.12);
+    --surface:#f6f8fc;
+    --font:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    --mono:"Consolas","Cascadia Code",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:#eef2f9; color:var(--ink); font-family:var(--font);
+    font-size:14px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  .toolbar{
+    position:sticky; top:0; z-index:10; display:flex; flex-wrap:wrap; gap:10px;
+    align-items:center; justify-content:space-between;
+    padding:12px 20px; background:rgba(255,255,255,.9); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--line);
+  }
+  .toolbar a,.toolbar button{
+    font:inherit; font-size:13px; text-decoration:none; color:var(--ink);
+    border:1px solid var(--line); background:#fff; border-radius:999px;
+    padding:8px 16px; cursor:pointer;
+  }
+  .toolbar .primary{background:linear-gradient(135deg,#1d4ed8,#2563eb 58%,#0ea5e9); color:#fff; border-color:transparent; font-weight:600}
+  .toolbar .hint{color:var(--faint); font-size:12px}
+
+  .page{
+    width:210mm; min-height:297mm; margin:20px auto 40px; background:#fff;
+    padding:16mm 14mm; box-shadow:0 20px 60px rgba(15,23,42,.14);
+  }
+  header.top{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; justify-content:space-between; padding-bottom:14px; border-bottom:3px solid var(--accent)}
+  .name{font-size:34px; font-weight:800; letter-spacing:.06em; line-height:1.1; margin:0}
+  .name span{color:var(--accent)}
+  .role{margin:6px 0 0; font-size:15px; font-weight:600; color:var(--accent)}
+  .meta{margin:8px 0 0; font-size:12.5px; color:var(--dim)}
+  .contact{text-align:right; font-size:12.5px; color:var(--dim); min-width:190px}
+  .contact div{margin-bottom:3px}
+  .contact a{color:var(--accent); text-decoration:none}
+
+  h2{
+    margin:22px 0 10px; font-size:15px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--accent); display:flex; align-items:center; gap:10px;
+  }
+  h2::after{content:""; flex:1; height:1px; background:var(--line)}
+  h3{margin:0; font-size:14.5px; font-weight:700}
+
+  .summary{
+    margin-top:14px; padding:12px 14px; border-radius:10px;
+    background:var(--surface); border:1px solid var(--line); font-size:13.5px; color:var(--dim);
+  }
+  .summary strong{color:var(--ink)}
+
+  .grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 22px}
+  .cap{display:flex; gap:8px; font-size:13px; color:var(--dim); break-inside:avoid}
+  .cap b{color:var(--ink); font-weight:600; white-space:nowrap}
+  .cap::before{content:""; margin-top:.55em; width:5px; height:5px; border-radius:50%; background:var(--accent); flex:none}
+
+  .item{padding:11px 0; border-top:1px solid var(--line); break-inside:avoid}
+  .item:first-of-type{border-top:0}
+  .item-head{display:flex; flex-wrap:wrap; gap:6px 12px; align-items:baseline; justify-content:space-between}
+  .item-head .when{font-family:var(--mono); font-size:11.5px; color:var(--faint); white-space:nowrap}
+  .item .sub{margin:3px 0 5px; font-size:12.5px; color:var(--accent)}
+  .item ul{margin:0; padding-left:16px}
+  .item li{font-size:12.8px; color:var(--dim); margin-bottom:2px}
+  .tags{margin-top:5px; display:flex; flex-wrap:wrap; gap:5px}
+  .tags span{font-size:11px; color:#1e3a8a; background:rgba(37,99,235,.07); border:1px solid rgba(37,99,235,.16); border-radius:999px; padding:1px 8px}
+  .badge{display:inline-block; font-size:11px; padding:1px 7px; border-radius:999px; border:1px solid var(--line); color:var(--faint)}
+
+  .edu{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 22px}
+  .edu .item{padding:8px 0}
+  .edu p{margin:2px 0; font-size:12.5px; color:var(--dim)}
+
+  footer.note{margin-top:22px; padding-top:10px; border-top:1px solid var(--line); font-size:11.5px; color:var(--faint)}
+
+  @media print{
+    @page{size:A4; margin:12mm 11mm}
+    body{background:#fff; font-size:11.4px; line-height:1.55}
+    .toolbar{display:none}
+    .page{width:auto; min-height:0; margin:0; padding:0; box-shadow:none}
+    h2{margin:14px 0 7px}
+    .item{padding:7px 0}
+    a{color:inherit}
+  }
+  @media (max-width:820px){
+    .page{width:auto; margin:12px; padding:18px}
+    .contact{text-align:left}
+    .grid,.edu{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="../">← 返回作品集</a>
+  <span class="hint">按 Ctrl / Cmd + P 可直接打印或另存为 PDF</span>
+  <span style="display:flex;gap:10px">
+    <a class="primary" href="../resume.pdf" download>下载 PDF 版</a>
+    <button type="button" onclick="window.print()">打印 / 存为 PDF</button>
+  </span>
+</div>
+
+<main class="page">
+  <header class="top">
+    <div>
+      <h1 class="name">张滨文<span>.</span></h1>
+      <p class="role">AI 产品经理 · AI 应用产品经理 · 技术产品经理</p>
+      <p class="meta">2026 届毕业生 · 现居长沙 · 意向北京 / 上海 / 广州 / 深圳 / 苏州 / 佛山 · 可接受合理出差</p>
+    </div>
+    <div class="contact">
+      <div>邮箱：<a href="mailto:3245485135@qq.com">3245485135@qq.com</a></div>
+      <div>电话：<a href="tel:18163794793">181 6379 4793</a></div>
+      <div>GitHub：<a href="https://github.com/duyu06">github.com/duyu06</a></div>
+      <div>作品集：<a href="../">duyu06.github.io/resume</a></div>
+    </div>
+  </header>
+
+  <div class="summary">
+    <strong>定位：</strong>偏技术型 AI 产品候选人，能连接业务、产品、模型与工程。从业务流程与用户问题出发，完成需求拆解、MVP 规划、模型选型与评测、原型开发、接口联调与部署验证。相比功能清单，更关注<strong>模型能力边界、任务成功率、响应时延、调用成本、异常恢复与最终可交付性</strong>。
+  </div>
+
+  <h2>核心能力</h2>
+  <div class="grid">
+    <div class="cap"><b>产品定义</b>用户场景 · 需求拆解 · MVP 与优先级 · 验收标准</div>
+    <div class="cap"><b>模型与效果</b>Prompt 设计 · 测试集与评分卡 · 模型横向评测 · 质量 / 时延 / 成本</div>
+    <div class="cap"><b>技术协同</b>API 与数据结构 · 异步任务 · WebSocket · 失败重试与日志</div>
+    <div class="cap"><b>项目协同</b>需求沟通 · PRD / 原型 · 研发联调 · 测试验收 / 交付</div>
+    <div class="cap"><b>部署与交付</b>Linux / Docker · vLLM / Ollama · 监控与排障 · 交付文档</div>
+    <div class="cap"><b>技术栈</b>Go / Python / TypeScript · Next.js / Vue3 · PostgreSQL / Redis / Qdrant</div>
+  </div>
+
+  <h2>项目经历</h2>
+
+  <div class="item">
+    <div class="item-head"><h3>果漾 AI · 多模态内容生产平台</h3><span class="when">持续迭代</span></div>
+    <p class="sub">产品与技术协同 / 核心参与者</p>
+    <ul>
+      <li>面向短视频、漫画及 AI 短剧创作者，参与定义从剧本输入到成片输出的端到端链路，拆解为可交付的 AI 能力模块。</li>
+      <li>梳理「剧本 → 角色提取 → 四视图 → 分镜 → 首尾帧 → 逐镜头视频 → FFmpeg 合成」流程，明确 MVP 边界。</li>
+      <li>围绕质量、成功率、时延与调用成本做多模型选型，设计异步任务、进度反馈、失败重试与结果留存。</li>
+    </ul>
+    <div class="tags"><span>AI 产品 0→1</span><span>多模态</span><span>模型编排</span><span>异步任务</span><span>Go</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>yaoke · 企业 AI 知识中台</h3><span class="when">2026.09</span></div>
+    <p class="sub">产品设计 / 全栈实现 · 个人项目（github.com/duyu06/rag）</p>
+    <ul>
+      <li>基于 Next.js + FastAPI + Qdrant + BGE Embedding 构建企业 RAG 知识中台，覆盖文档入库、混合召回、重排与生成。</li>
+      <li>搭建「向量 + BM25 混合召回 → Cross-Encoder 重排」检索链路，并建立 RAG 评测口径。</li>
+      <li>设计 Citation 引用溯源与 RBAC 权限语义，保证回答可追溯、越权可拒。</li>
+      <li>接入 Ollama 原生 stream 消费 NDJSON，assistant turn 在同一 message id 原地补全答案与引用；迭代至 P1.8 / v0.8.0，103 次提交。</li>
+    </ul>
+    <div class="tags"><span>Hybrid Search</span><span>Cross-Encoder Rerank</span><span>Qdrant</span><span>RBAC</span><span>Citation</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>AI 客服数字人工作台</h3><span class="when">2026.07</span></div>
+    <p class="sub">产品设计 / AI Agent 集成 / 前端体验重构</p>
+    <ul>
+      <li>将数字人、实时对话、客户洞察、业务工具调用与服务指标整合为企业 AI 客服工作台，覆盖售前咨询、订单物流、库存、退款与人工转接。</li>
+      <li>设计「意图与情绪识别 → 选择业务工具 → 验证业务结果 → 人工安全接管」Agent 工作流，并保留状态机。</li>
+    </ul>
+    <div class="tags"><span>AI Agent</span><span>Tool Calling</span><span>风险控制</span><span>人工接管</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>AI 模型服务与推理管理平台</h3><span class="when">2025.03 — 至今</span></div>
+    <p class="sub">项目负责人 · 技术产品实践</p>
+    <ul>
+      <li>统一模型部署、启动、参数配置、版本回滚与服务入口，用 Docker Compose 封装依赖，部署时间由约 4h 降至 20min。</li>
+      <li>建立 GPU / 显存 / Token 吞吐与服务状态监控链路（Prometheus、Grafana、DCGM），典型测试环境吞吐稳定在 50+ token/s、显存利用率控制在 85% 以下。</li>
+    </ul>
+    <div class="tags"><span>AI Platform</span><span>vLLM / Ollama</span><span>推理监控</span><span>成本优化</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>数字人风格对话模型 · 微调与评测</h3><span class="when">2026.04</span></div>
+    <p class="sub">产品负责人 / AI 应用实践</p>
+    <ul>
+      <li>清洗标注 7,328 条历史多模态对话，构建 JSONL 数据集及训练 / 验证集划分。</li>
+      <li>设计「角色设定 + 上下文 + 历史记忆 + 输出约束」Prompt 结构；建立 26 条标准测试 Prompt + 25 分制评分卡，使版本具备可比较、可复用的评测基础。</li>
+    </ul>
+    <div class="tags"><span>模型微调</span><span>数据构建</span><span>评分卡</span><span>API 部署</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>PrismPix · AI 电商视觉生成引擎</h3><span class="when">2026.09</span></div>
+    <p class="sub">二开 / 部署与工程细节落地 · 开源项目二开（原项目 keirosang/PrismPix）</p>
+    <ul>
+      <li>跑通「产品图 → 视觉分析 → 营销策略 → 14 条 GPT-Image-2 Prompt → 14 张电商图」三段式流程，明确 images.edit 底图不变、仅合成场景的能力边界。</li>
+      <li>本地化部署与调优：25 个场景模板按品类自适应映射，Campaign Style Lock 统一整套素材视觉基调。</li>
+      <li>掌握 SQLite Run / Step / Attempt / Asset 持久化设计：重启可恢复，单图修改走子版本且未变化图片不复制文件。</li>
+    </ul>
+    <div class="tags"><span>GPT-Image-2</span><span>images.edit</span><span>Prompt 工程</span><span>SQLite 持久化</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>DramaFlow Studio · AI 短剧智能生产平台</h3><span class="when">2026.09</span></div>
+    <p class="sub">产品化改造 / 二开与平台打通 · 开源项目二次产品化（github.com/duyu06/manju）</p>
+    <ul>
+      <li>把「创意与剧本 → AI 剧本分析 → 角色与场景资产 → 智能分镜 → 图片 → 视频 → 配音合成 → 交付」统一为可控工作流，针对工具链割裂、角色一致性差与长耗时任务不可控。</li>
+      <li>二次产品化：品牌化改版与 zh / en 双语信息架构；新增项目驾驶舱展示进度 / Blocker / 风险 / 成本并显式标注演示数据。</li>
+      <li>剧本规划引擎二开：演示数据切为《24小时之后》（3 角色 / 5 场景 / 24 镜），修复原测试套件 2 处作用域错误；引擎 JSON 输出经幂等 seed 脚本导入平台。</li>
+    </ul>
+    <div class="tags"><span>AI Workflow</span><span>多阶段流水线</span><span>Next.js 15</span><span>Prisma</span><span>BullMQ</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>SpiderFoot OSINT 情报平台 · Python 3.13 适配</h3><span class="when">2026.09</span></div>
+    <p class="sub">部署 / 依赖治理 / 平台迁移 · 开源项目部署与适配（SpiderFoot by smicallef）</p>
+    <ul>
+      <li>将开源 OSINT 自动化情报平台迁移到 Python 3.13 环境并完成本地服务化部署。</li>
+      <li>定位 pyyaml 5.4.1 源码构建失败（cython_sources）改用 pyyaml&gt;=6.0.1；放宽 lxml / cryptography / pyOpenSSL 过紧上限以取得 cp313 wheel，产出 requirements-py313.txt 且原文件不动。</li>
+    </ul>
+    <div class="tags"><span>OSINT</span><span>Python 3.13</span><span>依赖治理</span><span>venv</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>叫魂者 · Multi-Agent 叙事对话系统</h3><span class="when">2025.02 — 2025.04</span></div>
+    <p class="sub">技术负责人 / 产品原型设计</p>
+    <ul>
+      <li>将角色 Agent、世界状态与剧情推进拆分为独立模块，建立多角色协作与上下文管理机制。</li>
+      <li>通过角色信息隔离与关键事实注入，降低角色越界、代词冲突与上下文丢失；采用模拟 / API 双模式先验证流程，再接入真实模型。</li>
+    </ul>
+    <div class="tags"><span>Multi-Agent</span><span>Agent Orchestration</span><span>状态管理</span><span>Python</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>多账号运营 RPA 自动化系统</h3><span class="when">2026</span></div>
+    <p class="sub">产品设计 / RPA 流程开发 · 公司项目</p>
+    <ul>
+      <li>建立「账号—环境—任务批次—执行记录」映射，编排「读取任务 → 启动环境 → 访问页面 → 识别状态 → 执行 → 回写结果」工作流。</li>
+      <li>覆盖加载超时、元素变化、登录失效、网络异常与人工确认等异常节点，确保流程具备可控退出路径。</li>
+    </ul>
+    <div class="tags"><span>RPA</span><span>流程编排</span><span>任务调度</span><span>异常处理</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-head"><h3>跨境电商购物独立站</h3><span class="when">2026</span></div>
+    <p class="sub">产品策划 / 技术协同 · 长沙果漾商贸有限公司</p>
+    <ul>
+      <li>设计「流量 → 浏览 → 详情 → 加购 → 结算 → 支付 → 订单 / 售后」主链路，规划 SPU / SKU、库存、优惠、支付回调与退款售后规则。</li>
+      <li>建立 view_item / add_to_cart / begin_checkout / purchase 埋点与转化漏斗。</li>
+    </ul>
+    <div class="tags"><span>商业产品</span><span>SPU / SKU</span><span>交易链路</span><span>转化漏斗</span></div>
+  </div>
+
+  <h2>教育与认证</h2>
+  <div class="edu">
+    <div class="item">
+      <h3>湖南大众传媒职业技术学院</h3>
+      <p>计算机网络技术 · 大专 · 2023.09 — 2026.06</p>
+      <p>专业成绩前 5%</p>
+      <p>主修计算机网络、Linux 系统管理、路由交换、Windows Server 与程序设计基础。</p>
+    </div>
+    <div class="item">
+      <h3>认证与荣誉</h3>
+      <p>Elements of AI — Certificate of Completion（University of Helsinki × MinnaLearn · 2026.07）</p>
+      <p>RAG 应用构建及优化 — 阿里云 Apsara Clouder（有效期至 2028.07.05）</p>
+      <p>基于通义灵码实现高效 AI 编码实践 — 阿里云 Apsara Clouder（有效期至 2028.07.05）</p>
+      <p>NISP 国家信息安全专业人员 · 专业认证</p>
+      <p>易班优秀委员；思政课研究性学习竞赛二等奖（2024 · 第十、十一届）</p>
+    </div>
+  </div>
+
+  <footer class="note">
+    说明：本页内容与作品集网站 <a href="../">duyu06.github.io/resume</a> 保持一致；其中 PrismPix 与 SpiderFoot 为开源项目的二开 / 部署适配实践，DramaFlow Studio 为基于开源项目的二次产品化，均已在项目条目中注明来源。
+  </footer>
+</main>
+
+</body>
+</html>

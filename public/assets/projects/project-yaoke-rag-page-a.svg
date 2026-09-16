@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="yaoke · 企业 AI 知识中台">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eef4ff"/></linearGradient>
+<linearGradient id="flowgrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1d4ed8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient>
+<linearGradient id="titlegrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0f172a"/><stop offset="0.55" stop-color="#1e3a8a"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>
+<radialGradient id="glow" cx="0.82" cy="0.12" r="0.75"><stop offset="0" stop-color="#1d4ed8" stop-opacity="0.16"/><stop offset="1" stop-color="#1d4ed8" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1200" height="675" fill="url(#bg)"/>
+<line x1="0" y1="0" x2="0" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="48" y1="0" x2="48" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="96" y1="0" x2="96" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="144" y1="0" x2="144" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="192" y1="0" x2="192" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="240" y1="0" x2="240" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="288" y1="0" x2="288" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="336" y1="0" x2="336" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="384" y1="0" x2="384" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="432" y1="0" x2="432" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="480" y1="0" x2="480" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="528" y1="0" x2="528" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="576" y1="0" x2="576" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="624" y1="0" x2="624" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="672" y1="0" x2="672" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="720" y1="0" x2="720" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="768" y1="0" x2="768" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="816" y1="0" x2="816" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="864" y1="0" x2="864" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="912" y1="0" x2="912" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="960" y1="0" x2="960" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="1008" y1="0" x2="1008" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="1056" y1="0" x2="1056" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="1104" y1="0" x2="1104" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="1152" y1="0" x2="1152" y2="675" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="0" x2="1200" y2="0" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="48" x2="1200" y2="48" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="96" x2="1200" y2="96" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="144" x2="1200" y2="144" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="192" x2="1200" y2="192" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="240" x2="1200" y2="240" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="288" x2="1200" y2="288" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="336" x2="1200" y2="336" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="384" x2="1200" y2="384" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="432" x2="1200" y2="432" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="480" x2="1200" y2="480" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="528" x2="1200" y2="528" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="576" x2="1200" y2="576" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="624" x2="1200" y2="624" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<line x1="0" y1="672" x2="1200" y2="672" stroke="#1d4ed8" stroke-opacity="0.05"/>
+<rect width="1200" height="675" fill="url(#glow)"/>
+<rect x="0" y="0" width="1200" height="6" fill="url(#flowgrad)"/>
+<text x="56" y="76" font-family="Consolas, Cascadia Code, monospace" font-size="16" letter-spacing="2.6" fill="#1d4ed8">PROJECT 10 · RAG / 企业知识中台</text>
+<text x="56" y="150" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="40" font-weight="800" fill="url(#titlegrad)">yaoke · 企业 AI 知识中台</text>
+<text x="56" y="196" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="20" fill="rgba(15,23,42,0.66)">Next.js + FastAPI + Qdrant 的企业 RAG / Agent 演示平台</text>
+<rect x="56" y="224" width="221" height="36" rx="18" fill="#ffffff" stroke="#1d4ed8" stroke-opacity="0.28"/><text x="166.5" y="248" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="16" fill="#1e3a8a" text-anchor="middle">Hybrid Search</text>
+<rect x="289" y="224" width="326" height="36" rx="18" fill="#ffffff" stroke="#1d4ed8" stroke-opacity="0.28"/><text x="452.0" y="248" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="16" fill="#1e3a8a" text-anchor="middle">Cross-Encoder Rerank</text>
+<rect x="627" y="224" width="71" height="36" rx="18" fill="#ffffff" stroke="#1d4ed8" stroke-opacity="0.28"/><text x="662.5" y="248" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="16" fill="#1e3a8a" text-anchor="middle">BGE</text>
+<rect x="710" y="224" width="86" height="36" rx="18" fill="#ffffff" stroke="#1d4ed8" stroke-opacity="0.28"/><text x="753.0" y="248" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="16" fill="#1e3a8a" text-anchor="middle">RBAC</text>
+<rect x="56.0" y="368" width="169.7" height="66" rx="12" fill="url(#flowgrad)" opacity="0.72"/>
+<text x="140.8" y="398" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle">企业文档</text>
+<path d="M227.7 395 l7 6 l-7 6" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+<rect x="239.7" y="368" width="169.7" height="66" rx="12" fill="url(#flowgrad)" opacity="0.78"/>
+<text x="324.5" y="398" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle">切分入库</text>
+<path d="M411.3 395 l7 6 l-7 6" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+<rect x="423.3" y="368" width="169.7" height="66" rx="12" fill="url(#flowgrad)" opacity="0.83"/>
+<text x="508.2" y="389" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle">BGE 向量 +</text>
+<text x="508.2" y="408" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle">BM25</text>
+<path d="M595.0 395 l7 6 l-7 6" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+<rect x="607.0" y="368" width="169.7" height="66" rx="12" fill="url(#flowgrad)" opacity="0.89"/>
+<text x="691.8" y="398" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle">混合召回</text>
+<path d="M778.7 395 l7 6 l-7 6" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+<rect x="790.7" y="368" width="169.7" height="66" rx="12" fill="url(#flowgrad)" opacity="0.94"/>
+<text x="875.5" y="398" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle">Rerank</text>
+<path d="M962.3 395 l7 6 l-7 6" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+<rect x="974.3" y="368" width="169.7" height="66" rx="12" fill="url(#flowgrad)" opacity="1.00"/>
+<text x="1059.2" y="389" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle">生成 +</text>
+<text x="1059.2" y="408" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle">Citation</text>
+<line x1="56" y1="583" x2="1144" y2="583" stroke="#1d4ed8" stroke-opacity="0.18"/>
+<text x="56" y="619" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif" font-size="16" fill="rgba(15,23,42,0.52)">个人项目 · 本人原创（github.com/duyu06/rag）</text>
+<text x="1144" y="619" font-family="Consolas, Cascadia Code, monospace" font-size="15" fill="rgba(15,23,42,0.34)" text-anchor="end">ZHANGBINWEN</text>
+</svg>
