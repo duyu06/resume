@@ -136,8 +136,9 @@ export default function GuoyangCaseStudy() {
             {scenes.map((scene, index) => (
               <motion.article
                 key={scene.n}
-                initial={{ opacity: 0.32, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                data-motion-reveal
+                initial={reduceMotion ? false : { opacity: 0.32, y: 30 }}
+                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ amount: 0.62 }}
                 transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
                 className="grid min-h-[48vh] content-center gap-5 py-10 sm:min-h-[58vh] md:grid-cols-[72px_1fr] md:gap-7 lg:min-h-[72vh]"
