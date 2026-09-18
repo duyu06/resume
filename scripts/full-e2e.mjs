@@ -51,45 +51,70 @@ async function installStableRoutes(page) {
 
 async function testPortfolio(page, device) {
   await page.goto(`${baseURL}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#hero', { timeout: 20000 });
   await page.waitForSelector('#projects', { timeout: 20000 });
-  await page.locator('#projects').scrollIntoViewIfNeeded();
   await assertNoHorizontalOverflow(page, 'Portfolio');
 
-  const cases = [
-    ['AI 电商主图生成器', '/demos/ai-ecommerce/'],
-    ['数字人风格对话模型微调', '/demos/digitalhuman/'],
-    ['多账号运营 RPA 自动化系统', '/demos/rpa/'],
+  const heroText = await page.locator('#hero').textContent();
+  assert(heroText?.includes('我把 AI'), 'Portfolio: hero lost the AI positioning statement');
+  assert(heroText?.includes('从 Demo'), 'Portfolio: hero lost the Demo transition');
+  assert(heroText?.includes('推进到产品'), 'Portfolio: hero lost the product outcome');
+
+  for (const selector of ['#evidence', '#guoyang', '#projects', '#method', '#career', '#contact']) {
+    assert((await page.locator(selector).count()) === 1, `Portfolio: required section missing ${selector}`);
+  }
+
+  const evidenceText = await page.locator('#evidence').textContent();
+  for (const marker of ['1W+ → 7,328', '4h → 20min', '50+', '26']) {
+    assert(evidenceText?.includes(marker), `Portfolio: evidence marker missing ${marker}`);
+  }
+
+  const selectedProjects = [
+    ['果漾 AI', 'https://guoyang.xin/'],
+    ['AI 电商素材生成平台', '/demos/ai-ecommerce/'],
+    ['数字人模型微调', 'github.com/duyu06/resume'],
+    ['yaoke 企业 AI 知识中台', 'github.com/duyu06/rag'],
   ];
 
-  for (const [name, hrefPart] of cases) {
-    const card = page.locator('#projects button').filter({ hasText: name }).first();
-    await card.scrollIntoViewIfNeeded();
-    await card.click();
-    const dialog = page.getByRole('dialog');
-    await dialog.waitFor({ state: 'visible' });
-    assert((await dialog.locator('#project-modal-title').textContent())?.includes(name), `Portfolio: wrong modal opened for ${name}`);
-    const demoLink = dialog.getByRole('link', { name: /查看交互 Demo/ });
-    assert((await demoLink.getAttribute('href'))?.includes(hrefPart), `Portfolio: ${name} demo link is incorrect`);
-
-    const image = dialog.locator('img').first();
-    const before = await image.getAttribute('src');
-    await dialog.getByRole('button', { name: '下一张' }).click();
-    const after = await image.getAttribute('src');
-    assert(before !== after, `Portfolio: ${name} image carousel did not advance`);
-
-    if (device.isMobile) {
-      await dialog.locator('.project-modal-scroll').evaluate((element) => { element.scrollTop = element.scrollHeight; });
-      const ctaBox = await demoLink.boundingBox();
-      const closeBox = await dialog.getByRole('button', { name: '关闭项目详情' }).boundingBox();
-      assert(ctaBox && ctaBox.bottom <= device.viewport.height + 1, `Portfolio mobile: ${name} CTA is obscured`);
-      assert(closeBox && closeBox.top >= 0 && closeBox.bottom <= device.viewport.height, `Portfolio mobile: ${name} close button left viewport`);
-    }
-
-    await page.keyboard.press('Escape');
-    await dialog.waitFor({ state: 'detached' });
-    const unlocked = await page.evaluate(() => !document.body.classList.contains('project-modal-open') && document.body.style.position !== 'fixed');
-    assert(unlocked, `Portfolio: body scroll remained locked after closing ${name}`);
+  for (const [name, hrefPart] of selectedProjects) {
+    const link = page.locator('#projects a').filter({ hasText: name }).first();
+    await link.waitFor({ state: 'visible' });
+    const href = await link.getAttribute('href');
+    assert(href?.includes(hrefPart), `Portfolio: ${name} link is incorrect (${href})`);
   }
+
+  const customerAgent = page.locator('#projects button').filter({ hasText: /AI 客服数字人工作台/ }).first();
+  await customerAgent.scrollIntoViewIfNeeded();
+  await customerAgent.waitFor({ state: 'visible' });
+  const cardImage = await customerAgent.locator('img').getAttribute('src');
+  assert(cardImage?.includes('project-digitalhuman-page-a.jpg'), `Portfolio: unexpected customer-agent card image (${cardImage})`);
+  await customerAgent.click();
+
+  const dialog = page.getByRole('dialog', { name: 'AI 客服数字人工作台' });
+  await dialog.waitFor({ state: 'visible' });
+  const modalImage = dialog.locator('img').first();
+  const firstImage = await modalImage.getAttribute('src');
+  assert(firstImage?.includes('project-digitalhuman-page-a.jpg'), `Portfolio: unexpected first customer-agent image (${firstImage})`);
+
+  await dialog.getByRole('button', { name: '下一张' }).click();
+  const secondImage = await modalImage.getAttribute('src');
+  assert(secondImage?.includes('project-digitalhuman-page-b.jpg'), `Portfolio: customer-agent carousel did not advance (${secondImage})`);
+
+  const demoLink = dialog.getByRole('link', { name: /打开 Demo/ });
+  assert((await demoLink.getAttribute('href'))?.includes('/demos/digitalhuman/'), 'Portfolio: customer-agent demo link is incorrect');
+
+  await page.keyboard.press('Escape');
+  await dialog.waitFor({ state: 'detached' });
+
+  if (device.isMobile) {
+    const dock = page.locator('.mobile-dock-nav');
+    await dock.waitFor({ state: 'visible' });
+    const box = await dock.boundingBox();
+    assert(box && box.left >= 0 && box.right <= device.viewport.width, 'Portfolio mobile: dock exceeds viewport width');
+  }
+
+  await page.locator('#contact').scrollIntoViewIfNeeded();
+  await assertNoHorizontalOverflow(page, 'Portfolio final');
 }
 
 async function testPrismPix(page, device) {
