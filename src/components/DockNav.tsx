@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 
 const links = [
   { href: '#hero', label: '首页' },
-  { href: '#method', label: '方法' },
+  { href: '#evidence', label: '证据' },
   { href: '#projects', label: '项目' },
-  { href: '#career', label: '经历' },
+  { href: '#method', label: '方法' },
   { href: '#contact', label: '联系' },
 ];
 
