@@ -19,11 +19,16 @@ export default function MoreSystems() {
 
   useEffect(() => {
     if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpen(false);
     };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow;
+    };
   }, [open]);
 
   const show = () => {
@@ -73,7 +78,7 @@ export default function MoreSystems() {
           className="fixed inset-0 z-[1200] flex items-end justify-center bg-black/75 p-0 backdrop-blur-sm sm:items-center sm:p-5"
           role="dialog"
           aria-modal="true"
-          aria-label={project.name}
+          aria-labelledby="project-modal-title"
         >
           <button
             type="button"
@@ -85,7 +90,7 @@ export default function MoreSystems() {
             <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
               <div>
                 <p className="font-mono text-[0.56rem] uppercase tracking-[0.18em] text-blue-300">{project.category}</p>
-                <h3 className="mt-1 font-display text-lg font-semibold">{project.name}</h3>
+                <h3 id="project-modal-title" className="mt-1 font-display text-lg font-semibold">{project.name}</h3>
               </div>
               <button
                 type="button"
@@ -97,7 +102,7 @@ export default function MoreSystems() {
               </button>
             </header>
 
-            <div className="p-4 sm:p-6">
+            <div className="project-modal-scroll max-h-[calc(92svh-76px)] overflow-y-auto p-4 sm:max-h-[calc(88vh-76px)] sm:p-6">
               <img
                 src={project.images[imageIndex]}
                 alt={project.name + ' 项目截图'}
