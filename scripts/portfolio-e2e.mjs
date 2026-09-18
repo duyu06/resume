@@ -84,7 +84,7 @@ async function runCase(browser, testCase) {
     const dialog = page.getByRole('dialog', { name: 'AI 客服数字人工作台' });
     await dialog.waitFor({ state: 'visible' });
 
-    const closeButton = dialog.getByRole('button', { name: '关闭' });
+    const closeButton = dialog.getByRole('button', { name: '关闭', exact: true });
     assert(await closeButton.evaluate((element) => document.activeElement === element), 'Project dialog did not move focus to close button');
 
     const image = dialog.locator('img').first();
