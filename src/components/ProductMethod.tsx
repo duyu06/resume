@@ -30,8 +30,12 @@ export default function ProductMethod() {
             I WORK.
           </h2>
           <p className="mt-6 max-w-md text-sm leading-7 text-ink-dim sm:text-base">
-            先定义问题和验收标准，再进入模型、产品和工程；动效只是把这条工作路径解释清楚。
+            先定义问题和验收标准，再进入模型、产品和工程；每一步都对应明确输入、决策和输出。
           </p>
+          <div className="mt-8 hidden max-w-sm border-t border-ink/10 pt-4 lg:block">
+            <p className="font-mono text-[0.55rem] uppercase tracking-[0.18em] text-ink/35">OPERATING PRINCIPLE</p>
+            <p className="mt-2 text-sm leading-6 text-ink-dim">可做 ≠ 可用 ≠ 可交付。产品判断必须覆盖模型边界、异常路径、成本和运维。</p>
+          </div>
         </header>
 
         <div className="relative">
@@ -44,11 +48,11 @@ export default function ProductMethod() {
             {steps.map(([english, title, detail], index) => (
               <motion.article
                 key={english}
-                initial={{ opacity: 0.42 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ amount: 0.7 }}
-                transition={{ duration: 0.35 }}
-                className="relative grid min-h-[32vh] grid-cols-[30px_1fr] gap-5 border-b border-ink/10 py-8 last:border-b-0 sm:min-h-[36vh] sm:gap-7"
+                initial={{ opacity: 0.4, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ amount: 0.72 }}
+                transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+                className="relative grid min-h-[38vh] grid-cols-[30px_1fr] content-center gap-5 border-b border-ink/10 py-9 last:border-b-0 sm:min-h-[42vh] sm:gap-7 lg:min-h-[52vh]"
               >
                 <span className="relative z-10 mt-1 h-[15px] w-[15px] rounded-full border-[3px] border-bg bg-accent" />
                 <div>
@@ -62,6 +66,13 @@ export default function ProductMethod() {
                     {title}
                   </h3>
                   <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-dim sm:text-base">{detail}</p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {detail.split('、').slice(0, 4).map((item) => (
+                      <span key={item} className="border border-ink/10 px-2.5 py-1 font-mono text-[0.55rem] tracking-[0.1em] text-ink/45">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </motion.article>
             ))}
