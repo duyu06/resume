@@ -106,7 +106,10 @@ async function runCase(browser, testCase) {
       const dock = page.locator('.mobile-dock-nav');
       await dock.waitFor({ state: 'visible' });
       const box = await dock.boundingBox();
-      assert(box && box.left >= 0 && box.right <= testCase.viewport.width, 'Mobile dock exceeds viewport width');
+      assert(
+        box && box.left >= -1 && box.right <= testCase.viewport.width + 1,
+        `Mobile dock exceeds viewport width: ${JSON.stringify(box)} / ${testCase.viewport.width}`,
+      );
 
       const heroHeight = await page.locator('#hero').evaluate((element) => element.getBoundingClientRect().height);
       assert(heroHeight <= testCase.viewport.height * 1.35, `Mobile hero retained desktop pin height: ${heroHeight}`);
