@@ -78,12 +78,13 @@ export default function GuoyangCaseStudy() {
                 src={BASE + 'assets/projects/proj-01-a.png'}
                 alt="果漾 AI 产品界面"
                 className="aspect-[4/3] w-full object-cover object-top"
-                loading="eager"
+                loading="lazy"
               />
               <motion.img
                 src={BASE + 'assets/projects/proj-01-b.png'}
                 alt=""
                 aria-hidden="true"
+                loading="lazy"
                 className="absolute inset-0 h-full w-full object-cover object-top"
                 style={reduceMotion ? { opacity: 0 } : { opacity: productOpacity, scale: productScale }}
               />
