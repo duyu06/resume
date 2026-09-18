@@ -27,13 +27,13 @@ export default function MaxKBChat() {
         aria-label="打开 MaxKB 智能问答"
         aria-expanded={open}
       >
-        <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-blue-700 via-accent to-accent-2 text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)]">
+        <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-accent text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)]">
           <MessageCircle className="h-5 w-5" strokeWidth={1.8} />
           <span className="absolute right-0 top-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500" />
         </span>
         <span className="hidden sm:block">
-          <span className="block text-xs font-semibold text-ink">问问我的 AI 助手</span>
-          <span className="mt-0.5 block text-[0.65rem] text-ink-dim">基于 MaxKB 与个人项目知识库</span>
+          <span className="block text-xs font-semibold text-ink">ASK MY AI</span>
+          <span className="mt-0.5 block text-[0.65rem] text-ink-dim">项目经历 · 技术方案 · 求职信息</span>
         </span>
       </button>
 
