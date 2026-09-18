@@ -10,7 +10,7 @@
   --color-accent-2: #0ea5e9;
   --color-accent-3: rgba(37, 99, 235, 0.18);
   --color-accent-soft: rgba(37, 99, 235, 0.09);
-  --font-display: "Orbitron", "Noto Sans SC", system-ui, sans-serif;
+  --font-display: "Noto Sans SC", system-ui, sans-serif;
   --font-body: "Noto Sans SC", system-ui, sans-serif;
   --font-mono: "Noto Sans SC", ui-monospace, "Cascadia Code", "Consolas", monospace;
 }
