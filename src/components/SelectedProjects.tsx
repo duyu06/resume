@@ -1,5 +1,5 @@
 import { ArrowUpRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import MoreSystems from './MoreSystems';
 
 const BASE = import.meta.env.BASE_URL;
@@ -48,6 +48,8 @@ const projects = [
 ];
 
 export default function SelectedProjects() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section id="projects" className="bg-ink px-5 py-20 text-white sm:px-8 md:px-10 md:py-32">
       <div className="mx-auto max-w-7xl">
@@ -74,8 +76,9 @@ export default function SelectedProjects() {
                 href={project.link}
                 target={external ? '_blank' : undefined}
                 rel={external ? 'noopener noreferrer' : undefined}
-                initial={{ opacity: 0, y: 22 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                data-motion-reveal
+                initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-5% 0px -5% 0px' }}
                 transition={{ duration: 0.55, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
                 className="group grid gap-5 py-7 sm:py-9 md:grid-cols-[64px_minmax(0,0.9fr)_minmax(260px,0.58fr)] md:items-center md:gap-8"
