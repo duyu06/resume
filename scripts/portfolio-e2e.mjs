@@ -109,6 +109,20 @@ async function runCase(browser, testCase) {
     assert(await systemButton.evaluate((element) => document.activeElement === element), 'Project dialog did not restore focus to trigger');
     assert(await page.evaluate(() => document.body.style.overflow !== 'hidden'), 'Body scroll remained locked after dialog close');
 
+    const aiTrigger = page.getByRole('button', { name: '打开 MaxKB 智能问答' });
+    if ((await aiTrigger.count()) === 1) {
+      await aiTrigger.click();
+      const aiDialog = page.getByRole('dialog', { name: 'MaxKB 智能问答' });
+      await aiDialog.waitFor({ state: 'visible' });
+      const aiClose = aiDialog.getByRole('button', { name: '关闭智能问答' });
+      assert(await aiClose.evaluate((element) => document.activeElement === element), 'AI chat did not move focus to close button');
+      assert(await page.evaluate(() => document.body.style.overflow === 'hidden'), 'AI chat did not lock body scroll');
+      await page.keyboard.press('Escape');
+      await aiDialog.waitFor({ state: 'detached' });
+      assert(await aiTrigger.evaluate((element) => document.activeElement === element), 'AI chat did not restore focus to trigger');
+      assert(await page.evaluate(() => document.body.style.overflow !== 'hidden'), 'AI chat left body scroll locked');
+    }
+
     if (testCase.isMobile) {
       const dock = page.locator('.mobile-dock-nav');
       await dock.waitFor({ state: 'visible' });
