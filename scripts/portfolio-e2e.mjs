@@ -62,10 +62,24 @@ async function runCase(browser, testCase) {
     }
 
     const visualImages = page.locator('#guoyang img, #projects img');
-    await page.waitForFunction(() =>
-      [...document.querySelectorAll('#guoyang img, #projects img')].every((image) => image.complete && image.naturalWidth > 0),
-    );
-    assert((await visualImages.count()) >= 6, `Expected portfolio visual evidence, got ${await visualImages.count()} images`);
+    const visualImageCount = await visualImages.count();
+    assert(visualImageCount >= 6, `Expected portfolio visual evidence, got ${visualImageCount} images`);
+    for (let index = 0; index < visualImageCount; index += 1) {
+      const image = visualImages.nth(index);
+      await image.scrollIntoViewIfNeeded();
+      const loaded = await image.evaluate((element) =>
+        new Promise((resolve) => {
+          const target = element;
+          if (target.complete) {
+            resolve(target.naturalWidth > 0);
+            return;
+          }
+          target.addEventListener('load', () => resolve(true), { once: true });
+          target.addEventListener('error', () => resolve(false), { once: true });
+        }),
+      );
+      assert(loaded, `Portfolio image failed to load: ${await image.getAttribute('src')}`);
+    }
 
     const evidenceText = await page.locator('#evidence').textContent();
     for (const marker of ['1W+ → 7,328', '4h → 20min', '50+', '26']) {
