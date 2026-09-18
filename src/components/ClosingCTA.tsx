@@ -1,11 +1,11 @@
-import { ArrowUpRight, Download, FileText, Github, Mail } from 'lucide-react';
+import { ArrowUpRight, Code, Download, FileText, Mail } from 'lucide-react';
 
 const BASE = import.meta.env.BASE_URL;
 
 const actions = [
   { label: 'ONLINE RESUME', href: BASE + 'online-resume/', icon: FileText, external: false },
   { label: 'PDF RESUME', href: BASE + 'resume.pdf', icon: Download, external: false },
-  { label: 'GITHUB', href: 'https://github.com/duyu06', icon: Github, external: true },
+  { label: 'GITHUB', href: 'https://github.com/duyu06', icon: Code, external: true },
   { label: 'EMAIL', href: 'mailto:3245485135@qq.com', icon: Mail, external: false },
 ];
 
