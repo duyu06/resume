@@ -100,7 +100,7 @@ export default function SelectedProjects() {
                   <img
                     src={project.image}
                     alt={project.title + ' 项目界面'}
-                    loading={index === 0 ? 'eager' : 'lazy'}
+                    loading="lazy"
                     className="aspect-[16/10] w-full object-cover object-top opacity-78 transition duration-500 group-hover:scale-[1.025] group-hover:opacity-100"
                   />
                   <span className="absolute right-3 top-3 grid h-9 w-9 place-items-center bg-black/55 text-white backdrop-blur">
