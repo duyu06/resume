@@ -37,6 +37,7 @@ export default function DockNav() {
           <a
             key={link.href}
             href={link.href}
+            aria-current={selected ? 'page' : undefined}
             className={`flex-1 whitespace-nowrap rounded-full px-1.5 py-2 text-center font-display text-[0.58rem] font-semibold tracking-[0.06em] transition sm:text-[0.68rem] ${selected ? 'bg-accent text-white shadow-[0_8px_22px_rgba(37,99,235,0.25)]' : 'text-ink-dim hover:bg-accent-soft hover:text-accent'}`}
           >
             {link.label}
