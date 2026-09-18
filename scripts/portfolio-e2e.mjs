@@ -8,6 +8,7 @@ const targetName = process.env.TEST_TARGET || 'local-preview';
 const cases = [
   { name: 'desktop-1440', viewport: { width: 1440, height: 900 }, isMobile: false, reducedMotion: 'no-preference' },
   { name: 'mobile-390', viewport: { width: 390, height: 844 }, isMobile: true, reducedMotion: 'no-preference' },
+  { name: 'tablet-1024', viewport: { width: 1024, height: 768 }, isMobile: false, reducedMotion: 'no-preference' },
   { name: 'desktop-reduced-motion', viewport: { width: 1440, height: 900 }, isMobile: false, reducedMotion: 'reduce' },
 ];
 
@@ -59,6 +60,12 @@ async function runCase(browser, testCase) {
     for (const selector of ['#evidence', '#guoyang', '#projects', '#method', '#career', '#contact']) {
       assert((await page.locator(selector).count()) === 1, `Required section missing: ${selector}`);
     }
+
+    const visualImages = page.locator('#guoyang img, #projects img');
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll('#guoyang img, #projects img')].every((image) => image.complete && image.naturalWidth > 0),
+    );
+    assert((await visualImages.count()) >= 6, `Expected portfolio visual evidence, got ${await visualImages.count()} images`);
 
     const evidenceText = await page.locator('#evidence').textContent();
     for (const marker of ['1W+ → 7,328', '4h → 20min', '50+', '26']) {
@@ -125,6 +132,15 @@ async function runCase(browser, testCase) {
       }));
       assert(reduced.matches, 'Reduced-motion media query was not active');
       assert(reduced.scrollBehavior === 'auto', `Reduced-motion scroll behavior should be auto, got ${reduced.scrollBehavior}`);
+      const animatedResidue = await page.locator('[data-motion-reveal]').evaluateAll((elements) =>
+        elements
+          .map((element) => {
+            const style = getComputedStyle(element);
+            return { opacity: style.opacity, transform: style.transform };
+          })
+          .filter((style) => style.opacity !== '1' || style.transform !== 'none'),
+      );
+      assert(animatedResidue.length === 0, `Reduced-motion reveal residue: ${JSON.stringify(animatedResidue)}`);
     }
 
     await page.locator('#contact').scrollIntoViewIfNeeded();
