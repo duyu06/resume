@@ -48,8 +48,9 @@ export default function ProductMethod() {
             {steps.map(([english, title, detail], index) => (
               <motion.article
                 key={english}
-                initial={{ opacity: 0.4, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                data-motion-reveal
+                initial={reduceMotion ? false : { opacity: 0.4, y: 20 }}
+                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ amount: 0.72 }}
                 transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
                 className="relative grid min-h-[38vh] grid-cols-[30px_1fr] content-center gap-5 border-b border-ink/10 py-9 last:border-b-0 sm:min-h-[42vh] sm:gap-7 lg:min-h-[52vh]"
