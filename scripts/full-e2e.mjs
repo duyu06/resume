@@ -110,7 +110,10 @@ async function testPortfolio(page, device) {
     const dock = page.locator('.mobile-dock-nav');
     await dock.waitFor({ state: 'visible' });
     const box = await dock.boundingBox();
-    assert(box && box.left >= 0 && box.right <= device.viewport.width, 'Portfolio mobile: dock exceeds viewport width');
+    assert(
+      box && box.x >= -1 && box.x + box.width <= device.viewport.width + 1,
+      `Portfolio mobile: dock exceeds viewport width (${JSON.stringify(box)} / ${device.viewport.width})`,
+    );
   }
 
   await page.locator('#contact').scrollIntoViewIfNeeded();
