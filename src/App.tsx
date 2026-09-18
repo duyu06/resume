@@ -1,6 +1,3 @@
-import { useCallback, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import Loader from './components/Loader';
 import ViktorTopBar from './components/ViktorTopBar';
 import DockNav from './components/DockNav';
 import HeroStory from './components/HeroStory';
@@ -15,14 +12,16 @@ import MaxKBChat from './components/MaxKBChat';
 import Footer from './components/Footer';
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
-  const done = useCallback(() => setLoading(false), []);
-
   return (
     <>
-      <AnimatePresence>{loading && <Loader onDone={done} />}</AnimatePresence>
+      <a
+        href="#main-content"
+        className="fixed left-4 top-4 z-[2000] -translate-y-24 bg-ink px-4 py-3 text-sm font-medium text-white transition-transform focus:translate-y-0"
+      >
+        跳到主要内容
+      </a>
       <ViktorTopBar />
-      <main className="overflow-x-clip bg-bg">
+      <main id="main-content" className="overflow-x-clip bg-bg" tabIndex={-1}>
         <HeroStory />
         <Evidence />
         <GuoyangCaseStudy />
