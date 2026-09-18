@@ -42,10 +42,7 @@
   }
 
   body {
-    background-image:
-      radial-gradient(circle at 12% 8%, rgba(37, 99, 235, 0.055), transparent 28rem),
-      radial-gradient(circle at 88% 22%, rgba(14, 165, 233, 0.045), transparent 24rem);
-    background-attachment: fixed;
+    background: var(--color-bg);
   }
 
   ::selection {
@@ -174,31 +171,6 @@
   transform: scaleX(1);
 }
 
-#projects {
-  background: var(--color-surface) !important;
-  color: var(--color-ink) !important;
-  border-block: 1px solid rgba(15, 23, 42, 0.06);
-}
-
-#projects .text-white:not([class*="bg-black"]) {
-  color: var(--color-ink) !important;
-}
-
-#projects [class*="border-white"] {
-  border-color: rgba(15, 23, 42, 0.11) !important;
-}
-
-#projects [class*="bg-white/"] {
-  background-color: rgba(37, 99, 235, 0.045) !important;
-}
-
-#projects [class*="hover:text-white"]:hover {
-  color: var(--color-accent) !important;
-}
-
-#projects [class*="hover:border-white"]:hover {
-  border-color: rgba(37, 99, 235, 0.32) !important;
-}
 
 @media (prefers-reduced-motion: reduce) {
   html {
