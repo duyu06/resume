@@ -107,7 +107,7 @@ async function runCase(browser, testCase) {
       await dock.waitFor({ state: 'visible' });
       const box = await dock.boundingBox();
       assert(
-        box && box.left >= -1 && box.right <= testCase.viewport.width + 1,
+        box && box.x >= -1 && box.x + box.width <= testCase.viewport.width + 1,
         `Mobile dock exceeds viewport width: ${JSON.stringify(box)} / ${testCase.viewport.width}`,
       );
 
