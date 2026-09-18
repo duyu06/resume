@@ -1,5 +1,5 @@
 import { ChevronRight, ExternalLink, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const BASE = import.meta.env.BASE_URL;
 const project = {
@@ -16,18 +16,23 @@ const project = {
 export default function MoreSystems() {
   const [open, setOpen] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    const focusFrame = requestAnimationFrame(() => closeRef.current?.focus());
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpen(false);
     };
     document.addEventListener('keydown', onKey);
     return () => {
+      cancelAnimationFrame(focusFrame);
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = previousOverflow;
+      triggerRef.current?.focus();
     };
   }, [open]);
 
@@ -54,6 +59,7 @@ export default function MoreSystems() {
       </div>
 
       <button
+        ref={triggerRef}
         type="button"
         onClick={show}
         className="group grid w-full gap-4 border border-white/12 bg-white/[0.025] p-3 text-left transition hover:border-blue-300/45 hover:bg-white/[0.045] sm:grid-cols-[180px_1fr_auto] sm:items-center sm:p-4"
@@ -61,6 +67,7 @@ export default function MoreSystems() {
         <img
           src={project.images[0]}
           alt={project.name + ' 项目预览'}
+          loading="lazy"
           className="aspect-[16/10] w-full object-cover object-top opacity-80 transition duration-500 group-hover:opacity-100"
         />
         <span>
@@ -93,6 +100,7 @@ export default function MoreSystems() {
                 <h3 id="project-modal-title" className="mt-1 font-display text-lg font-semibold">{project.name}</h3>
               </div>
               <button
+                ref={closeRef}
                 type="button"
                 onClick={() => setOpen(false)}
                 className="grid h-10 w-10 place-items-center border border-white/12 text-white/65 transition hover:text-white"
