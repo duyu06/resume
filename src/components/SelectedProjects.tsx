@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import MoreSystems from './MoreSystems';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -110,6 +111,7 @@ export default function SelectedProjects() {
             );
           })}
         </div>
+        <MoreSystems />
       </div>
     </section>
   );
