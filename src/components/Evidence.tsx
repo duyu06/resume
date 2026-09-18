@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const evidence = [
   {
@@ -32,6 +32,8 @@ const evidence = [
 ];
 
 export default function Evidence() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section id="evidence" className="border-y border-ink/8 bg-surface px-5 py-20 sm:px-8 md:px-10 md:py-28">
       <div className="mx-auto max-w-7xl">
@@ -55,8 +57,9 @@ export default function Evidence() {
           {evidence.map((item, index) => (
             <motion.article
               key={item.index}
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              data-motion-reveal
+              initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-5% 0px -10% 0px' }}
               transition={{ duration: 0.6, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
               className="grid gap-4 py-7 sm:py-9 md:grid-cols-[72px_minmax(240px,0.8fr)_1fr] md:items-center md:gap-8"
