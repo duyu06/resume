@@ -3,20 +3,46 @@ import { chromium } from 'playwright';
 
 const baseURL = (process.env.TEST_BASE_URL || 'http://127.0.0.1:4173/resume').replace(/\/$/, '');
 const outputDir = process.env.TEST_OUTPUT_DIR || 'test-results/project-card-images';
-const expected = [
-  'project-ai-ecommerce-page-a.jpg',
-  'project-digitalhuman-page-a.jpg',
-  'project-rpa-page-a.jpg',
-  'project-yola-page-a.jpg',
-  'project-webui-page-a.jpg',
-  'project-soulcaller-page-a.jpg',
+
+const expectedSystems = [
+  { id: '01', name: '果漾 AI', image: 'proj-01-a.png', captured: false, imageSide: 'right' },
+  { id: '02', name: 'AI 电商素材生成平台', image: 'project-ai-ecommerce-page-a.jpg', captured: true, imageSide: 'right' },
+  { id: '03', name: '数字人模型微调', image: 'proj-04-a.png', captured: false, imageSide: 'right' },
+  { id: '04', name: 'yaoke 企业 AI 知识中台', image: 'project-yaoke-rag-page-a.svg', captured: false, imageSide: 'right' },
+  { id: 'more', name: 'AI 客服数字人工作台', image: 'project-digitalhuman-page-a.jpg', captured: true, imageSide: 'left' },
 ];
+
+const assert = (condition, message) => {
+  if (!condition) throw new Error(message);
+};
+
+async function ensureImageLoaded(image) {
+  await image.scrollIntoViewIfNeeded();
+  const state = await image.evaluate((element) =>
+    new Promise((resolve) => {
+      const target = element;
+      const finish = () => resolve({
+        src: target.getAttribute('src') || '',
+        naturalWidth: target.naturalWidth,
+        naturalHeight: target.naturalHeight,
+      });
+      if (target.complete) {
+        finish();
+        return;
+      }
+      target.addEventListener('load', finish, { once: true });
+      target.addEventListener('error', finish, { once: true });
+    }),
+  );
+  return state;
+}
 
 await mkdir(outputDir, { recursive: true });
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
 const page = await context.newPage();
 const failedResponses = [];
+
 page.on('response', (response) => {
   if (response.url().includes('/assets/projects/') && response.status() >= 400) {
     failedResponses.push(`${response.status()} ${response.url()}`);
@@ -25,65 +51,63 @@ page.on('response', (response) => {
 
 try {
   await page.goto(`${baseURL}/#projects`, { waitUntil: 'domcontentloaded', timeout: 45_000 });
-  await page.locator('#projects').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1200);
+  const section = page.locator('#projects');
+  await section.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(500);
 
-  const cards = page.locator('#projects button').filter({ has: page.locator('img') });
-  if (await cards.count() !== 6) throw new Error(`Expected 6 project cards, found ${await cards.count()}`);
+  const systems = section.locator('[data-project-system]');
+  assert(await systems.count() === expectedSystems.length, `Expected ${expectedSystems.length} project systems, found ${await systems.count()}`);
 
-  const images = await cards.locator('img').evaluateAll((nodes) => nodes.map((image) => ({
-    src: image.getAttribute('src') || '',
-    naturalWidth: image.naturalWidth,
-    naturalHeight: image.naturalHeight,
-  })));
+  const seenSources = [];
+  for (const expected of expectedSystems) {
+    const system = section.locator(`[data-project-system="${expected.id}"]`);
+    assert(await system.count() === 1, `Missing project system ${expected.id}: ${expected.name}`);
+    await system.scrollIntoViewIfNeeded();
 
-  for (const name of expected) {
-    const image = images.find((item) => item.src.includes(name));
-    if (!image) throw new Error(`Missing project card image ${name}`);
-    if (image.naturalWidth < 1000 || image.naturalHeight < 500) {
-      throw new Error(`Project image ${name} did not load at screenshot resolution: ${image.naturalWidth}x${image.naturalHeight}`);
+    const text = (await system.textContent()) || '';
+    assert(text.includes(expected.name), `Project system ${expected.id} lost title: ${expected.name}`);
+
+    const image = system.locator('img').first();
+    assert(await image.count() === 1, `Project system ${expected.id} has no primary image`);
+    const state = await ensureImageLoaded(image);
+    assert(state.src.includes(expected.image), `Project system ${expected.id} uses unexpected image: ${state.src}`);
+    assert(state.naturalWidth > 0 && state.naturalHeight > 0, `Project image failed to load: ${state.src}`);
+    if (expected.captured) {
+      assert(
+        state.naturalWidth >= 1000 && state.naturalHeight >= 500,
+        `Captured project image ${expected.image} is below screenshot resolution: ${state.naturalWidth}x${state.naturalHeight}`,
+      );
+    }
+    seenSources.push(state.src);
+
+    const systemBox = await system.boundingBox();
+    const imageBox = await image.boundingBox();
+    assert(systemBox && systemBox.width >= 1000, `Project system ${expected.id} is not a full-width row`);
+    assert(imageBox && imageBox.width >= 170, `Project system ${expected.id} image panel is too narrow`);
+
+    const imageCenter = imageBox.x + imageBox.width / 2;
+    const systemCenter = systemBox.x + systemBox.width / 2;
+    if (expected.imageSide === 'right') {
+      assert(imageCenter > systemCenter, `Project system ${expected.id} image is not positioned on the right`);
+    } else {
+      assert(imageCenter < systemCenter, `Project system ${expected.id} image is not positioned on the left`);
     }
   }
 
-  if (new Set(images.map((item) => item.src)).size !== expected.length) {
-    throw new Error('Each project card must use its own corresponding subproject screenshot');
-  }
+  assert(new Set(seenSources).size === expectedSystems.length, 'Each visible project system must use its own primary visual');
+  assert(failedResponses.length === 0, `Project image responses failed: ${failedResponses.join('; ')}`);
 
-  const geometry = await cards.evaluateAll((nodes) => nodes.map((card) => {
-    const imagePanel = card.firstElementChild;
-    const cardRect = card.getBoundingClientRect();
-    const imageRect = imagePanel?.getBoundingClientRect();
-    return {
-      cardWidth: cardRect.width,
-      cardHeight: cardRect.height,
-      cardLeft: cardRect.left,
-      imageWidth: imageRect?.width || 0,
-      imageHeight: imageRect?.height || 0,
-      imageLeft: imageRect?.left || 0,
-    };
-  }));
+  await section.screenshot({ path: `${outputDir}/portfolio-project-systems.jpg`, type: 'jpeg', quality: 88 });
 
-  for (const [index, item] of geometry.entries()) {
-    if (item.cardWidth < 1000) throw new Error(`Card ${index + 1} is not full-width (${item.cardWidth}px)`);
-    const imageRatio = item.imageWidth / item.cardWidth;
-    if (imageRatio < 0.55 || imageRatio > 0.7) {
-      throw new Error(`Card ${index + 1} screenshot panel ratio is ${imageRatio.toFixed(2)}, expected 0.55–0.70`);
-    }
-    if (Math.abs(item.cardLeft - item.imageLeft) > 2) throw new Error(`Card ${index + 1} screenshot is not positioned on the left`);
-    if (item.imageHeight < item.cardHeight - 4) throw new Error(`Card ${index + 1} screenshot does not fill the card height`);
-  }
-
-  if (failedResponses.length) throw new Error(`Project image responses failed: ${failedResponses.join('; ')}`);
-
-  await page.screenshot({ path: `${outputDir}/portfolio-project-cards.jpg`, type: 'jpeg', quality: 88, fullPage: true });
+  const capturedCount = expectedSystems.filter((item) => item.captured).length;
   await writeFile(`${outputDir}/report.md`, [
-    '# Project card screenshot verification',
+    '# Project visual verification',
     '',
-    '- Project cards: 6/6',
-    '- Captured subproject images: 12',
-    '- Unique primary project screenshots: 6/6',
-    '- Full-width horizontal card layout: 6/6',
-    '- Screenshot panels positioned on the left: 6/6',
+    `- Visible project systems: ${expectedSystems.length}/${expectedSystems.length}`,
+    `- Live-captured primary visuals in current portfolio: ${capturedCount}/${capturedCount}`,
+    '- Unique primary visuals: 5/5',
+    '- Selected Systems rows keep visuals on the right: 4/4',
+    '- More Systems row keeps its visual on the left: 1/1',
     '- Missing/failed project image responses: 0',
     '',
   ].join('\n'), 'utf8');

@@ -1,47 +1,40 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
 
 const baseURL = (process.env.TEST_BASE_URL || 'http://127.0.0.1:4173/resume').replace(/\/$/, '');
 const outputDir = path.resolve('public/assets/projects');
-const catalogPath = path.resolve('src/components/ProjectsCatalog.tsx');
 
 const projects = [
   {
     slug: 'ai-ecommerce',
     asset: 'ai-ecommerce',
     detail: { selector: '#stage-images', fraction: 0.58 },
-    previous: ['proj-02-a.png', 'proj-02-b.png'],
   },
   {
     slug: 'digitalhuman',
     asset: 'digitalhuman',
     detail: { selector: '#dashboard', fraction: 0.72 },
-    previous: ['proj-customer-agent-a.svg', 'proj-customer-agent-b.svg'],
   },
   {
     slug: 'rpa',
     asset: 'rpa',
     detail: { selector: '#canvas', fraction: 0.62 },
-    previous: ['proj-07-a.png', 'proj-07-b.png'],
   },
   {
     slug: 'cross-border',
     asset: 'yola',
     detail: { selector: '#collection', fraction: 0.52 },
-    previous: ['proj-03-a.png', 'proj-03-b.png'],
   },
   {
     slug: 'webui',
     asset: 'webui',
     detail: { fraction: 0.47, action: /快速部署|进入平台|开始使用|体验平台/i },
-    previous: ['proj-05-a.png', 'proj-05-b.png'],
   },
   {
     slug: 'soulcaller',
     asset: 'soulcaller',
     detail: { fraction: 0.3, action: /进入|开始体验|启动模拟|体验系统/i },
-    previous: ['proj-06-a.png', 'proj-06-b.png'],
   },
 ];
 
@@ -111,7 +104,6 @@ async function captureProject(browser, project) {
   const dimensions = await page.evaluate(() => ({
     width: innerWidth,
     height: innerHeight,
-    scrollHeight: document.documentElement.scrollHeight,
   }));
   if (dimensions.width !== 1440 || dimensions.height !== 810) {
     throw new Error(`${project.slug}: unexpected viewport ${dimensions.width}x${dimensions.height}`);
@@ -122,18 +114,6 @@ async function captureProject(browser, project) {
   await context.close();
 }
 
-async function updateCatalog() {
-  let source = await readFile(catalogPath, 'utf8');
-  for (const project of projects) {
-    const before = `imgs: ['${project.previous[0]}', '${project.previous[1]}']`;
-    const after = `imgs: ['${imageName(project.asset, 0)}', '${imageName(project.asset, 1)}']`;
-    if (source.includes(after)) continue;
-    if (!source.includes(before)) throw new Error(`ProjectsCatalog mapping not found: ${before}`);
-    source = source.replace(before, after);
-  }
-  await writeFile(catalogPath, source, 'utf8');
-}
-
 await mkdir(outputDir, { recursive: true });
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 try {
@@ -141,5 +121,4 @@ try {
 } finally {
   await browser.close();
 }
-await updateCatalog();
-console.log(`Captured ${projects.length * 2} project page images and updated ProjectsCatalog.tsx.`);
+console.log(`Captured ${projects.length * 2} archive demo page images for portfolio assets.`);
