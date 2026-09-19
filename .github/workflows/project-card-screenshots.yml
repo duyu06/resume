@@ -1,8 +1,10 @@
-name: Capture Project Card Screenshots
+name: Capture Project Visuals
 
 on:
   push:
-    branches: [main, feat/project-page-screenshots, feat/project-card-real-screenshots-layout]
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -15,7 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -30,12 +31,12 @@ jobs:
           npm install --no-save playwright
           npx playwright install --with-deps chromium
 
-      - name: Build current subprojects
+      - name: Build current portfolio and demos
         run: npm run build
         env:
           VITE_MAXKB_EMBED_URL: ${{ vars.MAXKB_EMBED_URL }}
 
-      - name: Start preview for subproject capture
+      - name: Start preview for demo capture
         run: |
           npm run preview -- --host 127.0.0.1 > /tmp/project-capture-preview.log 2>&1 &
           echo $! > /tmp/project-capture-preview.pid
@@ -46,12 +47,12 @@ jobs:
           cat /tmp/project-capture-preview.log
           exit 1
 
-      - name: Capture six subproject pages
+      - name: Capture archive demo page visuals
         run: node scripts/capture-project-card-images.mjs
         env:
           TEST_BASE_URL: http://127.0.0.1:4173/resume
 
-      - name: Rebuild portfolio with captured images
+      - name: Rebuild portfolio with captured visuals
         run: |
           kill "$(cat /tmp/project-capture-preview.pid)" || true
           npm run build
@@ -66,7 +67,7 @@ jobs:
         env:
           VITE_MAXKB_EMBED_URL: ${{ vars.MAXKB_EMBED_URL }}
 
-      - name: Verify portfolio project cards
+      - name: Verify current project systems
         run: node scripts/verify-project-card-images.mjs
         env:
           TEST_BASE_URL: http://127.0.0.1:4173/resume
@@ -75,18 +76,19 @@ jobs:
       - name: Upload visual evidence
         uses: actions/upload-artifact@v4
         with:
-          name: project-card-screenshots
+          name: project-visual-regression
           path: test-results/project-card-images
           retention-days: 14
 
-      - name: Commit captured project screenshots
+      - name: Commit refreshed demo captures
+        if: github.event_name == 'push'
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/components/ProjectsCatalog.tsx public/assets/projects/project-*-page-*.jpg
+          git add public/assets/projects/project-*-page-*.jpg
           if git diff --cached --quiet; then
             echo 'No screenshot changes to commit.'
             exit 0
           fi
-          git commit -m 'feat: use live subproject captures on project cards [skip project-capture]'
+          git commit -m 'chore: refresh live demo captures [skip project-capture]'
           git push origin HEAD:${GITHUB_REF_NAME}
