@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 
 const links = [
   { href: '#hero', label: '首页' },
-  { href: '#method', label: '方法' },
+  { href: '#evidence', label: '证据' },
   { href: '#projects', label: '项目' },
-  { href: '#career', label: '经历' },
+  { href: '#method', label: '方法' },
   { href: '#contact', label: '联系' },
 ];
 
@@ -28,7 +28,7 @@ export default function DockNav() {
 
   return (
     <nav
-      className="mobile-dock-nav fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-3 right-3 z-[900] flex justify-between gap-0.5 rounded-full border border-ink/10 bg-white/88 px-1.5 py-1.5 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-[opacity,visibility,transform] duration-300 md:hidden"
+      className="mobile-dock-nav fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-3 right-3 z-[900] flex max-w-[calc(100vw-1.5rem)] justify-between gap-0.5 overflow-hidden rounded-full border border-ink/10 bg-white/88 px-1.5 py-1.5 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-[opacity,visibility,transform] duration-300 md:hidden"
       aria-label="页面导航"
     >
       {links.map((link) => {
@@ -37,7 +37,8 @@ export default function DockNav() {
           <a
             key={link.href}
             href={link.href}
-            className={`flex-1 whitespace-nowrap rounded-full px-1.5 py-2 text-center font-display text-[0.58rem] font-semibold tracking-[0.06em] transition sm:text-[0.68rem] ${selected ? 'bg-accent text-white shadow-[0_8px_22px_rgba(37,99,235,0.25)]' : 'text-ink-dim hover:bg-accent-soft hover:text-accent'}`}
+            aria-current={selected ? 'page' : undefined}
+            className={`min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap rounded-full px-1.5 py-2 text-center font-display text-[0.58rem] font-semibold tracking-[0.06em] transition sm:text-[0.68rem] ${selected ? 'bg-accent text-white shadow-[0_8px_22px_rgba(37,99,235,0.25)]' : 'text-ink-dim hover:bg-accent-soft hover:text-accent'}`}
           >
             {link.label}
           </a>

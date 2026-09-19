@@ -1,19 +1,30 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Bot, ExternalLink, MessageCircle, Minimize2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const maxkbUrl = (import.meta.env.VITE_MAXKB_EMBED_URL || '').trim();
 
 export default function MaxKBChat() {
   const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusFrame = requestAnimationFrame(() => closeRef.current?.focus());
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpen(false);
     };
     document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      triggerRef.current?.focus();
+    };
   }, [open]);
 
   if (!maxkbUrl) return null;
@@ -21,19 +32,20 @@ export default function MaxKBChat() {
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
         className="group fixed bottom-24 right-4 z-[920] flex items-center gap-3 rounded-full border border-accent/15 bg-white/92 p-2 pr-4 text-left shadow-[0_18px_50px_rgba(15,23,42,0.16)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-accent/35 hover:shadow-[0_22px_58px_rgba(37,99,235,0.22)] md:bottom-6 md:right-6"
         aria-label="打开 MaxKB 智能问答"
         aria-expanded={open}
       >
-        <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-blue-700 via-accent to-accent-2 text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)]">
+        <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-accent text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)]">
           <MessageCircle className="h-5 w-5" strokeWidth={1.8} />
           <span className="absolute right-0 top-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500" />
         </span>
         <span className="hidden sm:block">
-          <span className="block text-xs font-semibold text-ink">问问我的 AI 助手</span>
-          <span className="mt-0.5 block text-[0.65rem] text-ink-dim">基于 MaxKB 与个人项目知识库</span>
+          <span className="block text-xs font-semibold text-ink">ASK MY AI</span>
+          <span className="mt-0.5 block text-[0.65rem] text-ink-dim">项目经历 · 技术方案 · 求职信息</span>
         </span>
       </button>
 
@@ -41,10 +53,11 @@ export default function MaxKBChat() {
         {open && (
           <motion.div
             className="fixed inset-0 z-[980] flex items-end justify-center bg-ink/20 p-0 backdrop-blur-[3px] sm:items-center sm:p-5"
-            initial={{ opacity: 0 }}
+            data-motion-dialog
+            initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            exit={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.2 }}
             role="dialog"
             aria-modal="true"
             aria-label="MaxKB 智能问答"
@@ -58,10 +71,10 @@ export default function MaxKBChat() {
 
             <motion.section
               className="relative flex h-[92svh] w-full max-w-[980px] flex-col overflow-hidden rounded-t-[28px] border border-ink/10 bg-white shadow-[0_32px_100px_rgba(15,23,42,0.24)] sm:h-[min(780px,88vh)] sm:rounded-[28px]"
-              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 28, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 28, scale: 0.98 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              exit={reduceMotion ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 28, scale: 0.98 }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
               <header className="flex items-center justify-between gap-4 border-b border-ink/8 bg-white px-4 py-3 sm:px-5">
                 <div className="flex min-w-0 items-center gap-3">
@@ -92,6 +105,7 @@ export default function MaxKBChat() {
                     <Minimize2 className="h-4 w-4" />
                   </button>
                   <button
+                    ref={closeRef}
                     type="button"
                     onClick={() => setOpen(false)}
                     className="flex h-9 w-9 items-center justify-center rounded-full text-ink-dim transition hover:bg-red-50 hover:text-red-600"

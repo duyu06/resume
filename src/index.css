@@ -10,7 +10,7 @@
   --color-accent-2: #0ea5e9;
   --color-accent-3: rgba(37, 99, 235, 0.18);
   --color-accent-soft: rgba(37, 99, 235, 0.09);
-  --font-display: "Orbitron", "Noto Sans SC", system-ui, sans-serif;
+  --font-display: "Noto Sans SC", system-ui, sans-serif;
   --font-body: "Noto Sans SC", system-ui, sans-serif;
   --font-mono: "Noto Sans SC", ui-monospace, "Cascadia Code", "Consolas", monospace;
 }
@@ -42,10 +42,7 @@
   }
 
   body {
-    background-image:
-      radial-gradient(circle at 12% 8%, rgba(37, 99, 235, 0.055), transparent 28rem),
-      radial-gradient(circle at 88% 22%, rgba(14, 165, 233, 0.045), transparent 24rem);
-    background-attachment: fixed;
+    background: var(--color-bg);
   }
 
   ::selection {
@@ -64,6 +61,11 @@
     border: none;
     background: none;
     color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
   }
 
   img {
@@ -174,31 +176,6 @@
   transform: scaleX(1);
 }
 
-#projects {
-  background: var(--color-surface) !important;
-  color: var(--color-ink) !important;
-  border-block: 1px solid rgba(15, 23, 42, 0.06);
-}
-
-#projects .text-white:not([class*="bg-black"]) {
-  color: var(--color-ink) !important;
-}
-
-#projects [class*="border-white"] {
-  border-color: rgba(15, 23, 42, 0.11) !important;
-}
-
-#projects [class*="bg-white/"] {
-  background-color: rgba(37, 99, 235, 0.045) !important;
-}
-
-#projects [class*="hover:text-white"]:hover {
-  color: var(--color-accent) !important;
-}
-
-#projects [class*="hover:border-white"]:hover {
-  border-color: rgba(37, 99, 235, 0.32) !important;
-}
 
 @media (prefers-reduced-motion: reduce) {
   html {

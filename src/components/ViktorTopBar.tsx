@@ -3,9 +3,10 @@ import ContactButton from './ContactButton';
 
 const links = [
   { href: '#hero', label: '首页' },
-  { href: '#method', label: '方法' },
+  { href: '#evidence', label: '证据' },
   { href: '#guoyang', label: '果漾' },
   { href: '#projects', label: '项目' },
+  { href: '#method', label: '方法' },
   { href: '#career', label: '经历' },
   { href: '#contact', label: '联系' },
 ];

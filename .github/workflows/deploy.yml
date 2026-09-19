@@ -48,6 +48,13 @@ jobs:
           cat /tmp/resume-preview.log
           exit 1
 
+      - name: Run portfolio acceptance suite
+        run: node scripts/portfolio-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          TEST_TARGET: local-preview
+          TEST_OUTPUT_DIR: test-results/portfolio-local
+
       - name: Run legacy deep adapter suite
         continue-on-error: true
         run: node scripts/full-e2e.mjs
@@ -83,6 +90,7 @@ jobs:
         with:
           name: full-e2e-local
           path: |
+            test-results/portfolio-local
             test-results/full-e2e-local
             test-results/all-demo-mode-local
             test-results/yola-review-local
@@ -136,6 +144,13 @@ jobs:
           done
           echo 'The expected commit revision was not published in time.'
           exit 1
+      - name: Run deployed portfolio acceptance suite
+        run: node scripts/portfolio-e2e.mjs
+        env:
+          TEST_BASE_URL: https://duyu06.github.io/resume
+          TEST_TARGET: github-pages
+          TEST_OUTPUT_DIR: test-results/portfolio-live
+
       - name: Run legacy deployed adapter suite
         continue-on-error: true
         run: node scripts/full-e2e.mjs
@@ -167,6 +182,7 @@ jobs:
         with:
           name: full-e2e-live
           path: |
+            test-results/portfolio-live
             test-results/full-e2e-live
             test-results/all-demo-mode-live
             test-results/yola-review-live
@@ -181,7 +197,7 @@ jobs:
         run: |
           if [[ "$LIVE_JOB_STATUS" == "success" ]]; then
             state=success
-            description='All live demo scenarios, YOLA regressions, and mobile UI checks passed'
+            description='Portfolio and all live demo acceptance checks passed'
           else
             state=failure
             description='Live project demo acceptance failed'

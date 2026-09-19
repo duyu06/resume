@@ -2,6 +2,32 @@
 
 基于 React、TypeScript、Vite、Tailwind CSS 和 Framer Motion 构建的个人简历与项目作品集网站。
 
+## 作品集信息架构
+
+主站不再使用“简历卡片墙”作为核心呈现方式，而是按 AI 产品交付过程组织：
+
+1. **Hero Story**：我把 AI 从 Demo 推进到产品
+2. **Evidence**：用数据与交付指标证明能力
+3. **Guoyang Case Study**：用果漾 AI 展示完整多模态产品链路
+4. **Selected Systems**：聚焦最能证明业务、模型、工程和交付能力的项目
+5. **Product Method**：Problem → Scope → Model → Product → Engineering → Delivery → Iterate
+6. **Experience / Education**
+7. **Closing CTA / AI Resume Assistant**
+
+滚动叙事由 Framer Motion + CSS sticky 驱动。移动端自动取消复杂 pinned 行为，`prefers-reduced-motion` 用户直接获得完整静态内容。
+
+## 质量门禁
+
+Pull Request 会执行：
+
+- TypeScript + Vite production build
+- 已发布链接检查
+- 桌面 / 移动数字人工作台验收
+- 主作品集与各 Demo 的 Playwright E2E
+- 移动端 Demo UI 回归
+- 生产预览启动验证
+
+
 ## 本地运行
 
 ```bash
