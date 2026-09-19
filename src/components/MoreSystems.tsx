@@ -60,6 +60,7 @@ export default function MoreSystems() {
 
       <button
         ref={triggerRef}
+        data-project-system="more"
         type="button"
         onClick={show}
         className="group grid w-full gap-4 border border-white/12 bg-white/[0.025] p-3 text-left transition hover:border-blue-300/45 hover:bg-white/[0.045] sm:grid-cols-[180px_1fr_auto] sm:items-center sm:p-4"
