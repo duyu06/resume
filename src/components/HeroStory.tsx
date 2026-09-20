@@ -71,10 +71,10 @@ export default function HeroStory() {
                 把模型能力变成可使用、可评测、可追踪的产品能力。
               </p>
               <a
-                href="#evidence"
+                href="#snapshot"
                 className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-ink transition hover:text-accent"
               >
-                EXPLORE MY WORK
+                60 SEC BRIEF
                 <span aria-hidden>↓</span>
               </a>
             </div>
