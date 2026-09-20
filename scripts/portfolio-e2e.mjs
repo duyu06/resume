@@ -57,9 +57,25 @@ async function runCase(browser, testCase) {
       assert(heroText?.includes(text), `Hero positioning missing: ${text}`);
     }
 
-    for (const selector of ['#evidence', '#guoyang', '#projects', '#method', '#career', '#contact']) {
+    for (const selector of ['#snapshot', '#evidence', '#guoyang', '#projects', '#method', '#career', '#contact']) {
       assert((await page.locator(selector).count()) === 1, `Required section missing: ${selector}`);
     }
+
+    const snapshotText = await page.locator('#snapshot').textContent();
+    for (const marker of ['60-SECOND BRIEF', 'AI 产品经理', '业务问题', '7,328', '50+ token/s']) {
+      assert(snapshotText?.includes(marker), `Recruiter snapshot missing: ${marker}`);
+    }
+    const snapshotProjectHref = await page.locator('#snapshot a').filter({ hasText: '看代表项目' }).getAttribute('href');
+    assert(snapshotProjectHref === '#guoyang', `Recruiter snapshot project CTA is incorrect: ${snapshotProjectHref}`);
+
+    const structuredData = await page.locator('script[type="application/ld+json"]').textContent();
+    const schema = JSON.parse(structuredData || '{}');
+    const graph = Array.isArray(schema['@graph']) ? schema['@graph'] : [];
+    const person = graph.find((item) => item['@type'] === 'Person');
+    const website = graph.find((item) => item['@type'] === 'WebSite');
+    assert(person?.name === '张滨文', 'Structured data is missing the portfolio owner');
+    assert(Array.isArray(person?.jobTitle) && person.jobTitle.includes('AI 产品经理'), 'Structured data is missing AI product role');
+    assert(website?.inLanguage === 'zh-CN', 'Structured data is missing website language');
 
     const visualImages = page.locator('#guoyang img, #projects img');
     const visualImageCount = await visualImages.count();
@@ -85,6 +101,15 @@ async function runCase(browser, testCase) {
     for (const marker of ['1W+ → 7,328', '4h → 20min', '50+', '26']) {
       assert(evidenceText?.includes(marker), `Evidence marker missing: ${marker}`);
     }
+    const relatedCaseLinks = page.locator('#evidence a[href="#project-03"]');
+    assert((await relatedCaseLinks.count()) === 2, 'Model evidence should deep-link to the digital-human fine-tuning case');
+    assert((await page.locator('#project-03').count()) === 1, 'Evidence target #project-03 is missing');
+
+    const socialPreview = await page.locator('meta[property="og:image"]').getAttribute('content');
+    assert(
+      socialPreview === 'https://duyu06.github.io/resume/og-cover.jpg',
+      `Open Graph preview must use an absolute URL: ${socialPreview}`,
+    );
 
     const selectedProjects = [
       ['果漾 AI', 'https://guoyang.xin/'],

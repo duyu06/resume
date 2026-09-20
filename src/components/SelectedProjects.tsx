@@ -73,6 +73,7 @@ export default function SelectedProjects() {
             return (
               <motion.a
                 key={project.n}
+                id={`project-${project.n}`}
                 data-project-system={project.n}
                 href={project.link}
                 target={external ? '_blank' : undefined}
