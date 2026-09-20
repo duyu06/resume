@@ -101,6 +101,15 @@ async function runCase(browser, testCase) {
     for (const marker of ['1W+ → 7,328', '4h → 20min', '50+', '26']) {
       assert(evidenceText?.includes(marker), `Evidence marker missing: ${marker}`);
     }
+    const relatedCaseLinks = page.locator('#evidence a[href="#project-03"]');
+    assert((await relatedCaseLinks.count()) === 2, 'Model evidence should deep-link to the digital-human fine-tuning case');
+    assert((await page.locator('#project-03').count()) === 1, 'Evidence target #project-03 is missing');
+
+    const socialPreview = await page.locator('meta[property="og:image"]').getAttribute('content');
+    assert(
+      socialPreview === 'https://duyu06.github.io/resume/og-cover.jpg',
+      `Open Graph preview must use an absolute URL: ${socialPreview}`,
+    );
 
     const selectedProjects = [
       ['果漾 AI', 'https://guoyang.xin/'],
