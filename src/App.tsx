@@ -1,6 +1,7 @@
 import ViktorTopBar from './components/ViktorTopBar';
 import DockNav from './components/DockNav';
 import HeroStory from './components/HeroStory';
+import RecruiterSnapshot from './components/RecruiterSnapshot';
 import Evidence from './components/Evidence';
 import GuoyangCaseStudy from './components/GuoyangCaseStudy';
 import SelectedProjects from './components/SelectedProjects';
@@ -23,6 +24,7 @@ export default function App() {
       <ViktorTopBar />
       <main id="main-content" className="overflow-x-clip bg-bg" tabIndex={-1}>
         <HeroStory />
+        <RecruiterSnapshot />
         <Evidence />
         <GuoyangCaseStudy />
         <SelectedProjects />
