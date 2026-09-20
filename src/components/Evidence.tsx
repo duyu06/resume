@@ -10,7 +10,7 @@ const evidence = [
     label: '原始数据 → 有效训练数据',
     source: '数字人风格对话模型微调',
     detail: '完成清洗、去重、标注与 JSONL 训练集构建。',
-    href: '#projects',
+    href: '#project-03',
     linkLabel: 'RELATED CASE',
   },
   {
@@ -37,7 +37,7 @@ const evidence = [
     label: '标准测试 Prompt',
     source: '数字人模型评测体系',
     detail: '建立 25 分制五维评分卡，让模型版本具备可比较的评测基础。',
-    href: '#projects',
+    href: '#project-03',
     linkLabel: 'RELATED CASE',
   },
 ];
