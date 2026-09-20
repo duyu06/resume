@@ -1,4 +1,7 @@
+import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+
+const BASE = import.meta.env.BASE_URL;
 
 const evidence = [
   {
@@ -7,6 +10,8 @@ const evidence = [
     label: '原始数据 → 有效训练数据',
     source: '数字人风格对话模型微调',
     detail: '完成清洗、去重、标注与 JSONL 训练集构建。',
+    href: '#projects',
+    linkLabel: 'RELATED CASE',
   },
   {
     index: '02',
@@ -14,6 +19,8 @@ const evidence = [
     label: '模型平台单次部署时间',
     source: 'Open WebUI / 本地模型平台',
     detail: '通过 Docker Compose 标准化依赖、配置与部署流程。',
+    href: BASE + 'online-resume/',
+    linkLabel: 'VIEW DETAILS',
   },
   {
     index: '03',
@@ -21,6 +28,8 @@ const evidence = [
     label: 'token/s 典型本地推理吞吐',
     source: '本地推理与监控实践',
     detail: '结合 GPU、显存、服务状态与 Token 吞吐建立监控链路。',
+    href: BASE + 'online-resume/',
+    linkLabel: 'VIEW DETAILS',
   },
   {
     index: '04',
@@ -28,6 +37,8 @@ const evidence = [
     label: '标准测试 Prompt',
     source: '数字人模型评测体系',
     detail: '建立 25 分制五维评分卡，让模型版本具备可比较的评测基础。',
+    href: '#projects',
+    linkLabel: 'RELATED CASE',
   },
 ];
 
@@ -74,6 +85,13 @@ export default function Evidence() {
               <div className="max-w-xl md:justify-self-end">
                 <p className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-accent/80">{item.source}</p>
                 <p className="mt-2 text-sm leading-6 text-ink-dim">{item.detail}</p>
+                <a
+                  href={item.href}
+                  className="mt-3 inline-flex items-center gap-1.5 font-mono text-[0.56rem] uppercase tracking-[0.16em] text-ink/42 transition hover:text-accent"
+                >
+                  {item.linkLabel}
+                  <ArrowUpRight size={12} />
+                </a>
               </div>
             </motion.article>
           ))}
