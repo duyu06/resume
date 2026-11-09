@@ -11,6 +11,7 @@ import EducationSection from './components/EducationSection';
 import ClosingCTA from './components/ClosingCTA';
 import MaxKBChat from './components/MaxKBChat';
 import Footer from './components/Footer';
+import RecentPractice from './components/RecentPractice';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Evidence />
         <GuoyangCaseStudy />
         <SelectedProjects />
+        <RecentPractice />
         <ProductMethod />
         <CareerTimeline />
         <EducationSection />

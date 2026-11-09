@@ -15,7 +15,7 @@ export default function HeroSection() {
       <LayeredIntelligence />
       <FadeIn delay={0} y={-20} className="relative z-30 flex flex-col items-start gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="font-display text-sm font-extrabold tracking-wide text-ink sm:text-base md:text-lg">ZHANG<span className="text-accent">.</span>BINWEN</div>
-        <div className="glass inline-flex max-w-full items-center gap-2 rounded-full px-3 py-2 text-[0.65rem] leading-relaxed tracking-wide text-ink-dim sm:whitespace-nowrap sm:text-[0.72rem]"><span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#22c55e] shadow-[0_0_12px_rgba(34,197,94,0.65)]" /><span>AI 产品经理 · 2026 届毕业生 · 现居长沙</span></div>
+        <div className="glass inline-flex max-w-full items-center gap-2 rounded-full px-3 py-2 text-[0.65rem] leading-relaxed tracking-wide text-ink-dim sm:whitespace-nowrap sm:text-[0.72rem]"><span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#22c55e] shadow-[0_0_12px_rgba(34,197,94,0.65)]" /><span>AI 产品经理 · 2026 届毕业生 · 现居广州</span></div>
       </FadeIn>
       <div className="relative z-20 flex flex-1 flex-col items-center justify-center gap-4 py-10 text-center">
         <FadeIn delay={0.12} y={18} className="mb-1"><span className="rounded-full border border-accent/15 bg-white/65 px-3 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-accent shadow-[0_8px_24px_rgba(37,99,235,0.05)] backdrop-blur-xl sm:text-[0.68rem]">AI PRODUCT · BUSINESS × MODEL × ENGINEERING</span></FadeIn>

@@ -4,7 +4,7 @@ const BASE = import.meta.env.BASE_URL;
 
 const actions = [
   { label: 'ONLINE RESUME', href: BASE + 'online-resume/', icon: FileText, external: false },
-  { label: 'PDF RESUME', href: BASE + 'resume.pdf', icon: Download, external: false },
+  { label: 'PDF · 历史版本', href: BASE + 'resume.pdf', icon: Download, external: false },
   { label: 'GITHUB', href: 'https://github.com/duyu06', icon: Code, external: true },
   { label: 'EMAIL', href: 'mailto:3245485135@qq.com', icon: Mail, external: false },
 ];
@@ -41,7 +41,7 @@ export default function ClosingCTA() {
                 href={href}
                 target={external ? '_blank' : undefined}
                 rel={external ? 'noopener noreferrer' : undefined}
-                download={label === 'PDF RESUME' ? true : undefined}
+                download={label === 'PDF · 历史版本' ? true : undefined}
                 className="group flex min-h-16 items-center justify-between bg-bg px-4 py-4 text-xs font-semibold tracking-[0.12em] text-ink transition hover:bg-accent hover:text-white"
               >
                 <span className="flex items-center gap-3">
