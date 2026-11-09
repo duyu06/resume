@@ -1,0 +1,145 @@
+name: RTY798 Digitalhuman Demo E2E
+
+on:
+  push:
+    branches:
+      - test/ai-customer-service-agent-e2e
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/rty798-*.mjs'
+      - '.github/workflows/rty798-digitalhuman-e2e.yml'
+      - 'public/demos/digitalhuman/**'
+      - 'public/demos/demo-mode.js'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rty798-digitalhuman-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  upstream-and-demo-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout portfolio
+        uses: actions/checkout@v4
+
+      - name: Checkout RTY798 upstream
+        uses: actions/checkout@v4
+        with:
+          repository: RTY798/ai-customer-service-agent
+          ref: master
+          path: vendor/ai-customer-service-agent
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: vendor/ai-customer-service-agent/backend/requirements.txt
+
+      - name: Install portfolio dependencies
+        run: npm ci
+
+      - name: Build portfolio
+        run: npm run build
+
+      - name: Install upstream dependencies
+        run: python -m pip install -r vendor/ai-customer-service-agent/backend/requirements.txt
+
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Start deterministic LLM stub
+        run: |
+          node scripts/rty798-openai-stub.mjs > /tmp/rty798-llm-stub.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:9001/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/rty798-llm-stub.log
+          exit 1
+
+      - name: Start RTY798 FastAPI backend
+        run: |
+          (
+            cd vendor/ai-customer-service-agent/backend
+            LLM_API_KEY=e2e-test-key \
+            LLM_BASE_URL=http://127.0.0.1:9001/v1 \
+            LLM_MODEL=rty798-e2e-stub \
+            DATA_PROVIDER=demo \
+            python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+          ) > /tmp/rty798-upstream.log 2>&1 &
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:8000/api/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/rty798-upstream.log
+          exit 1
+
+      - name: Start compatibility adapter
+        run: |
+          RTY798_UPSTREAM_URL=http://127.0.0.1:8000 \
+          node scripts/rty798-agent-adapter.mjs > /tmp/rty798-adapter.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8787/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/rty798-adapter.log
+          exit 1
+
+      - name: Start portfolio preview
+        run: |
+          npm run preview -- --host 127.0.0.1 > /tmp/rty798-portfolio-preview.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/resume/demos/digitalhuman/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/rty798-portfolio-preview.log
+          exit 1
+
+      - name: Run upstream API and guided demo E2E
+        run: node scripts/rty798-digitalhuman-e2e.mjs
+        env:
+          TEST_BASE_URL: http://127.0.0.1:4173/resume
+          RTY798_UPSTREAM_URL: http://127.0.0.1:8000
+          RTY798_ADAPTER_URL: http://127.0.0.1:8787
+          TEST_OUTPUT_DIR: test-results/rty798-digitalhuman
+
+      - name: Collect service logs
+        if: always()
+        run: |
+          mkdir -p test-results/rty798-digitalhuman/logs
+          cp /tmp/rty798-llm-stub.log test-results/rty798-digitalhuman/logs/llm-stub.log || true
+          cp /tmp/rty798-upstream.log test-results/rty798-digitalhuman/logs/upstream.log || true
+          cp /tmp/rty798-adapter.log test-results/rty798-digitalhuman/logs/adapter.log || true
+          cp /tmp/rty798-portfolio-preview.log test-results/rty798-digitalhuman/logs/portfolio-preview.log || true
+
+      - name: Upload RTY798 demo evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rty798-digitalhuman-e2e
+          path: test-results/rty798-digitalhuman
+          if-no-files-found: error
+          retention-days: 14
