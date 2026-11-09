@@ -101,9 +101,9 @@
 
 <div class="toolbar">
   <a href="../">← 返回作品集</a>
-  <span class="hint">按 Ctrl / Cmd + P 可直接打印或另存为 PDF</span>
+  <span class="hint">本页已更新 eBay 项目；按 Ctrl / Cmd + P 可打印或另存新版 PDF</span>
   <span style="display:flex;gap:10px">
-    <a class="primary" href="../resume.pdf" download>下载 PDF 版</a>
+    <a class="primary" href="../resume.pdf" download>下载历史 PDF</a>
     <button type="button" onclick="window.print()">打印 / 存为 PDF</button>
   </span>
 </div>
@@ -138,6 +138,19 @@
   </div>
 
   <h2>项目经历</h2>
+
+  <div class="item" id="ebay-listing-project">
+    <div class="item-head"><h3>eBay 自动刊登工作台</h3><span class="when">2026.10 - 2026.11</span></div>
+    <p class="sub">基于 Vibe Seller 的二次开发 · 项目实践</p>
+    <ul>
+      <li>使用 Python / FastAPI / SQLAlchemy / SQLite 与 React / TypeScript，串联 CSV/XLSX 导入、草稿编辑、人工审核、队列执行和刊登结果回读。</li>
+      <li>集成 eBay MCP/Trading 通道，完善图片顺序、商品属性、议价及 Compatibility 字段；通过账号/环境/SKU 排他锁、持久操作记录和失败回读控制重复刊登，未知写入结果不盲目重试。</li>
+      <li>2026-11-03 完成一款已授权单 SKU 固定价商品的 Production 发布、完整 GetItem 回读和后续 End/Ended 下架验证；依据既有本地验收记录，本次简历更新未再次操作真实店铺。</li>
+      <li>范围边界：并非全自动批量上架已上线。多店批量、全品类、无人值守、买家页面和搜索收录、当前在线可用性尚未核实；另一路 Inventory API 仅有本地安全模式验证，不能等同于真实 Sandbox 刊登通过。</li>
+    </ul>
+    <div class="tags"><span>eBay MCP / Trading</span><span>状态机</span><span>幂等与并发</span><span>API 集成</span><span>二次开发</span></div>
+  </div>
+
 
   <div class="item">
     <div class="item-head"><h3>果漾 AI · 多模态内容生产平台</h3><span class="when">持续迭代</span></div>

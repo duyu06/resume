@@ -169,7 +169,7 @@ for (const path of runtimeCopyFiles) {
   }
 }
 
-const deploymentRevision = process.env.GITHUB_SHA || 'local-build';
+const deploymentRevision = process.env.GITHUB_SHA || process.env.RENDER_GIT_COMMIT || 'local-build';
 await writeFile('dist/deploy-revision.txt', `${deploymentRevision}\n`, 'utf8');
 
 console.log(`Patched ${stylesheets.length} static demo stylesheets, audited ${runtimeCopyFiles.length} runtime scripts, themed ${demoIndexes.length} demo pages, and wrote revision ${deploymentRevision}.`);
